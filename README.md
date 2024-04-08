@@ -39,5 +39,15 @@ educativa en línea.
 
 ## Modelo Entidad-Relación
 
+| Entidad   | Atributos                                      |
+|-----------|------------------------------------------------|
+| Usuario   | UsuarioID, Nombre, Correo, Contraseña          |
+| listadoClase  | ClaseID, UsuarioID |
+| Clase     | ClaseID, Nombre, Descripcion |
+| Rol       | RolID, Nombre |
+| Tarea     | TareaID, Titulo, Descripcion, Fecha_Entrega, Nota, Id_Clase, Id_Alumno |
+| Anuncios  | AnuncioID,, Contenido, Fecha, Profesor_id |
+
+
 ![Modelo E/R](docs/img/ModeloEntidadRelacion.jpg)
 
