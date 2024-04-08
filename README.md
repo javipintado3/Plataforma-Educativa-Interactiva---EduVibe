@@ -58,5 +58,7 @@ educativa en línea.
 - Relación entre Clase y Tarea: una clase tiene muchas tareas, pero una tarea solo tiene una clase.
 - Relación entre Usuario y Tarea: un usuario tiene una o muchas tareas, pero una tarea esta asignada solo a ese usuario.
 
+#### Imagen del Modelo E/R
+
 ![Modelo E/R](docs/img/ModeloEntidadRelacion.jpg)
 
