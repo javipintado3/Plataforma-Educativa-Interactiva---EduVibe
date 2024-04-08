@@ -48,7 +48,7 @@ educativa en línea.
 | Clase     | ClaseID, Nombre, Descripcion |
 | Rol       | RolID, Nombre |
 | Tarea     | TareaID, Titulo, Descripcion, Fecha_Entrega, Nota, ClaseID, UsuarioID |
-| Anuncios  | AnuncioID,, Contenido, Fecha, UsuarioID |
+| Anuncios  | AnuncioID, Contenido, Fecha, UsuarioID |
 
 #### Relaciones
 
