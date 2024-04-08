@@ -37,3 +37,7 @@ educativa en línea.
 - docs
 - README.md
 
+## Modelo Entidad-Relación
+
+![Modelo E/R](docs/img/ModeloEntidadRelacion.jpg)
+
