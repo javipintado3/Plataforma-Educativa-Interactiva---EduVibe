@@ -31,10 +31,10 @@ public class Clase {
 
     @OneToOne
     @JoinColumn(name = "profesor_id", referencedColumnName = "id")
-    private Usuario profesor;
+    private User profesor;
 
     @OneToMany(mappedBy = "clase")
-    private List<Usuario> alumnos;
+    private List<User> alumnos;
 
   
 }
