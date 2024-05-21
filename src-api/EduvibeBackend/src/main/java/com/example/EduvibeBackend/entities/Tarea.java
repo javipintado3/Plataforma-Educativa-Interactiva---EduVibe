@@ -22,6 +22,7 @@ public class Tarea {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idTarea;
 
+    private String nombreTarea;
     private String enunciado;
     private Date fechaApertura;
     private Boolean estado;

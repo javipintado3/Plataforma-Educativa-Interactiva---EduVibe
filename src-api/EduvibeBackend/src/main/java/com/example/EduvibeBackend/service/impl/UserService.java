@@ -37,9 +37,13 @@ public class UserService implements UserDetailsService {
 	}
 
 	public User registroUsuario(RegistroUserDto userDto) {
-		boolean emailCorrecto = userDto.email().toLowerCase().contains("@eviden.com");
-		String das = userDto.das();
-		String expresion = "A\\d{6}";
+	
+		
+		// Verificar que el email termine en "@vibe.com"
+        if (!userDto.email().toLowerCase().endsWith("@vibe.com")) {
+            throw new GlobalException("El email debe terminar en '@vibe.com'");
+        }
+	
 
 		if (userRepository.existsByEmailIgnoreCase(userDto.email())) {
 			throw new GlobalException("El email ya ha sido registrado");
