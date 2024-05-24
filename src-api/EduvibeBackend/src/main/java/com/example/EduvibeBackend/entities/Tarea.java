@@ -1,7 +1,6 @@
 package com.example.EduvibeBackend.entities;
 
-import java.sql.Date;
-import java.util.List;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,13 +24,16 @@ public class Tarea {
 
     private String nombreTarea;
     private String enunciado;
-    private Date fechaApertura;
+    private LocalDate fechaApertura; // Cambiado de Date a LocalDate
     private Boolean estado;
     private Double calificacion;
 
     @ManyToOne
     @JoinColumn(name = "id_clase")
     private Clase clase;
-
-    // Getters and Setters
+    
+    @PrePersist
+    protected void onCreate() {
+        this.fechaApertura = LocalDate.now();
+    }
 }
