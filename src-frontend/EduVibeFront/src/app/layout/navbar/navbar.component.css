@@ -1,0 +1,13 @@
+.navbar-nav .nav-link {
+    font-weight: bold;
+    margin-right: 15px;
+  }
+  
+  .navbar-nav .nav-link.active {
+    color: #000;
+  }
+  
+  .navbar-nav .nav-link i {
+    font-size: 1.2rem;
+  }
+  
