@@ -13,4 +13,11 @@
   footer a:hover {
     text-decoration: underline;
   }
+
+  footer {
+    position: absolute; /* o 'absolute' dependiendo del caso */
+    bottom: 0;
+    width: 100%;
+  }
+  
   

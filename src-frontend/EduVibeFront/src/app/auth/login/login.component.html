@@ -1,0 +1,36 @@
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="RegisterContainer">
+                <div class="RegisterCard">
+                    <h2 class="card-title text-center mt-3">Inicio Sesión</h2>
+                    <form method="post" class="card-body">
+
+                        <!-- Campo Email -->
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" class="form-control" name="correo" id="correo"
+                                [(ngModel)]="loginRequest.email" required pattern="[^@\s]+@eviden\.com">
+                        </div><br>
+
+                        <!-- Campo Contraseñas -->
+                        <div class="form-group">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" name="contraseña" id="contraseña"
+                                [(ngModel)]="loginRequest.password" required minlength="8">
+                        </div><br>
+
+
+                        <!-- Botón de Login -->
+                        <div class="form-group d-flex justify-content-center">
+                            <button type="submit" class="boton" id="botonLogin" (click)="login()">Iniciar
+                                Sesion</button>
+                        </div>
+
+                        <br>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
