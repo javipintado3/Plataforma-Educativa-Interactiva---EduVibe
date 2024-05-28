@@ -6,6 +6,9 @@ import { InicioComponent } from './home/inicio/inicio.component';
 import { adminGuard } from './guardians/admin.guard';
 import { alumnoGuard } from './guardians/alumno.guard';
 import { profesorGuard } from './guardians/profesor.guard';
+import { RenewComponent } from './renew/renew.component';
+import { loginGuard } from './guardians/login.guard';
+import { CalendarioComponent } from './home/calendario/calendario.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -14,7 +17,17 @@ export const routes: Routes = [
   { 
     path: 'inicio', 
     component: InicioComponent, 
-    
+    canActivate: [loginGuard] 
+  },
+  { 
+    path: 'calendario', 
+    component: CalendarioComponent, 
+    canActivate: [loginGuard] 
+  },
+  { 
+    path: "renew", 
+    component: RenewComponent, 
+    canActivate: [loginGuard]
   },
 ];
 
@@ -23,5 +36,3 @@ export const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
-
-

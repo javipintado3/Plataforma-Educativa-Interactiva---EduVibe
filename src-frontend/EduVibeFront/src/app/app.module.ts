@@ -13,6 +13,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { InicioComponent } from './home/inicio/inicio.component';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { CalendarioComponent } from './home/calendario/calendario.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
     RegistroComponent,
     LoginComponent,
     InicioComponent,
+    CalendarioComponent,
     
   ],
   imports: [
