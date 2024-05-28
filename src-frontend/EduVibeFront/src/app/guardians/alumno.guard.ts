@@ -7,6 +7,6 @@ export const alumnoGuard: CanActivateFn = (route, state) => {
   const router = inject(Router)
 
   // Si el token no es admin nos manda al login
-  return authservice.getUserData().role=="alumno"? true : router.navigateByUrl("/login");
+  return authservice.getUserData().rol=="alumno"? true : router.navigateByUrl("/login");
 
 };

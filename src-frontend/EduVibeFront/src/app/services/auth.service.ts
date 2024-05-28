@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { LoginRequest } from '../request/loginRequest';
 import { UserResp } from '../interfaces/userResp';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { useAnimation } from '@angular/animations';
 
 @Injectable({
@@ -15,7 +15,8 @@ import { useAnimation } from '@angular/animations';
 export class AuthService {
   private apiUrl = 'http://localhost:9090';
   private isAuthenticated$: BehaviorSubject<boolean>;
-  name = ""
+  name = "";
+  rol = ""; // Cambio 'role' por 'rol'
 
   constructor(private http: HttpClient, private router: Router) {
     this.isAuthenticated$ = new BehaviorSubject<boolean>(this.isAuthenticated());
@@ -33,6 +34,7 @@ export class AuthService {
             localStorage.setItem('token', response.token);
             const decodedToken: any = jwtDecode(response.token);
             localStorage.setItem('name', decodedToken.name); // Almacena el nombre de usuario
+            localStorage.setItem('rol', decodedToken.rol); // Almacena el rol
           }
           this.isAuthenticated$.next(true);
           // Mostrar alerta exitosa
@@ -96,34 +98,52 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/renew`);
   }
 
-  /*
-  minutosRestantes(): number {
-    let minutosRestantes = -1;
-    if (this.isLocalStorageAvailable() && localStorage.getItem("token")) {
-      const expiracion: number = jwtDecode(localStorage.getItem("token") || "").exp as any;
-      const dateExp = new Date(expiracion * 1000);
-      const now = new Date();
-      if (((dateExp.getTime() - now.getTime()) / (1000 * 60)) > 0) {
-        minutosRestantes = Math.abs(dateExp.getTime() - now.getTime()) / (1000 * 60);
-      }
-    }
-    return minutosRestantes;
-  }
-  */
-
   ifAdmin(): boolean {
-    return (this.getUserData()?.role=="admin")? true:false
+    return (this.getUserData()?.rol == "admin") ? true : false; // Cambio 'role' por 'rol'
+  }
+  ifAlumno(): boolean {
+    return (this.getUserData()?.rol == "alumno") ? true : false; // Cambio 'role' por 'rol'
+  }
+  ifProfesor(): boolean {
+    return (this.getUserData()?.rol == "profesor") ? true : false; // Cambio 'role' por 'rol'
   }
 
   getUserData() {
-    let token:string = localStorage.getItem("token") as any;
-    const {name, role} = jwtDecode(token) as any
+    let token: string = localStorage.getItem("token") as any;
+    const { name, rol } = jwtDecode(token) as any;
     return {
       nombre: name,
-      role: role
+      rol: rol // Cambio 'role' por 'rol'
+    };
+
+  }
+
+  //metodo para calcular los minutos restantes del token
+  minutosRestantes(){
+    //creamos la variable
+    let minutosRestantes = -1
+    //si hay token en el localstorage entocnes entra
+    if(localStorage.getItem("token")){
+      //sacamos los milisegundos del token
+      let expiracion:number = jwtDecode((localStorage.getItem("token") || "") ).exp as any
+      //lo seteamos en una nueva fecha
+      let dateExp = new Date(expiracion*1000)
+      //creamos una fecha de hoy
+      let now = new Date()
+      //si el tiempo que hay de diferencia en minutos es mayor que 0 entra
+      if(((dateExp.getTime()-now.getTime())/(1000*60))>0){
+        //sacamos el valor absoluto entre la fecha de expiracion y hoy, en minutos
+        minutosRestantes = Math.abs(dateExp.getTime()-now.getTime())/(1000*60)
+      }else{
+        //si no pues seguimos dejando la variable por defecto
+        minutosRestantes = -1
+      }
+      console.log(minutosRestantes)
     }
-    
+    // devolvemos los minutos
+    return minutosRestantes
   }
   
-  
+
+
 }

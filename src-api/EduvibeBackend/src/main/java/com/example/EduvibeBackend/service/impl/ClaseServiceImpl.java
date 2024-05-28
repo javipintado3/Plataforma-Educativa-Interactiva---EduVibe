@@ -21,6 +21,7 @@ public class ClaseServiceImpl implements ClaseService {
     @Override
     public ClaseDto crearClase(ClaseDto claseDto) {
         Clase clase = new Clase();
+        
         clase.setNombre(claseDto.getNombre());
         clase.setDescripcion(claseDto.getDescripcion());
         Clase nuevaClase = claseRepository.save(clase);

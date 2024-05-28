@@ -53,7 +53,7 @@ public class TokenUtils {
 		 */
 		
 		
-		public static String generateToken(String username, String name, String role) {
+		public static String generateToken(String username, String name, String rol) {
 
 			// Establecemos la fecha de expiración del token en milisegundos
 			Date expirationDate = new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDATY_SECONDS * 1000);
@@ -64,7 +64,7 @@ public class TokenUtils {
 			// subject.
 			Map<String, Object> extra = new HashMap<>();
 			extra.put("name", name);
-			extra.put("role", role);
+			extra.put("rol", rol);
 
 			// Construimos el token con el nombre del usuario, la fecha de expiración, la
 			// información
@@ -127,9 +127,9 @@ public class TokenUtils {
 
 			
 			String username = claims.getSubject();
-			String role = (String) claims.get("role");
+			String rol = (String) claims.get("rol");
 			List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-			authorities.add(new SimpleGrantedAuthority(role));
+			authorities.add(new SimpleGrantedAuthority(rol));
 
 			return new UsernamePasswordAuthenticationToken(username, null, authorities);
 

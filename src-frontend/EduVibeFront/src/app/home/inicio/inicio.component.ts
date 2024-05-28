@@ -10,6 +10,7 @@ import { ClaseService } from '../../services/clase.service';
 export class InicioComponent {
 
   clases: ClaseDto[] = [];
+  p: number = 1;
 
   constructor(private claseService: ClaseService) { }
 

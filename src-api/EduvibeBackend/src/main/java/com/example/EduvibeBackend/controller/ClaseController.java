@@ -54,7 +54,7 @@ public class ClaseController {
 
     // Obtener todas las clases
     @GetMapping("/todos")
-    public ResponseEntity<List<ClaseDto>> obtenerTodasLasClases() {
+    public ResponseEntity<List<ClaseDto>> obtenerTodasLasClases(@RequestHeader("Authorization") String token) {
         List<ClaseDto> clases = claseService.obtenerTodasLasClases();
         return ResponseEntity.ok(clases);
     }
