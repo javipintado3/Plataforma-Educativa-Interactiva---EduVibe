@@ -10,7 +10,8 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { RegistroComponent } from './auth/registro/registro.component';
 import { LoginComponent } from './auth/login/login.component';
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { InicioComponent } from './home/inicio/inicio.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { LoginComponent } from './auth/login/login.component';
     FooterComponent,
     RegistroComponent,
     LoginComponent,
+    InicioComponent,
     
   ],
   imports: [
@@ -27,7 +29,8 @@ import { LoginComponent } from './auth/login/login.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    HttpClientModule
+    HttpClientModule,
+    FontAwesomeModule
   ],
   providers: [
     provideHttpClient(

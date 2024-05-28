@@ -1,13 +1,36 @@
-.navbar-nav .nav-link {
-    font-weight: bold;
-    margin-right: 15px;
-  }
-  
-  .navbar-nav .nav-link.active {
-    color: #000;
-  }
-  
-  .navbar-nav .nav-link i {
-    font-size: 1.2rem;
-  }
-  
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+
+.navbar-divider {
+  height: 40px;
+  width: 2px;
+  background-color: black;
+  margin-right: 15px;
+}
+
+.nav-link {
+  font-weight: bold;
+  margin-right: 10px; /* Reduce el margen entre enlaces */
+  font-size: 1.4rem; /* Aumenta el tamaño de fuente */
+}
+
+.navbar-nav .icon {
+  color: #2D9596;
+}
+
+.navbar-nav .nav-link i {
+  font-size: 1.8rem; /* Aumenta el tamaño de los iconos */
+  margin-right: 10px;
+}
+
+.navbar-nav .nav-item img {
+  height: 35px; /* Aumenta el tamaño de la imagen de perfil */
+  margin-right: 10px;
+}
+
+.navbar-nav.ml-auto {
+  margin-left: auto; /* Alinea los elementos de la derecha */
+}

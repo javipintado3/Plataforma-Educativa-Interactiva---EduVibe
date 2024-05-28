@@ -59,7 +59,7 @@ public class SecurityConfig {
 	        .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
 	        .authorizeHttpRequests((requests) -> {
 			requests
-				.requestMatchers("/registeruser").hasAuthority("admin")
+				.requestMatchers("/registeruser").permitAll()
 				.requestMatchers("/loginuser").permitAll()
 				.requestMatchers("/validate").permitAll()
 				.requestMatchers("/prueba").authenticated()

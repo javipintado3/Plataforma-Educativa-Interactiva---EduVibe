@@ -30,7 +30,7 @@ export class LoginComponent {
             icon: "success",
             showConfirmButton:false
           });
-          this.router.navigateByUrl("/dashboard")
+          this.router.navigateByUrl("/inicio")
         }else{
           Swal.fire({
             title: "Error",

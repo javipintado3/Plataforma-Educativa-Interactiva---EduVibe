@@ -1,0 +1,40 @@
+/* vistas-clases.component.css */
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2D9596;
+  }
+  
+  .card-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .card-buttons .btn {
+    width: 45%;
+  }
+  
+  .pagination-controls {
+    margin-top: 20px;
+  }
+  
+  .pagination-controls .btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .pagination-controls .btn i {
+    font-size: 1.5rem;
+    color: #2D9596;
+  }
+  

@@ -1,0 +1,24 @@
+<!-- vistas-clases.component.html -->
+<div class="container my-5">
+    <h2 class="mb-4">Vistas de clases</h2>
+    <div class="row">
+      <div class="col-md-6 mb-4" *ngFor="let clase of clases">
+        <div class="card">
+          <img src="assets/{{ clase.nombre | lowercase }}.jpg" class="card-img-top" alt="{{ clase.nombre }}">
+          <div class="card-body">
+            <h5 class="card-title">{{ clase.nombre }}</h5>
+            <p class="card-text">{{ clase.descripcion }}</p>
+            <div class="card-buttons">
+              <a href="#" class="btn btn-primary">Tareas</a>
+              <a href="#" class="btn btn-secondary">Calificaciones</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pagination-controls text-center">
+      <button class="btn btn-light"><i class="fas fa-arrow-left"></i></button>
+      <button class="btn btn-light"><i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+  

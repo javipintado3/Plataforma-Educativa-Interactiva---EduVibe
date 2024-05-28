@@ -1,33 +1,42 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-    <div class="container">
+  <div class="container">
+    <div class="navbar-left">
       <a class="navbar-brand" href="#">
-        <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="40">
+        <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="50" class="navbar-logo">
       </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Mis clases</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Calendario</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-moon"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30"></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#"><i class="fas fa-bell"></i></a>
-          </li>
-        </ul>
-      </div>
+      <div class="navbar-divider"></div>
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" routerLink="inicio">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Mis clases</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Calendario</a>
+        </li>
+      </ul>
     </div>
-  </nav>
-  
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link icon" href="#"><fa-icon [icon]="faMoon"></fa-icon></a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" id="dropdownUsuario" role="button" data-bs-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            <img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30">
+          </a>
+          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUsuario">
+            <a class="dropdown-item" href="#">Perfil</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" (click)="logout()">Cerrar sesión</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link icon" href="#"><fa-icon [icon]="faBell"></fa-icon></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

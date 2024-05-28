@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import { LoginRequest } from '../request/loginRequest';
 import { UserResp } from '../interfaces/userResp';
 import {jwtDecode} from 'jwt-decode';
+import { useAnimation } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root'
@@ -95,6 +96,7 @@ export class AuthService {
     return this.http.get<any>(`${this.apiUrl}/renew`);
   }
 
+  /*
   minutosRestantes(): number {
     let minutosRestantes = -1;
     if (this.isLocalStorageAvailable() && localStorage.getItem("token")) {
@@ -107,22 +109,21 @@ export class AuthService {
     }
     return minutosRestantes;
   }
+  */
 
   ifAdmin(): boolean {
-    const userData = this.getUserData();
-    return userData.role === "admin";
+    return (this.getUserData()?.role=="admin")? true:false
   }
 
   getUserData() {
-    if (this.isLocalStorageAvailable()) {
-      const token: string = localStorage.getItem("token") as any;
-      const { name, role, username } = jwtDecode(token) as any;
-      return {
-        nombre: name,
-        rol: role,
-        username: username
-      };
+    let token:string = localStorage.getItem("token") as any;
+    const {name, role} = jwtDecode(token) as any
+    return {
+      nombre: name,
+      role: role
     }
-    return { nombre: '', role: '', username: '' };
+    
   }
+  
+  
 }
