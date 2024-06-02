@@ -63,6 +63,7 @@ public class ClaseServiceImpl implements ClaseService {
 
     private ClaseDto mapToDto(Clase clase) {
         ClaseDto claseDto = new ClaseDto();
+        claseDto.setIdClase(clase.getIdClase());
         claseDto.setNombre(clase.getNombre());
         claseDto.setDescripcion(clase.getDescripcion());
         return claseDto;

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class GetTareaDTO {
+	 private Long idTarea;
 	 private String nombreTarea;
 	 private String enunciado;
 	 private LocalDate fechaApertura;
