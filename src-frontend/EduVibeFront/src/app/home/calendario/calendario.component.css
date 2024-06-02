@@ -1,0 +1,29 @@
+/* calendario.component.css */
+.calendario-container {
+    max-width: 700px; /* ajusta el tamaño máximo según tus necesidades */
+    width: 100%; /* asegura que el contenedor ocupe todo el ancho disponible */
+    height: auto; /* permite que la altura del contenedor se ajuste según el contenido */
+    margin: 0 auto; /* centra el contenedor horizontalmente */
+  }
+  
+
+  
+  .fc-day-number {
+    color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+}
+
+.fc-today {
+    background-color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+}
+
+  
+  /* Cambia el color de las flechas de navegación */
+  .fc-icon {
+    color: #2D9596;
+  }
+  
+  .fc-prev-button, .fc-next-button {
+    color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+}
+
+  

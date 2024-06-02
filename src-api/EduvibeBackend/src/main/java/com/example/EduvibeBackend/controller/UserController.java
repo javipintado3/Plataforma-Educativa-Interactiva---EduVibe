@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +37,16 @@ public class UserController {
 		}
 		return result;
 	}
+	
+    @PutMapping("/user/changePassword")
+    public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
+        try {
+            userService.changePassword(email, newPassword);
+            return ResponseEntity.ok("Contraseña actualizada exitosamente");
+        } catch (GlobalException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 	
 
 	

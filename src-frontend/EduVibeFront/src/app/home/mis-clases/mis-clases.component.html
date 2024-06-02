@@ -1,12 +1,11 @@
 <div class="container my-5">
     <h2 class="mb-4">Vistas de clases</h2>
     <div class="row">
-        <div class="col-md-6 mb-4" *ngFor="let clase of clases | paginate: { itemsPerPage: 2, currentPage: p }">
+        <div class="col-md-6 mb-4" *ngFor="let clase of clases; let i = index">
             <div class="card">
                 <img src="assets/{{ clase.nombre | lowercase }}.jpg" class="card-img-top" alt="{{ clase.nombre }}">
                 <div class="card-body">
-                    <h5 class="card-title"><a [routerLink]="['/clase', clase.idClase]">{{ clase.nombre }}</a></h5>
-                    <p >  {{clase.idClase}}</p>
+                    <h5 class="card-title">{{ clase.nombre }}</h5>
                     <p class="card-text">{{ clase.descripcion }}</p>
                     <div class="card-buttons">
                         <a href="#" class="btn btn-primary">Tareas</a>
@@ -14,10 +13,9 @@
                     </div>
                 </div>
             </div>
+            <!-- En caso de que sea la segunda tarjeta o la última, cerramos la fila -->
+            <!-- La segunda tarjeta es cada tarjeta de clase con índice impar, o si es la última tarjeta -->
+            <div *ngIf="(i + 1) % 2 === 0 || i === clases.length - 1" class="w-100 d-none d-md-block"></div>
         </div>
-    </div>
-    <div class="mx-auto me-5 mt-4 mb-2 justify-content-center d-flex">
-        <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5"
-            (pageChange)="p = $event"></pagination-controls>
     </div>
 </div>

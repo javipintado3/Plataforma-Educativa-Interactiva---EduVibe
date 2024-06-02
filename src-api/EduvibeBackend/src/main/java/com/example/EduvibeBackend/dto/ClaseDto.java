@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class ClaseDto {
 	
+	private Long idClase;
+	
 	private String nombre;
 	
 	private String descripcion;

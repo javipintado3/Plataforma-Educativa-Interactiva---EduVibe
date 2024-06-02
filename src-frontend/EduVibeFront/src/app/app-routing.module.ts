@@ -9,6 +9,9 @@ import { profesorGuard } from './guardians/profesor.guard';
 import { RenewComponent } from './renew/renew.component';
 import { loginGuard } from './guardians/login.guard';
 import { CalendarioComponent } from './home/calendario/calendario.component';
+import { PerfilUsuarioComponent } from './user/perfil-usuario/perfil-usuario.component';
+import { MisClasesComponent } from './home/mis-clases/mis-clases.component';
+import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -29,6 +32,22 @@ export const routes: Routes = [
     component: RenewComponent, 
     canActivate: [loginGuard]
   },
+  {
+    path: "perfil", 
+    component: PerfilUsuarioComponent, 
+    canActivate: [loginGuard]
+  },
+  {
+    path: "misClases",
+    component:MisClasesComponent,
+    canActivate: [loginGuard]
+  },
+  {
+    path: "clase/:id", // Ruta para la vista detallada de una clase, donde ':id' es el identificador de la clase
+    component: VistaDeClaseComponent, // Componente que muestra los detalles de la clase
+    canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
+  }
+  
 ];
 
 @NgModule({

@@ -60,6 +60,7 @@ public class SecurityConfig {
 	        .authorizeHttpRequests((requests) -> {
 			requests
 				.requestMatchers("/registeruser").permitAll()
+				.requestMatchers("/user/changePassword").authenticated()
 				.requestMatchers("/loginuser").permitAll()
 				.requestMatchers("/validate").permitAll()
 				.requestMatchers("/prueba").authenticated()

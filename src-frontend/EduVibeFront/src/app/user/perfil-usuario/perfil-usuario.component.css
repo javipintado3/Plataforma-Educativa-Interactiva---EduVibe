@@ -1,0 +1,28 @@
+.profile-info {
+    padding: 10px;
+    border: 2px solid #ccc;
+    background-color: #f9f9f9;
+    /* Agrega más estilos según tus preferencias */
+  }
+  
+  .profile-info img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    /* Estilos para la imagen de perfil */
+  }
+  
+  .profile-info input {
+    margin-bottom: 10px;
+    /* Estilos para los campos de entrada */
+  }
+  
+  .profile-info button {
+    background-color: #2D9596;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    /* Estilos para el botón de actualización */
+  }
+  

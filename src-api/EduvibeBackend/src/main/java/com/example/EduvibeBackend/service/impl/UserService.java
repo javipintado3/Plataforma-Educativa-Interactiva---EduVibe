@@ -61,5 +61,25 @@ public class UserService implements UserDetailsService {
 		User save = userRepository.save(user);
 		return save;
 	}
+	
+	public void changePassword(String email, String newPassword) {
+        // Verificar que la nueva contraseña cumpla con los requisitos de seguridad
+        if (newPassword.length() < 8) {
+            throw new GlobalException("La contraseña debe tener al menos 8 caracteres");
+        }
+
+        // Buscar el usuario por su correo electrónico
+        User user = userRepository.findByEmail(email)
+                                  .orElseThrow(() -> new GlobalException("Usuario no encontrado con el correo electrónico proporcionado"));
+
+        // Codificar la nueva contraseña
+        String newPasswordEncoded = encode.encode(newPassword);
+
+        // Establecer la nueva contraseña para el usuario
+        user.setPassword(newPasswordEncoded);
+
+        // Guardar los cambios en el repositorio
+        userRepository.save(user);
+    }
 
 }

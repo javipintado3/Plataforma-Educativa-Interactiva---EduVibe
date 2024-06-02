@@ -1,4 +1,3 @@
-/* vistas-clases.component.css */
 .card {
     border: none;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -16,6 +15,7 @@
     margin-top: 10px;
   }
   
+
   .card-buttons .btn {
     width: 45%;
     border-color: #2D9596;
@@ -24,19 +24,9 @@
     background-color: white;
   }
   
-  .pagination-controls {
-    margin-top: 20px;
-  }
 
-  a {
-    text-decoration: none;
-    color: #2D9596;
-  }
   
 
 
 
-  .paginacion ::ng-deep .ngx-pagination .current {
-    background: #2D9596;
-}
   
