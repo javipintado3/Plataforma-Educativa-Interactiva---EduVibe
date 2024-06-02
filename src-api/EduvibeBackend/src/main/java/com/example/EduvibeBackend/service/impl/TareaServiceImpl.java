@@ -57,16 +57,7 @@ public class TareaServiceImpl implements TareaService {
                 .map(this::mapToGetDto)
                 .collect(Collectors.toList());
     }
-    
-    /*
-    @Override
-    public List<GetTareaDTO> obtenerTareasPorClase(Long idClase) {
-        return tareaRepository.findByClaseId(idClase)
-                .stream()
-                .map(this::mapToGetDto)
-                .collect(Collectors.toList());
-    }
-    */
+
 
     private TareaDTO mapToDto(Tarea tarea) {
         TareaDTO tareaDto = new TareaDTO();

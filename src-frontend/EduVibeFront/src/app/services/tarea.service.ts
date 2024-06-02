@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { TareaDto } from '../interfaces/tarea';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class TareaService {
   constructor(private http: HttpClient) { }
 
   // Crear una nueva tarea
-  crearTarea(tareaDto: any): Observable<any> {
+  crearTarea(tareaDto: TareaDto): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/crear`, tareaDto)
 
   }
@@ -24,7 +24,7 @@ export class TareaService {
   }
 
   // Editar una tarea existente
-  editarTarea(id: number, tareaDto: any): Observable<any> {
+  editarTarea(id: number, tareaDto: TareaDto): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/editar/${id}`, tareaDto)
    
   }
@@ -36,9 +36,14 @@ export class TareaService {
   }
 
   // Obtener todas las tareas
-  obtenerTodasLasTareas(): Observable<any[]> {
+  obtenerTodasLasTareas(): Observable<TareaDto[]> {
     return this.http.get<any[]>(`${this.baseUrl}/todos`)
 
   }
+
+    // Obtener todas las tareas por ID de clase
+    obtenerTareasPorClase(idClase: number): Observable<TareaDto[]> {
+        return this.http.get<TareaDto[]>(`${this.baseUrl}/clase/${idClase}`);
+      }
 
 }

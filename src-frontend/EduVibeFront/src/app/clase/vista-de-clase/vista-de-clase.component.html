@@ -1,1 +1,12 @@
-<p>vista-de-clase works!</p>
+<div class="container my-5" *ngIf="clase">
+    <h2 class="mb-4">{{ clase.nombre }}</h2>
+    <p>{{ clase.descripcion }}</p>
+    <div class="list-group">
+      <div class="list-group-item mb-3" *ngFor="let tarea of tareas">
+        <h5 class="mb-1">{{ tarea.nombre }}</h5>
+        <p class="mb-1">{{ tarea.descripcion }}</p>
+        <button class="btn btn-outline-primary">Ver Detalles</button>
+      </div>
+    </div>
+  </div>
+  
