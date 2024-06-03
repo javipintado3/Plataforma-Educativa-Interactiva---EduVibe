@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.dto.GetTareaDTO;
 import com.example.EduvibeBackend.dto.TareaDTO;
+import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.Tarea;
 import com.example.EduvibeBackend.repository.TareaRepository;
 import com.example.EduvibeBackend.service.TareaService;
@@ -57,7 +59,14 @@ public class TareaServiceImpl implements TareaService {
                 .map(this::mapToGetDto)
                 .collect(Collectors.toList());
     }
-
+    
+ 
+    public List<GetTareaDTO> getTareasByClase(Clase clase) {
+        return tareaRepository.findByClase(clase)
+                .stream()
+                .map(this::mapToGetDto)
+                .collect(Collectors.toList());
+    }
 
     private TareaDTO mapToDto(Tarea tarea) {
         TareaDTO tareaDto = new TareaDTO();
@@ -68,9 +77,23 @@ public class TareaServiceImpl implements TareaService {
 
     private GetTareaDTO mapToGetDto(Tarea tarea) {
         GetTareaDTO getTareaDto = new GetTareaDTO();
+        getTareaDto.setIdTarea(tarea.getIdTarea());
         getTareaDto.setNombreTarea(tarea.getNombreTarea());
         getTareaDto.setEnunciado(tarea.getEnunciado());
         getTareaDto.setFechaApertura(tarea.getFechaApertura());
+        
+        // Convertir Clase a ClaseDto
+        ClaseDto claseDto = mapClaseToDto(tarea.getClase());
+        getTareaDto.setClase(claseDto);
+        
         return getTareaDto;
+    }
+
+    private ClaseDto mapClaseToDto(Clase clase) {
+        ClaseDto claseDto = new ClaseDto();
+        claseDto.setIdClase(clase.getIdClase());
+        claseDto.setNombre(clase.getNombre());
+        claseDto.setDescripcion(clase.getDescripcion());
+        return claseDto;
     }
 }

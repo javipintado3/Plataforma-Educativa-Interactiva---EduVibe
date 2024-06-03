@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.service.ClaseService;
+import com.example.EduvibeBackend.service.impl.ClaseServiceImpl;
 
 @RestController
 @RequestMapping("clases")
 public class ClaseController {
 
     @Autowired
-    private ClaseService claseService;
+    private ClaseServiceImpl claseService;
 
     // Crear una nueva clase
     @PostMapping("/crear")
@@ -43,6 +44,11 @@ public class ClaseController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    
+    @PostMapping("/inscribir")
+    public void inscribirUsuarioEnClase(@RequestParam String email, @RequestParam Long idClase) {
+        claseService.inscribirUsuarioEnClase(email, idClase);
     }
 
     // Eliminar una clase por su ID

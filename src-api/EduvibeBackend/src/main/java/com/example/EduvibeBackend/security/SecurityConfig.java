@@ -68,11 +68,13 @@ public class SecurityConfig {
 				.requestMatchers("/clases/editar/{id}").hasAnyAuthority("admin", "profesor")
 				.requestMatchers("/clases/crear").hasAuthority("admin")
 				.requestMatchers("/clases/eliminar/{id}").hasAuthority("admin")
+				.requestMatchers("/clases/inscribir").hasAuthority("admin")
 				.requestMatchers("/tareas/crear").hasAnyAuthority("admin", "profesor")
 				.requestMatchers("/tareas/{id}").authenticated()
 				.requestMatchers("/tareas/todos").authenticated()
 				.requestMatchers("/tareas/eliminar/{id}").hasAnyAuthority("admin", "profesor")
 				.requestMatchers("/tareas/editar/{id}").hasAnyAuthority("admin", "profesor")
+				.requestMatchers("/tareas/clase/{idClase}").authenticated()
 				.anyRequest().permitAll();
 	        })
 	        .formLogin((form) -> form.permitAll())

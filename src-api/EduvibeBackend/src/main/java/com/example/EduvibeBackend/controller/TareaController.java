@@ -5,11 +5,21 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.dto.GetTareaDTO;
 import com.example.EduvibeBackend.dto.TareaDTO;
-
+import com.example.EduvibeBackend.entities.Clase;
+import com.example.EduvibeBackend.entities.Tarea;
+import com.example.EduvibeBackend.service.impl.ClaseServiceImpl;
 import com.example.EduvibeBackend.service.impl.TareaServiceImpl;
 
 @RestController
@@ -18,6 +28,8 @@ public class TareaController {
 
     @Autowired
     private TareaServiceImpl tareaService;
+    @Autowired
+    private ClaseServiceImpl claseService;
 
     @PostMapping("/crear")
     public ResponseEntity<TareaDTO> crearTarea(@RequestBody TareaDTO tareaDto) {
@@ -57,11 +69,12 @@ public class TareaController {
         return new ResponseEntity<>(tareas, HttpStatus.OK);
     }
     
-    /*
+
     @GetMapping("/clase/{idClase}")
-    public ResponseEntity<List<GetTareaDTO>> obtenerTareasPorClase(@PathVariable Long idClase) {
-        List<GetTareaDTO> tareas = tareaService.obtenerTareasPorClase(idClase);
-        return new ResponseEntity<>(tareas, HttpStatus.OK);
+    public List<GetTareaDTO> getTareasByClase(@PathVariable Long idClase) {
+        Clase clase = claseService.obtenerClaseSinDto(idClase);
+        return tareaService.getTareasByClase(clase);
     }
-    */
+    
+
 }

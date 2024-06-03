@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TareaDto } from '../../interfaces/tarea';
 import { TareaService } from '../../services/tarea.service';
 import { ClaseDto } from '../../interfaces/clase';
@@ -8,11 +8,12 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-vista-de-clase',
   templateUrl: './vista-de-clase.component.html',
-  styleUrl: './vista-de-clase.component.css'
+  styleUrls: ['./vista-de-clase.component.css']
 })
 export class VistaDeClaseComponent {
   tareas: TareaDto[] = [];
   clase: ClaseDto | undefined;
+  id: number = 0;
 
   constructor(
     private tareaService: TareaService,
@@ -22,22 +23,17 @@ export class VistaDeClaseComponent {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      const idClase = parseInt(params['idClase'], 10); // Convertir a número
-      console.log('ID de la clase:', idClase);
-      if (!isNaN(idClase)) {
-        this.obtenerClaseYtareas(idClase);
-      } else {
-        console.error('ID de la clase no es un número válido:', params['idClase']);
-      }
+      this.id = +params['id']; // Convierte el parámetro a número
+      this.obtenerClaseYtareas(); // Llama a la función para obtener la clase y las tareas
     });
   }
 
-  obtenerClaseYtareas(idClase: number): void {
-    this.claseService.obtenerClasePorId(idClase).subscribe(
+  obtenerClaseYtareas(): void {
+    this.claseService.obtenerClasePorId(this.id).subscribe(
       (clase) => {
-        console.log('Clase obtenida:', clase);
+        console.log('Clase obtenida:', this.id);
         this.clase = clase;
-        this.obtenerTareasPorClase(idClase);
+        this.obtenerTareasPorClase();
       },
       (error) => {
         console.error('Error al obtener la clase:', error);
@@ -45,8 +41,8 @@ export class VistaDeClaseComponent {
     );
   }
 
-  obtenerTareasPorClase(idClase: number): void {
-    this.tareaService.obtenerTareasPorClase(idClase).subscribe(
+  obtenerTareasPorClase(): void {
+    this.tareaService.obtenerTareasPorClase(this.id).subscribe(
       (tareas) => {
         console.log('Tareas obtenidas:', tareas);
         this.tareas = tareas;

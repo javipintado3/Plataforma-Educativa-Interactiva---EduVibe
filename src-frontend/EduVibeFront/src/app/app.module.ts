@@ -18,6 +18,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { PerfilUsuarioComponent } from './user/perfil-usuario/perfil-usuario.component';
 import { MisClasesComponent } from './home/mis-clases/mis-clases.component';
 import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.component';
+import { NavbarSecundarioComponent } from './layout/navbar-secundario/navbar-secundario.component';
 
 
 @NgModule({
@@ -32,6 +33,7 @@ import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.com
     PerfilUsuarioComponent,
     MisClasesComponent,
     VistaDeClaseComponent,
+    NavbarSecundarioComponent,
     
   ],
   imports: [

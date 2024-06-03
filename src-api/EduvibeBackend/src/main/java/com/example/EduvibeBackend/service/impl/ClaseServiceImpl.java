@@ -9,14 +9,21 @@ import org.springframework.stereotype.Service;
 
 import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.entities.Clase;
+import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.repository.ClaseRepository;
+import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.ClaseService;
+
+import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class ClaseServiceImpl implements ClaseService {
 
     @Autowired
     private ClaseRepository claseRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public ClaseDto crearClase(ClaseDto claseDto) {
@@ -49,6 +56,17 @@ public class ClaseServiceImpl implements ClaseService {
         }
         return null; // O lanzar una excepción personalizada
     }
+    
+
+    public List<ClaseDto> obtenerClasesPorUsuario(Integer idUsuario) {
+        User usuario = userRepository.findById(idUsuario).orElse(null);
+        if (usuario != null) {
+            List<Clase> clases = usuario.getClases().stream().collect(Collectors.toList());
+            return clases.stream().map(this::mapToDto).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
     @Override
     public void eliminarClase(Long id) {
@@ -60,6 +78,21 @@ public class ClaseServiceImpl implements ClaseService {
         List<Clase> clases = claseRepository.findAll();
         return clases.stream().map(this::mapToDto).collect(Collectors.toList());
     }
+    
+
+    public void inscribirUsuarioEnClase(String email, Long idClase) {
+    	User usuario = userRepository.findByEmail(email).orElse(null);
+        Clase clase = claseRepository.findById(idClase).orElse(null);
+        if (usuario != null && clase != null) {
+            usuario.getClases().add(clase);
+            userRepository.save(usuario);
+        }
+    }
+    
+    public Clase obtenerClaseSinDto(Long id)  {
+    	 Clase claseOptional = claseRepository.findById(id).orElse(null);
+		return claseOptional;
+    }
 
     private ClaseDto mapToDto(Clase clase) {
         ClaseDto claseDto = new ClaseDto();
@@ -68,4 +101,6 @@ public class ClaseServiceImpl implements ClaseService {
         claseDto.setDescripcion(clase.getDescripcion());
         return claseDto;
     }
+    
+    
 }

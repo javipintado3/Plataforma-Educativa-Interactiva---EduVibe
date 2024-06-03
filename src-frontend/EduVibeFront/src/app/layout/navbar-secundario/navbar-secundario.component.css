@@ -1,0 +1,43 @@
+
+  .navbar, .subnavbar {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .subnavbar {
+    background-color: #2ca39b;
+    padding: 0.5rem 1rem;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+    top: 0;
+  }
+  
+  .subnavbar-nav {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .subnav-item {
+    margin: 0 1rem;
+  }
+  
+  .subnav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .subnav-link.active {
+    border-bottom: 2px solid white;
+  }
+  
+  .subnav-link:hover {
+    text-decoration: underline;
+  }
+  

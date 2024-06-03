@@ -5,7 +5,7 @@
             <div class="card">
                 <img src="assets/{{ clase.nombre | lowercase }}.jpg" class="card-img-top" alt="{{ clase.nombre }}">
                 <div class="card-body">
-                    <h5 class="card-title">{{ clase.nombre }}</h5>
+                    <h5 class="card-title"><a [routerLink]="['/clase', clase.idClase]">{{ clase.nombre }}</a></h5>
                     <p class="card-text">{{ clase.descripcion }}</p>
                     <div class="card-buttons">
                         <a href="#" class="btn btn-primary">Tareas</a>
