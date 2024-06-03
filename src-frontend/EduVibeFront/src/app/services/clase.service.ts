@@ -37,4 +37,9 @@ export class ClaseService {
   obtenerTodasLasClases(): Observable<ClaseDto[]> {
     return this.http.get<ClaseDto[]>(`${this.baseUrl}/todos`);
   }
+
+    // Obtener clases por usuario
+    obtenerClasesPorUsuario(idUsuario: number): Observable<ClaseDto[]> {
+      return this.http.get<ClaseDto[]>(`${this.baseUrl}/usuario/${idUsuario}`);
+    }
 }

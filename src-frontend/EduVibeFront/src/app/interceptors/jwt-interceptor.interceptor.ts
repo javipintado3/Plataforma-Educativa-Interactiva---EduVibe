@@ -12,7 +12,8 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router)
   const loader = inject(NgxUiLoaderService)
   if(!req.url.includes("/user/existeEmail")
-  && !req.url.includes("/clases/todos")) {
+  && !req.url.includes("/clases")
+) {
   
   loader.start()
   }
@@ -21,7 +22,8 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
   && !req.url.includes("/login")
   && !req.url.includes("/user/existeEmail")
   && !req.url.includes("/registro")
-  && !req.url.includes("/clases/todos")) {
+  && !req.url.includes("/clases/todos")
+) {
   
   if(authService.minutosRestantes()<1 && !req.url.includes("/registro")){
     authService.logout()

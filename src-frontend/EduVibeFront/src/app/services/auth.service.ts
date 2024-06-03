@@ -35,6 +35,7 @@ export class AuthService {
             const decodedToken: any = jwtDecode(response.token);
             localStorage.setItem('name', decodedToken.name); // Almacena el nombre de usuario
             localStorage.setItem('rol', decodedToken.rol); // Almacena el rol
+            localStorage.setItem('id', decodedToken.id); // Almacena el rol
           }
           this.isAuthenticated$.next(true);
           // Mostrar alerta exitosa
@@ -110,10 +111,11 @@ export class AuthService {
 
   getUserData() {
     let token: string = localStorage.getItem("token") as any;
-    const { name, rol } = jwtDecode(token) as any;
+    const { name, rol, id } = jwtDecode(token) as any;
     return {
       nombre: name,
-      rol: rol // Cambio 'role' por 'rol'
+      rol: rol, 
+      id: id
     };
 
   }
@@ -144,7 +146,15 @@ export class AuthService {
     return minutosRestantes
   }
   
-
+  // Método para obtener el ID del usuario del token decodificado
+  getUserId(): number | null {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.id; // Cambia 'id' por el nombre correcto del campo en el token
+    }
+    return null;
+  }
 
 
 }

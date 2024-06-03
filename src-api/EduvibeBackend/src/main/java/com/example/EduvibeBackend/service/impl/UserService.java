@@ -2,6 +2,7 @@ package com.example.EduvibeBackend.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.EduvibeBackend.dto.RegistroUserDto;
 import com.example.EduvibeBackend.dto.UsuarioDto;
+import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
+import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.UserRepository;
 
 @Service
@@ -24,6 +27,9 @@ public class UserService implements UserDetailsService {
 	private UserRepository userRepository;
 	@Autowired
 	private PasswordEncoder encode;
+	
+	 @Autowired
+	    private ClaseRepository claseRepository;
 
 	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email).orElse(null);
@@ -107,5 +113,20 @@ public class UserService implements UserDetailsService {
         usuarioDto.setRol(usuario.getRol());
         return usuarioDto;
     }
+    
+    public List<UsuarioDto> obtenerUsuariosPorClase(Long idClase) {
+        // Buscar la clase por su ID
+        Clase clase = claseRepository.findById(idClase)
+                                      .orElseThrow(() -> new GlobalException("Clase no encontrada"));
+
+        // Obtener la lista de usuarios asociados a la clase
+        Set<User> usuarios = clase.getUsuarios();
+
+        // Mapear los usuarios a DTOs
+        return usuarios.stream()
+                       .map(this::convertirAUsuarioDto)
+                       .collect(Collectors.toList());
+    }
+
 
 }

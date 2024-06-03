@@ -113,7 +113,7 @@ public class AuthController {
 				}
 				
 					// Generar un token JWT utilizando los detalles del usuario autenticado
-					String jwt = TokenUtils.generateToken(user.getEmail(), user.getNombre(), user.getRol());
+					String jwt = TokenUtils.generateToken(user.getEmail(), user.getNombre(), user.getRol(), user.getId());
 
 					// Devolver el token JWT en un ResponseEntity OK
 					TokenDTO tokennew = new TokenDTO();
@@ -170,7 +170,7 @@ public class AuthController {
 			User info = userService.getUserByEmail(loginRequest.getEmail());
 
 			// Generar un token JWT utilizando los detalles del usuario autenticado
-			String jwt = TokenUtils.generateToken(userDetails.getUsername(), info.getNombre(), info.getRol());
+			String jwt = TokenUtils.generateToken(userDetails.getUsername(), info.getNombre(), info.getRol(), info.getId());
 
 			// Devolver el token JWT en un ResponseEntity OK
 

@@ -53,7 +53,7 @@ public class TokenUtils {
 		 */
 		
 		
-		public static String generateToken(String username, String name, String rol) {
+		public static String generateToken(String username, String name, String rol, Integer id) {
 
 			// Establecemos la fecha de expiración del token en milisegundos
 			Date expirationDate = new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDATY_SECONDS * 1000);
@@ -65,6 +65,8 @@ public class TokenUtils {
 			Map<String, Object> extra = new HashMap<>();
 			extra.put("name", name);
 			extra.put("rol", rol);
+			extra.put("id", id);
+			
 
 			// Construimos el token con el nombre del usuario, la fecha de expiración, la
 			// información

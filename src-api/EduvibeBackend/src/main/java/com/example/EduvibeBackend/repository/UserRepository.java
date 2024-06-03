@@ -28,5 +28,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
    
     @Query("SELECT u.clases FROM User u WHERE u.id = :userId")
     List<Clase> findClasesByUserId(@Param("userId") Integer userId);
+    
+
 
 }

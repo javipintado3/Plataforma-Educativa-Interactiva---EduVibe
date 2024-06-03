@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +55,17 @@ public class UserController {
     public ResponseEntity<List<UsuarioDto>> listarTodosUsuarios() {
         List<UsuarioDto> usuarios = userService.listarTodosUsuarios(); // Obtener la lista de todos los usuarios
         return ResponseEntity.ok(usuarios); // Devolver la lista de usuarios en la respuesta
+    }
+    
+    @GetMapping("usuarios/clase/{idClase}")
+    public List<UsuarioDto> obtenerUsuariosPorClase(@PathVariable Long idClase) {
+        try {
+            return userService.obtenerUsuariosPorClase(idClase);
+        } catch (GlobalException e) {
+            // Manejo de excepciones
+            // Por ejemplo, devolver un mensaje de error al cliente
+            return null; // O un ResponseEntity con un mensaje de error
+        }
     }
 
 	
