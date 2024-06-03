@@ -64,6 +64,7 @@ public class SecurityConfig {
 				.requestMatchers("/loginuser").permitAll()
 				.requestMatchers("/validate").permitAll()
 				.requestMatchers("/prueba").authenticated()
+				.requestMatchers("usuarios").hasAuthority("admin")
 				.requestMatchers("/clases/**").authenticated()
 				.requestMatchers("/clases/editar/{id}").hasAnyAuthority("admin", "profesor")
 				.requestMatchers("/clases/crear").hasAuthority("admin")

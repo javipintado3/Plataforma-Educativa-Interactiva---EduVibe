@@ -64,4 +64,11 @@ public class ClaseController {
         List<ClaseDto> clases = claseService.obtenerTodasLasClases();
         return ResponseEntity.ok(clases);
     }
+    
+    // Obtener clases por usuario
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<ClaseDto>> obtenerClasesPorUsuario(@PathVariable Integer idUsuario) {
+        List<ClaseDto> clases = claseService.obtenerClasesPorUsuario(idUsuario);
+        return ResponseEntity.ok(clases);
+    }
 }

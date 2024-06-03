@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.User;
+import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.ClaseService;
@@ -59,13 +60,14 @@ public class ClaseServiceImpl implements ClaseService {
     
 
     public List<ClaseDto> obtenerClasesPorUsuario(Integer idUsuario) {
-        User usuario = userRepository.findById(idUsuario).orElse(null);
-        if (usuario != null) {
-            List<Clase> clases = usuario.getClases().stream().collect(Collectors.toList());
-            return clases.stream().map(this::mapToDto).collect(Collectors.toList());
-        } else {
-            return Collections.emptyList();
-        }
+        User usuario = userRepository.findById(idUsuario)
+                                      .orElseThrow(() -> new GlobalException("Usuario no encontrado"));
+
+        List<Clase> clases = userRepository.findClasesByUserId(idUsuario);
+
+        return clases.stream()
+                     .map(this::mapToDto)
+                     .collect(Collectors.toList());
     }
 
     @Override

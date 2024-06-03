@@ -1,5 +1,6 @@
 package com.example.EduvibeBackend.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.EduvibeBackend.dto.PostRegistroDto;
+import com.example.EduvibeBackend.dto.UsuarioDto;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.service.impl.UserService;
@@ -47,7 +49,12 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-	
+    
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<UsuarioDto>> listarTodosUsuarios() {
+        List<UsuarioDto> usuarios = userService.listarTodosUsuarios(); // Obtener la lista de todos los usuarios
+        return ResponseEntity.ok(usuarios); // Devolver la lista de usuarios en la respuesta
+    }
 
 	
 }

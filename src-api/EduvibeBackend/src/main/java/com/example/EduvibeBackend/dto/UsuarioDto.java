@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class UsuarioDto {
 	
-	private String firstName;
-	private String lastname;
+	private Integer id;
+	private String nombre;
+	private String email;
+	
+	private String rol;
+	
 }

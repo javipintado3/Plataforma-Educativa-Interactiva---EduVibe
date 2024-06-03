@@ -1,7 +1,8 @@
 package com.example.EduvibeBackend.service.impl;
 
-import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.EduvibeBackend.dto.RegistroUserDto;
+import com.example.EduvibeBackend.dto.UsuarioDto;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.UserRepository;
@@ -84,6 +86,26 @@ public class UserService implements UserDetailsService {
 
         // Guardar los cambios en el repositorio
         userRepository.save(user);
+    }
+	
+	   // Método para obtener todos los usuarios y convertirlos a objetos UsuarioDto
+    public List<UsuarioDto> listarTodosUsuarios() {
+        List<User> usuarios = userRepository.findAll(); // Consulta todos los usuarios en la base de datos
+        // Convierte la lista de usuarios a una lista de UsuarioDto
+        List<UsuarioDto> usuariosDto = usuarios.stream()
+                .map(this::convertirAUsuarioDto) // Utiliza el método convertirAUsuarioDto para convertir cada usuario
+                .collect(Collectors.toList()); // Recolecta los resultados en una lista
+        return usuariosDto; // Devuelve la lista de UsuarioDto
+    }
+
+    // Método para convertir un objeto User a UsuarioDto
+    private UsuarioDto convertirAUsuarioDto(User usuario) {
+        UsuarioDto usuarioDto = new UsuarioDto();
+        usuarioDto.setId(usuario.getId());
+        usuarioDto.setNombre(usuario.getNombre());
+        usuarioDto.setEmail(usuario.getEmail());
+        usuarioDto.setRol(usuario.getRol());
+        return usuarioDto;
     }
 
 }
