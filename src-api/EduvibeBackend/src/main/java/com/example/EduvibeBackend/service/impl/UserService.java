@@ -115,18 +115,15 @@ public class UserService implements UserDetailsService {
     }
     
     public List<UsuarioDto> obtenerUsuariosPorClase(Long idClase) {
-        // Buscar la clase por su ID
-        Clase clase = claseRepository.findById(idClase)
-                                      .orElseThrow(() -> new GlobalException("Clase no encontrada"));
+        List<User> usuarios = userRepository.findUsersByClaseId(idClase);
 
-        // Obtener la lista de usuarios asociados a la clase
-        Set<User> usuarios = clase.getUsuarios();
+        if (usuarios.isEmpty()) {
+            throw new GlobalException("No hay usuarios en esta clase");
+        }
 
-        // Mapear los usuarios a DTOs
         return usuarios.stream()
-                       .map(this::convertirAUsuarioDto)
-                       .collect(Collectors.toList());
+                .map(this::convertirAUsuarioDto)
+                .collect(Collectors.toList());
     }
-
 
 }

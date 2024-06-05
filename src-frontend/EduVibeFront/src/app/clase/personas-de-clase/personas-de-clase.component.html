@@ -1,0 +1,18 @@
+<app-navbar-secundario [clase]="clase"></app-navbar-secundario>
+<div class="clase-usuarios">
+    <h2 class="mb-4">{{ clase?.nombre }}</h2>
+    <div class="seccion">
+      <h2>PROFESOR</h2>
+      <div *ngIf="profesor" class="usuario profesor">
+        <img src="path_to_profile_image/{{ profesor.id }}" alt="{{ profesor.nombre }}" class="avatar">
+        <span>{{ profesor.nombre }}</span>
+      </div>
+    </div>
+    <div class="seccion">
+      <h2>ALUMNOS</h2>
+      <div *ngFor="let alumno of alumnos" class="usuario alumno">
+        <img src="path_to_profile_image/{{ alumno.id }}" alt="{{ alumno.nombre }}" class="avatar">
+        <span>{{ alumno.nombre }}</span>
+      </div>
+    </div>
+</div>

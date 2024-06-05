@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { ClaseDto } from '../../interfaces/clase';
 
 @Component({
   selector: 'app-navbar-secundario',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrl: './navbar-secundario.component.css'
 })
 export class NavbarSecundarioComponent {
+  @Input() clase: ClaseDto | undefined;
 
 }

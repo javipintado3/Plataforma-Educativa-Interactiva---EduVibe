@@ -1,0 +1,34 @@
+.clase-usuarios {
+    padding: 20px;
+  }
+  
+  .seccion {
+    margin-bottom: 20px;
+  }
+  
+  .seccion h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .usuario {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .usuario .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .profesor {
+    font-weight: bold;
+  }
+  
+  .alumno {
+    font-weight: normal;
+  }
+  

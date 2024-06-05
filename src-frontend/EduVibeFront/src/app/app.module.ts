@@ -19,6 +19,8 @@ import { PerfilUsuarioComponent } from './user/perfil-usuario/perfil-usuario.com
 import { MisClasesComponent } from './home/mis-clases/mis-clases.component';
 import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.component';
 import { NavbarSecundarioComponent } from './layout/navbar-secundario/navbar-secundario.component';
+import { PersonasDeClaseComponent } from './clase/personas-de-clase/personas-de-clase.component';
+import { VistaTareaComponent } from './tarea/vista-tarea/vista-tarea.component';
 
 
 @NgModule({
@@ -34,6 +36,8 @@ import { NavbarSecundarioComponent } from './layout/navbar-secundario/navbar-sec
     MisClasesComponent,
     VistaDeClaseComponent,
     NavbarSecundarioComponent,
+    PersonasDeClaseComponent,
+    VistaTareaComponent,
     
   ],
   imports: [

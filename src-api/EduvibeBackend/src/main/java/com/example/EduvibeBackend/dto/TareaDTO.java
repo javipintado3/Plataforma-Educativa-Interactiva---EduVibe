@@ -1,6 +1,7 @@
 package com.example.EduvibeBackend.dto;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.example.EduvibeBackend.entities.Clase;
@@ -18,5 +19,7 @@ public class TareaDTO {
 	
 	 private String nombreTarea;
 	 private String enunciado;
+	 private Double calificion;
+	 private Boolean estado; 
 	
 }

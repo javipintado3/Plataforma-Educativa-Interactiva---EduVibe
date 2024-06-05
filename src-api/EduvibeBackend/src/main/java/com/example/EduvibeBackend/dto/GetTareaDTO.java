@@ -15,5 +15,7 @@ public class GetTareaDTO {
 	 private String nombreTarea;
 	 private String enunciado;
 	 private LocalDate fechaApertura;
+	 private Double calificion;
+	 private Boolean estado; 
 	 private ClaseDto clase;
 }

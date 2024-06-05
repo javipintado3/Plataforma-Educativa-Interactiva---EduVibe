@@ -1,0 +1,15 @@
+<app-navbar-secundario [clase]="tarea?.clase"></app-navbar-secundario>
+
+<div class="container my-5">
+  <div class="tarea-container">
+    <div class="tarea-item" *ngIf="tarea">
+      <div class="tarea-header">
+        <h2 class="tarea-title">{{ tarea.nombreTarea }}</h2>
+        <span class="tarea-status" [class.completed]="tarea.estado">{{ tarea.estado ? 'Completada' : 'Pendiente' }}</span>
+      </div>
+      <p class="tarea-enunciado">{{ tarea.enunciado }}</p>
+      <p class="tarea-date">Fecha de apertura: {{ tarea.fechaApertura | date }}</p>
+      <p class="tarea-calificacion">Calificación: {{ tarea.calificacion }}</p>
+    </div>
+  </div>
+</div>

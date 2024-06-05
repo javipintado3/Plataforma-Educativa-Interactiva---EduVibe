@@ -1,11 +1,11 @@
 
-<app-navbar-secundario></app-navbar-secundario>
+<app-navbar-secundario [clase]="clase"></app-navbar-secundario>
 <div class="container my-5" *ngIf="clase">
   <h2 class="mb-4">{{ clase.nombre }}</h2>
   <p>{{ clase.descripcion }}</p>
   <div class="tarea-container">
     <div class="tarea-item" *ngFor="let tarea of tareas">
-      <button class="tarea-button">
+      <button class="tarea-button" [routerLink]="['/tarea', tarea.idTarea]">
         <span class="tarea-titulo">TAREA</span>
         <span class="tarea-descripcion">{{ tarea.nombreTarea }}</span>
       </button>

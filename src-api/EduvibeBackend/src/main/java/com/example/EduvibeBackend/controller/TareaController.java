@@ -76,5 +76,7 @@ public class TareaController {
         return tareaService.getTareasByClase(clase);
     }
     
+    
+    
 
 }

@@ -1,5 +1,5 @@
 <div class="container my-5">
-    <h2 class="mb-4">Vistas de clases</h2>
+    <h2 class="mb-4">Mis clases</h2>
     <div class="row">
         <div class="col-md-6 mb-4" *ngFor="let clase of clases; let i = index">
             <div class="card">
@@ -8,7 +8,7 @@
                     <h5 class="card-title"><a [routerLink]="['/clase', clase.idClase]">{{ clase.nombre }}</a></h5>
                     <p class="card-text">{{ clase.descripcion }}</p>
                     <div class="card-buttons">
-                        <a href="#" class="btn btn-primary">Tareas</a>
+                        <a [routerLink]="['/clase', clase.idClase]" class="btn btn-primary">Tareas</a>
                         <a href="#" class="btn btn-secondary">Calificaciones</a>
                     </div>
                 </div>

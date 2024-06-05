@@ -156,5 +156,14 @@ export class AuthService {
     return null;
   }
 
+  obtenerUsuariosPorClase(idClase: number): Observable<UserResp[]> {
+    return this.http.get<UserResp[]>(`${this.apiUrl}/usuarios/clase/${idClase}`).pipe(
+      catchError(error => {
+        console.error('Error al obtener usuarios de la clase', error);
+        return throwError(error);
+      })
+    );
+  }
+
 
 }
