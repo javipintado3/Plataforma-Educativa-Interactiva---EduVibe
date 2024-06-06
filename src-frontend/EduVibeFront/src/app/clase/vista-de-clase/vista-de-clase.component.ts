@@ -4,6 +4,7 @@ import { TareaService } from '../../services/tarea.service';
 import { ClaseDto } from '../../interfaces/clase';
 import { ClaseService } from '../../services/clase.service';
 import { ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-vista-de-clase',
@@ -18,7 +19,8 @@ export class VistaDeClaseComponent {
   constructor(
     private tareaService: TareaService,
     private claseService: ClaseService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public auth: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -51,5 +53,13 @@ export class VistaDeClaseComponent {
         console.error('Error al obtener las tareas:', error);
       }
     );
+  }
+
+  editarTarea(idTarea: number): void {
+    // Implementa la lógica para editar la tarea
+  }
+
+  eliminarTarea(idTarea: number): void {
+    // Implementa la lógica para eliminar la tarea
   }
 }

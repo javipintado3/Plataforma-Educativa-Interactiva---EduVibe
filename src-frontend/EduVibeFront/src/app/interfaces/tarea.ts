@@ -6,7 +6,7 @@ export interface TareaDto {
   enunciado: string;
   fechaApertura: Date;
   estado: boolean;
-  calificacion:number;
+  calificacion: number;
   clase: ClaseDto;
-  }
-  
+  archivos: any[];  // Asegúrate de definir esta propiedad
+}

@@ -9,6 +9,13 @@
         <span class="tarea-titulo">TAREA</span>
         <span class="tarea-descripcion">{{ tarea.nombreTarea }}</span>
       </button>
+      <div class="tarea-buttons">
+        <!-- Botón de editar -->
+        <button class="editar-button" (click)="editarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Editar</button>
+        <br><br>
+        <!-- Botón de eliminar -->
+        <button class="eliminar-button" (click)="eliminarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Eliminar</button>
+      </div>
     </div>
   </div>
 </div>

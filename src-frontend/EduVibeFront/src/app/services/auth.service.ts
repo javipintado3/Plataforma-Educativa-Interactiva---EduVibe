@@ -109,6 +109,7 @@ export class AuthService {
     return (this.getUserData()?.rol == "profesor") ? true : false; // Cambio 'role' por 'rol'
   }
 
+
   getUserData() {
     let token: string = localStorage.getItem("token") as any;
     const { name, rol, id } = jwtDecode(token) as any;
@@ -164,6 +165,18 @@ export class AuthService {
       })
     );
   }
+
+    // Método para obtener los datos del usuario
+    getUserProfile(id: number): Observable<UserResp> {
+      return this.http.get<UserResp>(`${this.apiUrl}/user/${id}`);
+    }
+  
+    // Método para actualizar los datos del usuario
+    updateUserProfile(id: number, userData: Partial<UserResp>): Observable<UserResp> {
+      return this.http.put<UserResp>(`${this.apiUrl}/usuarios/${id}`, userData);
+    }
+  
+   
 
 
 }

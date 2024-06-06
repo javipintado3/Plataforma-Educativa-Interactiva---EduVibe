@@ -8,8 +8,18 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  userResp: any; // Define la propiedad userResp
+  constructor(public authService: AuthService) {} // Hacer que authService sea público
 
-  constructor(private authService:AuthService){}
+  ngOnInit(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.authService.getUserProfile(userId).subscribe(
+        data => this.userResp = data,
+        error => console.error('Error fetching user data', error)
+      );
+    }
+  }
 
   logout(){
     this.authService.logout()

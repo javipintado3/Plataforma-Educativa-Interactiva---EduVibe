@@ -35,6 +35,8 @@ export class TareaService {
  
   }
 
+  
+
   // Obtener todas las tareas
   obtenerTodasLasTareas(): Observable<TareaDto[]> {
     return this.http.get<any[]>(`${this.baseUrl}/todos`)
@@ -45,5 +47,21 @@ export class TareaService {
     obtenerTareasPorClase(idClase: number): Observable<TareaDto[]> {
         return this.http.get<TareaDto[]>(`${this.baseUrl}/clase/${idClase}`);
       }
+
+        // Subir un archivo a una tarea
+  subirArchivo(idTarea: number, archivo: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('archivo', archivo, archivo.name);
+    return this.http.post<any>(`${this.baseUrl}/${idTarea}/archivo`, formData);
+  }
+
+  // Descargar un archivo de una tarea
+  descargarArchivo(idTarea: number, indice: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${idTarea}/archivo/${indice}`, {
+      responseType: 'blob'
+    });
+  }
+
+      
 
 }

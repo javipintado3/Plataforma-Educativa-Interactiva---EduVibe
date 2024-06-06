@@ -31,5 +31,33 @@
     color: #2D9596;
   }
 
+  
+.editar-button{
+  background-color: #2D9596; /* Color de fondo del botón */
+  color: white; /* Color del texto del botón */
+  border: none; /* Sin borde */
+  padding: 0.5rem 1rem; /* Espaciado interno */
+  font-size: 1rem; /* Tamaño de fuente */
+  border-radius: 0.25rem; /* Borde redondeado */
+  cursor: pointer; /* Cambiar el cursor al pasar el ratón */
+  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+}
+
+.editar-button:hover{
+  background-color: #2D9596; /* Color de fondo del botón al pasar el ratón */
+}
+
+.eliminar-button{
+  background-color: #962d2d; /* Color de fondo del botón */
+  color: white; /* Color del texto del botón */
+  border: none; /* Sin borde */
+  padding: 0.5rem 1rem; /* Espaciado interno */
+  font-size: 1rem; /* Tamaño de fuente */
+  border-radius: 0.25rem; /* Borde redondeado */
+  cursor: pointer; /* Cambiar el cursor al pasar el ratón */
+  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+}
+
+
 
   

@@ -1,17 +1,18 @@
-import { Component, Input } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
 import { TareaDto } from '../../interfaces/tarea';
 import { TareaService } from '../../services/tarea.service';
 import { ActivatedRoute } from '@angular/router';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-vista-tarea',
   templateUrl: './vista-tarea.component.html',
-  styleUrl: './vista-tarea.component.css'
+  styleUrls: ['./vista-tarea.component.css']
 })
-export class VistaTareaComponent {
-  tarea: TareaDto | undefined
+export class VistaTareaComponent implements OnInit {
+  tarea: TareaDto | undefined;
   id: number = 0;
+  archivo: File | null = null;
 
   constructor(
     private tareaService: TareaService,
@@ -35,5 +36,27 @@ export class VistaTareaComponent {
         console.error('Error al obtener la tarea:', error);
       }
     );
+  }
+
+  onArchivoSeleccionado(event: any): void {
+    this.archivo = event.target.files[0];
+  }
+
+  subirArchivo(): void {
+    if (this.tarea && this.archivo) {
+      this.tareaService.subirArchivo(this.tarea.idTarea, this.archivo).subscribe(() => {
+        alert('Archivo subido exitosamente');
+        this.obtenerTarea(); // Recargar la tarea para obtener la lista actualizada de archivos
+      });
+    }
+  }
+
+  descargarArchivo(indice: number): void {
+    if (this.tarea) {
+      this.tareaService.descargarArchivo(this.tarea.idTarea, indice).subscribe(blob => {
+        const archivoNombre = `archivo_${indice}.pdf`; // Nombre del archivo descargado
+        saveAs(blob, archivoNombre);
+      });
+    }
   }
 }

@@ -1,7 +1,17 @@
-<div class="profile-info">
-    <img src="ruta-a-la-imagen-de-perfil" alt="Foto de perfil" />
-
-    <input type="password" placeholder="Contraseña" />
-    <button>ACTUALIZAR</button>
-  </div>
+<div class="profile-info" *ngIf="user">
   
+  
+  <div>
+    <label for="nombre">Nombre:</label>
+    <input id="nombre" [(ngModel)]="user.nombre" type="text" />
+  </div>
+
+  <div>
+    <label for="email">Email:</label>
+    <input id="email" [(ngModel)]="user.email" type="email" />
+  </div>
+
+
+
+  <button (click)="updateProfile()">ACTUALIZAR</button>
+</div>

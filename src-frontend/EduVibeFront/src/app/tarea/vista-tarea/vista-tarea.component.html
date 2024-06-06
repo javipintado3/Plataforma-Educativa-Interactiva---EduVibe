@@ -10,6 +10,23 @@
       <p class="tarea-enunciado">{{ tarea.enunciado }}</p>
       <p class="tarea-date">Fecha de apertura: {{ tarea.fechaApertura | date }}</p>
       <p class="tarea-calificacion">Calificación: {{ tarea.calificacion }}</p>
+      
+      <!-- Control para subir archivo -->
+      <div class="archivo-subida">
+        <input type="file" (change)="onArchivoSeleccionado($event)">
+        <button (click)="subirArchivo()" [disabled]="!archivo">Subir Archivo</button>
+      </div>
+
+      <!-- Lista de archivos adjuntos -->
+      <div class="archivo-lista" *ngIf="tarea.archivos && tarea.archivos.length > 0">
+        <h3>Archivos Adjuntos</h3>
+        <ul>
+          <li *ngFor="let archivo of tarea.archivos; let i = index">
+            Archivo {{ i + 1 }} 
+            <button (click)="descargarArchivo(i)">Descargar</button>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

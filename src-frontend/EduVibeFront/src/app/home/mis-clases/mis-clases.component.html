@@ -11,6 +11,14 @@
                         <a [routerLink]="['/clase', clase.idClase]" class="btn btn-primary">Tareas</a>
                         <a href="#" class="btn btn-secondary">Calificaciones</a>
                     </div>
+                    <div class="tarea-buttons">
+                        <br>
+                        <!-- Botón de editar -->
+                        <button class="editar-button" (click)="editarClase(clase.idClase)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Editar</button>
+                        <br><br>
+                        <!-- Botón de eliminar -->
+                        <button class="eliminar-button" (click)="eliminarClase(clase.idClase)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Eliminar</button>
+                      </div>
                 </div>
             </div>
             <!-- En caso de que sea la segunda tarjeta o la última, cerramos la fila -->

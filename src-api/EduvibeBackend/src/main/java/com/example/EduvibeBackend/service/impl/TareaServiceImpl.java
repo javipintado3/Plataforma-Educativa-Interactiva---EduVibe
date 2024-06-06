@@ -1,9 +1,13 @@
 package com.example.EduvibeBackend.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +18,9 @@ import com.example.EduvibeBackend.dto.GetTareaDTO;
 import com.example.EduvibeBackend.dto.TareaDTO;
 import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.Tarea;
+import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.TareaRepository;
 import com.example.EduvibeBackend.service.TareaService;
-
-import jakarta.annotation.Resource;
 
 @Service
 public class TareaServiceImpl implements TareaService {
@@ -69,32 +72,34 @@ public class TareaServiceImpl implements TareaService {
     
     
  
-    public TareaDTO agregarArchivosAdjuntos(Long idTarea, List<MultipartFile> archivosAdjuntos) {
-        return tareaRepository.findById(idTarea)
-                .map(tarea -> {
-                    if (tarea != null) {
-                        if (archivosAdjuntos != null && !archivosAdjuntos.isEmpty()) {
-                            List<byte[]> bytesArchivos = new ArrayList<>();
-                            for (MultipartFile archivo : archivosAdjuntos) {
-                                try {
-                                    byte[] bytesArchivo = archivo.getBytes();
-                                    bytesArchivos.add(bytesArchivo);
-                                } catch (IOException e) {
-                                    // Manejar la excepción
-                                    e.printStackTrace();
-                                }
-                            }
-                            tarea.setArchivoAdjunto(bytesArchivos);
-                            tarea = tareaRepository.save(tarea);
-                        }
-                        return mapToDto(tarea);
-                    } else {
-                        return null; 
-                    }
-                })
-                .orElse(null); 
+ // Método para agregar archivo a una tarea
+    public void agregarArchivoAdjunto(Long idTarea, MultipartFile archivo) throws IOException, SQLException {
+        Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
+        if (optionalTarea.isPresent()) {
+            Tarea tarea = optionalTarea.get();
+            Blob archivoBlob = new SerialBlob(archivo.getBytes());
+            tarea.getArchivoAdjunto().add(archivoBlob);
+            tareaRepository.save(tarea);
+        } else {
+            throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
+        }
     }
 
+    // Método para descargar archivo de una tarea
+    public byte[] descargarArchivoAdjunto(Long idTarea, int indiceArchivo) throws SQLException {
+        Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
+        if (optionalTarea.isPresent()) {
+            Tarea tarea = optionalTarea.get();
+            if (indiceArchivo >= 0 && indiceArchivo < tarea.getArchivoAdjunto().size()) {
+                Blob archivoBlob = tarea.getArchivoAdjunto().get(indiceArchivo);
+                return archivoBlob.getBytes(1, (int) archivoBlob.length());
+            } else {
+                throw new GlobalException("Índice de archivo inválido: " + indiceArchivo);
+            }
+        } else {
+            throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
+        }
+    }
 
     
  

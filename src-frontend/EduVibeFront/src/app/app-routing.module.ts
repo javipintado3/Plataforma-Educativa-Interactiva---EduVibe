@@ -35,7 +35,7 @@ export const routes: Routes = [
     canActivate: [loginGuard]
   },
   {
-    path: "perfil", 
+    path: 'perfil/:id', 
     component: PerfilUsuarioComponent, 
     canActivate: [loginGuard]
   },

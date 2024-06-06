@@ -33,7 +33,7 @@ public class Tarea {
     
     @ElementCollection
     @Lob
-    private List<byte[]> archivoAdjunto; // Lista para archivos adjuntos
+    private List<java.sql.Blob> archivoAdjunto; // Lista para archivos adjuntos
 
     @ManyToOne
     @JoinColumn(name = "id_clase")

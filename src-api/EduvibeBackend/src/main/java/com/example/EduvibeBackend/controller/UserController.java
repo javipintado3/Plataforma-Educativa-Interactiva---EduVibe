@@ -41,6 +41,12 @@ public class UserController {
 		return result;
 	}
 	
+    @GetMapping("user/{id}")
+    public ResponseEntity<UsuarioDto> getUserById(@PathVariable Integer id) {
+        UsuarioDto userDto = userService.getUserById(id);
+        return ResponseEntity.ok(userDto);
+    }
+	
     @PutMapping("/user/changePassword")
     public ResponseEntity<?> changePassword(@RequestParam String email, @RequestParam String newPassword) {
         try {
@@ -56,6 +62,8 @@ public class UserController {
         List<UsuarioDto> usuarios = userService.listarTodosUsuarios(); // Obtener la lista de todos los usuarios
         return ResponseEntity.ok(usuarios); // Devolver la lista de usuarios en la respuesta
     }
+    
+    
     
     @GetMapping("usuarios/clase/{idClase}")
     public List<UsuarioDto> obtenerUsuariosPorClase(@PathVariable Long idClase) {
