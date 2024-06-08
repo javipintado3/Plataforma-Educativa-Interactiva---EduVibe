@@ -14,6 +14,10 @@ import { MisClasesComponent } from './home/mis-clases/mis-clases.component';
 import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.component';
 import { PersonasDeClaseComponent } from './clase/personas-de-clase/personas-de-clase.component';
 import { VistaTareaComponent } from './tarea/vista-tarea/vista-tarea.component';
+import { CrearClaseComponent } from './clase/crear-clase/crear-clase.component';
+import { adminProfesorGuard } from './guardians/adminProfesor.guard';
+import { InscribirUsuarioComponent } from './clase/inscribir-usuario/inscribir-usuario.component';
+import { EditarClaseComponent } from './clase/editar-clase/editar-clase.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -58,7 +62,17 @@ export const routes: Routes = [
     path: "tarea/:id",
     component:VistaTareaComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
-  }
+  },
+  { path: 'crear-clase', component:CrearClaseComponent,
+    canActivate: [adminGuard]
+   },
+   { path: 'inscribir-usuario/:idClase', component: InscribirUsuarioComponent,
+    canActivate: [adminGuard]
+    },
+    { path: 'editar-clase/:idClase', component: EditarClaseComponent,
+      canActivate: [adminProfesorGuard]
+      },
+
 
   
 ];

@@ -6,6 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.EduvibeBackend.dto.GetTareaDTO;
 import com.example.EduvibeBackend.dto.TareaDTO;
 import com.example.EduvibeBackend.entities.Clase;
+import com.example.EduvibeBackend.entities.User;
+import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.impl.ClaseServiceImpl;
 import com.example.EduvibeBackend.service.impl.TareaServiceImpl;
 
@@ -31,8 +36,12 @@ public class TareaController {
 
     @Autowired
     private TareaServiceImpl tareaService;
+    
     @Autowired
     private ClaseServiceImpl claseService;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/crear")
     public ResponseEntity<TareaDTO> crearTarea(@RequestBody TareaDTO tareaDto) {
@@ -71,14 +80,7 @@ public class TareaController {
         List<GetTareaDTO> tareas = tareaService.obtenerTodasLasTareas();
         return new ResponseEntity<>(tareas, HttpStatus.OK);
     }
-    
 
-    @GetMapping("/clase/{idClase}")
-    public List<GetTareaDTO> getTareasByClase(@PathVariable Long idClase) {
-        Clase clase = claseService.obtenerClaseSinDto(idClase);
-        return tareaService.getTareasByClase(clase);
-    }
-    
     @PostMapping("/{id}/archivo")
     public ResponseEntity<String> agregarArchivoAdjunto(@PathVariable Long id, @RequestParam("archivo") MultipartFile archivo) throws java.io.IOException {
         try {
@@ -99,5 +101,27 @@ public class TareaController {
         }
     }
     
+    @GetMapping("/clase/{idClase}")
+    public List<GetTareaDTO> getTareasByClase(@PathVariable Long idClase) {
+        Clase clase = claseService.obtenerClaseSinDto(idClase);
+        return tareaService.getTareasByClase(clase);
+    }
 
+    // Nuevo método para obtener tareas por clase para el usuario actual
+    @GetMapping("/clase/user/{claseId}")
+    public ResponseEntity<List<GetTareaDTO>> getTareasByClaseForCurrentUser(@PathVariable Long claseId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByEmail(authentication.getName())
+                                  .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Clase clase = claseService.obtenerClaseSinDto(claseId);
+        if (clase == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        List<GetTareaDTO> tareas = tareaService.getTareasByClaseAndUser(clase, user);
+        return new ResponseEntity<>(tareas, HttpStatus.OK);
+    }
+    
+    
 }

@@ -7,12 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.Tarea;
+import com.example.EduvibeBackend.entities.User;
 
 @Repository
 public interface TareaRepository extends JpaRepository<Tarea, Long> {
 	
 	
     List<Tarea> findByClase(Clase clase);
+    List<Tarea> findByClaseAndUsuario(Clase clase, User user); // Agrega este método
 
 
 }
+

@@ -18,4 +18,5 @@ public class GetTareaDTO {
 	 private Double calificion;
 	 private Boolean estado; 
 	 private ClaseDto clase;
+	 private UsuarioDto user;
 }

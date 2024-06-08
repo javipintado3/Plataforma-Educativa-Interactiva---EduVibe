@@ -1,5 +1,10 @@
 <div class="container my-5">
     <h2 class="mb-4">Mis clases</h2>
+    <div class="row mb-4">
+        <div class="col-md-12 text-right">
+            <a [routerLink]="['/crear-clase']" class="editar-button" *ngIf="auth.ifAdmin()">Crear Nueva Clase</a>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6 mb-4" *ngFor="let clase of clases; let i = index">
             <div class="card">
@@ -14,15 +19,15 @@
                     <div class="tarea-buttons">
                         <br>
                         <!-- Botón de editar -->
-                        <button class="editar-button" (click)="editarClase(clase.idClase)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Editar</button>
+                        <button class="editar-button" (click)="editarClase(clase.idClase)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Editar</button>
                         <br><br>
                         <!-- Botón de eliminar -->
-                        <button class="eliminar-button" (click)="eliminarClase(clase.idClase)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Eliminar</button>
-                      </div>
+                        <button class="eliminar-button" (click)="eliminarClase(clase.idClase)" *ngIf="auth.ifAdmin()">Eliminar</button>
+                        <br><br>
+                        <a [routerLink]="['/inscribir-usuario', clase.idClase]" *ngIf="auth.ifAdmin()" class="editar-button">Inscribir en Clase Un usuario</a> <!-- Nuevo botón para inscripción -->
+                    </div>
                 </div>
             </div>
-            <!-- En caso de que sea la segunda tarjeta o la última, cerramos la fila -->
-            <!-- La segunda tarjeta es cada tarjeta de clase con índice impar, o si es la última tarjeta -->
             <div *ngIf="(i + 1) % 2 === 0 || i === clases.length - 1" class="w-100 d-none d-md-block"></div>
         </div>
     </div>

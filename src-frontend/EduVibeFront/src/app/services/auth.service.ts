@@ -177,6 +177,9 @@ export class AuthService {
     }
   
    
-
+  // Método para obtener todos los usuarios
+  obtenerUsuarios(): Observable<UserResp[]> {
+    return this.http.get<UserResp[]>(`${this.apiUrl}/usuarios`);
+  }
 
 }

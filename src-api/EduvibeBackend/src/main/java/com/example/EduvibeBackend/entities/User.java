@@ -53,6 +53,9 @@ public class User implements UserDetails {
         authorities.add(new SimpleGrantedAuthority(rol));
         return authorities;
     }
+    
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarea> tareas = new ArrayList<>();
 
     @Override
     public String getPassword() {

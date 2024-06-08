@@ -21,6 +21,9 @@ import { VistaDeClaseComponent } from './clase/vista-de-clase/vista-de-clase.com
 import { NavbarSecundarioComponent } from './layout/navbar-secundario/navbar-secundario.component';
 import { PersonasDeClaseComponent } from './clase/personas-de-clase/personas-de-clase.component';
 import { VistaTareaComponent } from './tarea/vista-tarea/vista-tarea.component';
+import { CrearClaseComponent } from './clase/crear-clase/crear-clase.component';
+import { InscribirUsuarioComponent } from './clase/inscribir-usuario/inscribir-usuario.component';
+import { EditarClaseComponent } from './clase/editar-clase/editar-clase.component';
 
 
 @NgModule({
@@ -38,6 +41,9 @@ import { VistaTareaComponent } from './tarea/vista-tarea/vista-tarea.component';
     NavbarSecundarioComponent,
     PersonasDeClaseComponent,
     VistaTareaComponent,
+    CrearClaseComponent,
+    InscribirUsuarioComponent,
+    EditarClaseComponent,
     
   ],
   imports: [

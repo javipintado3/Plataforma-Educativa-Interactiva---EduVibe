@@ -45,7 +45,7 @@ export class TareaService {
 
     // Obtener todas las tareas por ID de clase
     obtenerTareasPorClase(idClase: number): Observable<TareaDto[]> {
-        return this.http.get<TareaDto[]>(`${this.baseUrl}/clase/${idClase}`);
+        return this.http.get<TareaDto[]>(`${this.baseUrl}/clase/user/${idClase}`);
       }
 
         // Subir un archivo a una tarea

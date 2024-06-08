@@ -1,0 +1,20 @@
+<div class="create-class-container">
+    <h2>CREAR CLASE</h2>
+    <form (ngSubmit)="crearClase()" #createForm="ngForm">
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" [(ngModel)]="clase.nombre" name="nombre" class="form-control" placeholder="Nombre de la clase..." required>
+        <div *ngIf="createForm.controls['nombre'].invalid && (createForm.controls['nombre'].dirty || createForm.controls['nombre'].touched)" class="text-danger">
+          El nombre de la clase es requerido.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" [(ngModel)]="clase.descripcion" name="descripcion" class="form-control" placeholder="Descripción de la clase" required></textarea>
+        <div *ngIf="createForm.controls['descripcion'].invalid && (createForm.controls['descripcion'].dirty || createForm.controls['descripcion'].touched)" class="text-danger">
+          La descripción de la clase es requerida.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3" [disabled]="!createForm.valid">CREAR</button>
+    </form>
+</div>

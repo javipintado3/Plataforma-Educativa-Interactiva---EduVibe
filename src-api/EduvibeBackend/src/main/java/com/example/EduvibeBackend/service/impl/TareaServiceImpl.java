@@ -15,9 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.EduvibeBackend.dto.ClaseDto;
 import com.example.EduvibeBackend.dto.GetTareaDTO;
+import com.example.EduvibeBackend.dto.RegistroUserDto;
 import com.example.EduvibeBackend.dto.TareaDTO;
+import com.example.EduvibeBackend.dto.UsuarioDto;
 import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.Tarea;
+import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.TareaRepository;
 import com.example.EduvibeBackend.service.TareaService;
@@ -103,6 +106,13 @@ public class TareaServiceImpl implements TareaService {
 
     
  
+    public List<GetTareaDTO> getTareasByClaseAndUser(Clase clase, User user) {
+        return tareaRepository.findByClaseAndUsuario(clase, user)
+                .stream()
+                .map(this::mapToGetDto)
+                .collect(Collectors.toList());
+    }
+    
     public List<GetTareaDTO> getTareasByClase(Clase clase) {
         return tareaRepository.findByClase(clase)
                 .stream()
@@ -131,6 +141,8 @@ public class TareaServiceImpl implements TareaService {
         // Convertir Clase a ClaseDto
         ClaseDto claseDto = mapClaseToDto(tarea.getClase());
         getTareaDto.setClase(claseDto);
+        UsuarioDto userDto = mapUserToDto(tarea.getUsuario());
+        getTareaDto.setUser(userDto);
         
         return getTareaDto;
     }
@@ -141,5 +153,13 @@ public class TareaServiceImpl implements TareaService {
         claseDto.setNombre(clase.getNombre());
         claseDto.setDescripcion(clase.getDescripcion());
         return claseDto;
+    }
+    
+    private UsuarioDto mapUserToDto(User user) {
+    	UsuarioDto userDto = new UsuarioDto();
+    	userDto.setId(user.getId());
+    	userDto.setNombre(user.getNombre());
+    	userDto.setEmail(user.getEmail());
+    	return userDto;
     }
 }

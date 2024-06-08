@@ -1,0 +1,21 @@
+<div class="container-fluid editar-clase-container">
+    <h2>EDITAR CLASE</h2>
+    <form [formGroup]="claseForm" (ngSubmit)="editarClase()">
+      <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" formControlName="nombre" class="form-control" required>
+        <div *ngIf="claseForm.controls['nombre'].invalid && (claseForm.controls['nombre'].dirty || claseForm.controls['nombre'].touched)" class="text-danger">
+          El nombre de la clase es requerido.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" formControlName="descripcion" class="form-control" required></textarea>
+        <div *ngIf="claseForm.controls['descripcion'].invalid && (claseForm.controls['descripcion'].dirty || claseForm.controls['descripcion'].touched)" class="text-danger">
+          La descripción de la clase es requerida.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3" [disabled]="claseForm.invalid">GUARDAR CAMBIOS</button>
+    </form>
+  </div>
+  
