@@ -24,6 +24,7 @@ import com.example.EduvibeBackend.dto.GetTareaDTO;
 import com.example.EduvibeBackend.dto.TareaDTO;
 import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.User;
+import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.impl.ClaseServiceImpl;
 import com.example.EduvibeBackend.service.impl.TareaServiceImpl;
@@ -48,6 +49,17 @@ public class TareaController {
         TareaDTO nuevaTarea = tareaService.crearTarea(tareaDto);
         return new ResponseEntity<>(nuevaTarea, HttpStatus.CREATED);
     }
+    
+    @PostMapping("/crear/{idClase}")
+    public ResponseEntity<TareaDTO> crearTareaAsignandoClase(@PathVariable Long idClase, @RequestBody TareaDTO tareaDto) {
+        try {
+            TareaDTO nuevaTarea = tareaService.crearTareaAsignandoClase(idClase, tareaDto);
+            return new ResponseEntity<>(nuevaTarea, HttpStatus.CREATED);
+        } catch (GlobalException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<GetTareaDTO> obtenerTareaPorId(@PathVariable Long id) {
@@ -74,7 +86,7 @@ public class TareaController {
         tareaService.eliminarTarea(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
+    
     @GetMapping("/todos")
     public ResponseEntity<List<GetTareaDTO>> obtenerTodasLasTareas() {
         List<GetTareaDTO> tareas = tareaService.obtenerTodasLasTareas();

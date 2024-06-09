@@ -65,3 +65,14 @@
   cursor: pointer; /* Cambiar el cursor al pasar el ratón */
   transition: background-color 0.3s ease; /* Transición suave del color de fondo */
 }
+a {
+  text-decoration: none;
+  
+}
+
+
+
+
+.paginacion ::ng-deep .ngx-pagination .current {
+  background: #2D9596;
+}

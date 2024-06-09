@@ -4,7 +4,8 @@
   <h2 class="mb-4">{{ clase.nombre }}</h2>
   <p>{{ clase.descripcion }}</p>
   <div class="tarea-container">
-    <div class="tarea-item" *ngFor="let tarea of tareas">
+
+    <div class="tarea-item" *ngFor="let tarea of tareas | paginate: { itemsPerPage: 2, currentPage: p }">
       <button class="tarea-button" [routerLink]="['/tarea', tarea.idTarea]">
         <span class="tarea-titulo">TAREA</span>
         <span class="tarea-descripcion">{{ tarea.nombreTarea }}</span>
@@ -17,5 +18,12 @@
         <button class="eliminar-button" (click)="eliminarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Eliminar</button>
       </div>
     </div>
+    <div class="col-md-12 text-right">
+      <a [routerLink]="['/crear-tarea', id]" class="editar-button"  *ngIf="auth.ifProfesor() || auth.ifAdmin()">Crear Nueva Tarea</a>
+    </div>
   </div>
+  <div class="mx-auto me-5 mt-4 mb-2 justify-content-center d-flex">
+    <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5" (pageChange)="p = $event"></pagination-controls>
+  </div>
+
 </div>

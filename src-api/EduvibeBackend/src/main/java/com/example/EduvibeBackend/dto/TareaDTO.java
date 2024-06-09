@@ -21,5 +21,5 @@ public class TareaDTO {
 	 private String enunciado;
 	 private Double calificion;
 	 private Boolean estado; 
-	
+	private ClaseDto clase;
 }

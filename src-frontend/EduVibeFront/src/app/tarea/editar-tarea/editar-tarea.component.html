@@ -1,0 +1,20 @@
+<div class="edit-task-container">
+    <h2>EDITAR TAREA</h2>
+    <form (ngSubmit)="editarTarea()" [formGroup]="tareaForm">
+        <div class="form-group">
+            <label for="nombreTarea">Nombre de la Tarea:</label>
+            <input type="text" id="nombreTarea" formControlName="nombreTarea" class="form-control" placeholder="Nombre de la tarea..." required>
+            <div *ngIf="tareaForm.controls['nombreTarea'].invalid && (tareaForm.controls['nombreTarea'].dirty || tareaForm.controls['nombreTarea'].touched)" class="text-danger">
+                El nombre de la tarea es requerido.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="enunciado">Enunciado:</label>
+            <textarea id="enunciado" formControlName="enunciado" class="form-control" placeholder="Enunciado de la tarea" required></textarea>
+            <div *ngIf="tareaForm.controls['enunciado'].invalid && (tareaForm.controls['enunciado'].dirty || tareaForm.controls['enunciado'].touched)" class="text-danger">
+                El enunciado de la tarea es requerido.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3" [disabled]="tareaForm.invalid">GUARDAR CAMBIOS</button>
+    </form>
+</div>

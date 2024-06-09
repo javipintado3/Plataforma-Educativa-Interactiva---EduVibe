@@ -22,6 +22,7 @@ import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.Tarea;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
+import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.TareaRepository;
 import com.example.EduvibeBackend.service.TareaService;
 
@@ -32,15 +33,50 @@ public class TareaServiceImpl implements TareaService {
     private TareaRepository tareaRepository;
     @Autowired
     private FileStorageService fileStorageService;
+    @Autowired
+    private ClaseServiceImpl claseService;
 
     @Override
     public TareaDTO crearTarea(TareaDTO tareaDto) {
         Tarea tarea = new Tarea();
         tarea.setNombreTarea(tareaDto.getNombreTarea());
         tarea.setEnunciado(tareaDto.getEnunciado());
+        tarea.setEstado(false);
         Tarea nuevaTarea = tareaRepository.save(tarea);
         return mapToDto(nuevaTarea);
     }
+
+    
+    public TareaDTO crearTareaAsignandoClase(Long idClase, TareaDTO tareaDto) {
+        // Busca la clase por su ID
+        ClaseDto claseDto = claseService.obtenerClasePorId(idClase);
+        
+        if (claseDto != null) {
+            // Si la clase existe, crea la nueva tarea y asigna la clase
+            Tarea tarea = new Tarea();
+            tarea.setNombreTarea(tareaDto.getNombreTarea());
+            tarea.setEnunciado(tareaDto.getEnunciado());
+            tarea.setEstado(false);
+            
+            // Asigna la información de la clase a la tarea
+            Clase clase = new Clase();
+            clase.setIdClase(claseDto.getIdClase());
+            clase.setNombre(claseDto.getNombre());
+            clase.setDescripcion(claseDto.getDescripcion());
+            tarea.setClase(clase);
+            
+            // Guarda la nueva tarea en el repositorio
+            Tarea nuevaTarea = tareaRepository.save(tarea);
+            
+            // Devuelve el DTO de la nueva tarea creada
+            return mapToDto(nuevaTarea);
+        } else {
+            // Si la clase no existe, lanza una excepción
+            throw new GlobalException("La clase con ID " + idClase + " no fue encontrada.");
+        }
+    }
+
+
 
     @Override
     public GetTareaDTO obtenerTareaPorId(Long id) {
@@ -156,10 +192,13 @@ public class TareaServiceImpl implements TareaService {
     }
     
     private UsuarioDto mapUserToDto(User user) {
-    	UsuarioDto userDto = new UsuarioDto();
-    	userDto.setId(user.getId());
-    	userDto.setNombre(user.getNombre());
-    	userDto.setEmail(user.getEmail());
-    	return userDto;
+        UsuarioDto userDto = new UsuarioDto();
+        if (user != null) {
+            userDto.setId(user.getId());
+            userDto.setNombre(user.getNombre());
+            userDto.setEmail(user.getEmail());
+        }
+        return userDto;
     }
+
 }

@@ -1,0 +1,22 @@
+<div class="create-task-container">
+    <h2>CREAR TAREA</h2>
+    <form (ngSubmit)="crearTarea()" [formGroup]="tareaForm">
+        <div class="form-group">
+            <label for="nombreTarea">Nombre de la Tarea:</label>
+            <input type="text" id="nombreTarea" formControlName="nombreTarea" class="form-control" placeholder="Nombre de la tarea..." required>
+            <div *ngIf="tareaForm.get('nombreTarea')?.invalid && (tareaForm.get('nombreTarea')?.dirty || tareaForm.get('nombreTarea')?.touched)" class="text-danger">
+                Nombre de la tarea es requerido
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="enunciado">Enunciado:</label>
+            <textarea id="enunciado" formControlName="enunciado" class="form-control" placeholder="Enunciado de la tarea" required></textarea>
+            <div *ngIf="tareaForm.get('enunciado')?.invalid && (tareaForm.get('enunciado')?.dirty || tareaForm.get('enunciado')?.touched)" class="text-danger">
+                Enunciado de la tarea es requerido
+            </div>
+        </div>
+        
+        <!-- Puedes agregar más campos aquí según sea necesario -->
+        <button type="submit" class="btn btn-primary mt-3" [disabled]="tareaForm.invalid">CREAR</button>
+    </form>
+</div>

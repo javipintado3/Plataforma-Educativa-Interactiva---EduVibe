@@ -18,6 +18,8 @@ import { CrearClaseComponent } from './clase/crear-clase/crear-clase.component';
 import { adminProfesorGuard } from './guardians/adminProfesor.guard';
 import { InscribirUsuarioComponent } from './clase/inscribir-usuario/inscribir-usuario.component';
 import { EditarClaseComponent } from './clase/editar-clase/editar-clase.component';
+import { CrearTareaComponent } from './tarea/crear-tarea/crear-tarea.component';
+import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -72,6 +74,14 @@ export const routes: Routes = [
     { path: 'editar-clase/:idClase', component: EditarClaseComponent,
       canActivate: [adminProfesorGuard]
       },
+    {
+      path: 'crear-tarea/:idClase', component: CrearTareaComponent,
+      canActivate: [adminProfesorGuard]
+    },
+    {
+      path: 'editar-tarea/:idTarea', component: EditarTareaComponent,
+      canActivate: [adminProfesorGuard]
+    }
 
 
   

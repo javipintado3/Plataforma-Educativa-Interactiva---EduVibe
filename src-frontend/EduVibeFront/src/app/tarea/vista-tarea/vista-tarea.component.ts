@@ -3,6 +3,7 @@ import { TareaDto } from '../../interfaces/tarea';
 import { TareaService } from '../../services/tarea.service';
 import { ActivatedRoute } from '@angular/router';
 import { saveAs } from 'file-saver';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-vista-tarea',
@@ -16,7 +17,8 @@ export class VistaTareaComponent implements OnInit {
 
   constructor(
     private tareaService: TareaService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public auth:AuthService
   ) { }
 
   ngOnInit(): void {
