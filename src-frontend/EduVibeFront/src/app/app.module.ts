@@ -27,6 +27,7 @@ import { EditarClaseComponent } from './clase/editar-clase/editar-clase.componen
 import { CrearTareaComponent } from './tarea/crear-tarea/crear-tarea.component';
 import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.component';
 import { VistaUsersComponent } from './user/vista-users/vista-users.component';
+import { AsignarTareaUsuarioComponent } from './tarea/asignar-tarea-usuario/asignar-tarea-usuario.component';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { VistaUsersComponent } from './user/vista-users/vista-users.component';
     CrearTareaComponent,
     EditarTareaComponent,
     VistaUsersComponent,
+    AsignarTareaUsuarioComponent,
     
   ],
   imports: [

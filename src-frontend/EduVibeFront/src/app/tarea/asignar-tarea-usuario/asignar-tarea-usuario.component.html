@@ -1,0 +1,17 @@
+<div class="asignar-tarea-container">
+    <h2>Asignar Tarea a Usuario</h2>
+    <form (ngSubmit)="asignarTareaAUsuario()" #asignarForm="ngForm">
+      <div class="form-group">
+        <label for="usuario">Seleccionar Usuario</label>
+        <select id="usuario" [(ngModel)]="selectedUser" name="usuario" class="form-control" required>
+          <option value="" disabled selected>Seleccionar usuario</option>
+          <option *ngFor="let usuario of alumnos" [value]="usuario.id">{{ usuario.email }}</option>
+        </select>
+        <div *ngIf="asignarForm.controls['usuario'].invalid && (asignarForm.controls['usuario'].dirty || asignarForm.controls['usuario'].touched)" class="text-danger">
+          Debes seleccionar un usuario.
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3" [disabled]="!asignarForm.valid">Asignar</button>
+    </form>
+  </div>
+  

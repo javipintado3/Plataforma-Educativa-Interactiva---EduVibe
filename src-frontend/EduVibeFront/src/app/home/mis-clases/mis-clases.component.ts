@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ClaseService } from '../../services/clase.service';
 import { ClaseDto } from '../../interfaces/clase';
 import { AuthService } from '../../services/auth.service';
@@ -10,29 +10,45 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-mis-clases',
   templateUrl: './mis-clases.component.html',
-  styleUrl: './mis-clases.component.css'
+  styleUrls: ['./mis-clases.component.css'] // Corrige 'styleUrl' a 'styleUrls'
 })
-export class MisClasesComponent {
+export class MisClasesComponent implements OnInit {
   clases: ClaseDto[] = [];
   p: number = 1;
 
   constructor(
     private claseService: ClaseService,
     public auth: AuthService,
-    private router:Router
+    private router: Router
   ) { }
 
   ngOnInit(): void {
-    // Obtener el ID del usuario del token almacenado en el localStorage
-    const id = this.auth.getUserId();
-
-    // Verificar si el ID del usuario está disponible
-    if (id) {
-      // Llamar al servicio para obtener las clases del usuario
-      this.obtenerClasesPorUsuario(id);
+    // Verificar si el usuario es admin
+    if (this.auth.ifAdmin()) {
+      this.obtenerTodasLasClases();
     } else {
-      console.error('No se pudo obtener el ID del usuario.');
+      // Obtener el ID del usuario del token almacenado en el localStorage
+      const id = this.auth.getUserId();
+
+      // Verificar si el ID del usuario está disponible
+      if (id) {
+        // Llamar al servicio para obtener las clases del usuario
+        this.obtenerClasesPorUsuario(id);
+      } else {
+        console.error('No se pudo obtener el ID del usuario.');
+      }
     }
+  }
+
+  obtenerTodasLasClases(): void {
+    this.claseService.obtenerTodasLasClases().subscribe(
+      clases => {
+        this.clases = clases;
+      },
+      error => {
+        console.error('Error al obtener todas las clases:', error);
+      }
+    );
   }
 
   obtenerClasesPorUsuario(id: number): void {
@@ -50,7 +66,6 @@ export class MisClasesComponent {
   editarClase(idClase: number): void {
     this.router.navigate(['editar-clase', idClase]); // Sin el prefijo ':'
   }
-  
 
   eliminarClase(idClase: number): void {
     // Mostrar SweetAlert de confirmación antes de eliminar la clase
@@ -73,6 +88,8 @@ export class MisClasesComponent {
               'La clase ha sido eliminada correctamente.',
               'success'
             );
+            // Actualizar la lista de clases
+            this.clases = this.clases.filter(clase => clase.idClase !== idClase);
           },
           error => {
             console.error('Error al eliminar la clase:', error);
@@ -87,5 +104,4 @@ export class MisClasesComponent {
       }
     });
   }
-  
- }
+}

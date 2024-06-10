@@ -19,16 +19,32 @@ export class InicioComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Obtener el ID del usuario del token almacenado en el localStorage
-    const id = this.authService.getUserId();
-
-    // Verificar si el ID del usuario está disponible
-    if (id) {
-      // Llamar al servicio para obtener las clases del usuario
-      this.obtenerClasesPorUsuario(id);
+    // Verificar si el usuario es admin
+    if (this.authService.ifAdmin()) {
+      this.obtenerTodasLasClases();
     } else {
-      console.error('No se pudo obtener el ID del usuario.');
+      // Obtener el ID del usuario del token almacenado en el localStorage
+      const id = this.authService.getUserId();
+
+      // Verificar si el ID del usuario está disponible
+      if (id) {
+        // Llamar al servicio para obtener las clases del usuario
+        this.obtenerClasesPorUsuario(id);
+      } else {
+        console.error('No se pudo obtener el ID del usuario.');
+      }
     }
+  }
+
+  obtenerTodasLasClases(): void {
+    this.claseService.obtenerTodasLasClases().subscribe(
+      clases => {
+        this.clases = clases;
+      },
+      error => {
+        console.error('Error al obtener todas las clases:', error);
+      }
+    );
   }
 
   obtenerClasesPorUsuario(id: number): void {

@@ -1,18 +1,17 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TareaDto } from '../../interfaces/tarea';
 import { TareaService } from '../../services/tarea.service';
 import { ClaseDto } from '../../interfaces/clase';
 import { ClaseService } from '../../services/clase.service';
-import { ActivatedRoute, Route, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
 
 @Component({
   selector: 'app-vista-de-clase',
   templateUrl: './vista-de-clase.component.html',
   styleUrls: ['./vista-de-clase.component.css']
 })
-export class VistaDeClaseComponent {
+export class VistaDeClaseComponent implements OnInit {
   tareas: TareaDto[] = [];
   clase: ClaseDto | undefined;
   id: number = 0;
@@ -23,7 +22,7 @@ export class VistaDeClaseComponent {
     private claseService: ClaseService,
     private route: ActivatedRoute,
     public auth: AuthService,
-    private router:Router
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -47,20 +46,31 @@ export class VistaDeClaseComponent {
   }
 
   obtenerTareasPorClase(): void {
-    this.tareaService.obtenerTareasPorClaseParaUsuarioActual(this.id).subscribe(
-      (tareas) => {
-        console.log('Tareas obtenidas:', tareas);
-        this.tareas = tareas;
-      },
-      (error) => {
-        console.error('Error al obtener las tareas:', error);
-      }
-    );
+    if (this.auth.ifProfesor() || this.auth.ifAdmin()) {
+      this.tareaService.obtenerTareasPorClase(this.id).subscribe(
+        (tareas) => {
+          console.log('Tareas obtenidas:', tareas);
+          this.tareas = tareas;
+        },
+        (error) => {
+          console.error('Error al obtener las tareas:', error);
+        }
+      );
+    } else {
+      this.tareaService.obtenerTareasPorClaseParaUsuarioActual(this.id).subscribe(
+        (tareas) => {
+          console.log('Tareas obtenidas:', tareas);
+          this.tareas = tareas;
+        },
+        (error) => {
+          console.error('Error al obtener las tareas:', error);
+        }
+      );
+    }
   }
 
   editarTarea(idTarea: number): void {
     this.router.navigate(['editar-tarea', idTarea]); 
-
   }
 
   eliminarTarea(idTarea: number): void {

@@ -64,4 +64,9 @@ export class TareaService {
     obtenerTareasPorClaseParaUsuarioActual(idClase: number): Observable<any> {
       return this.http.get<any>(`${this.baseUrl}/clase/user/${idClase}`);
     }
+
+    asignarTareaAUsuario(idTarea: number, idUsuario: number): Observable<void> {
+      const url = `${this.baseUrl}/asignar?idTarea=${idTarea}&idUsuario=${idUsuario}`;
+      return this.http.post<void>(url, null);
+    }
 }

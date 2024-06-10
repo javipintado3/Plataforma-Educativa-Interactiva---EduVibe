@@ -1,0 +1,54 @@
+.inscribir-usuario-container {
+    width: 50%;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .inscribir-usuario-container h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .inscribir-usuario-container .form-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .inscribir-usuario-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .inscribir-usuario-container .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .inscribir-usuario-container .form-control::placeholder {
+    color: #ccc;
+  }
+  
+  .inscribir-usuario-container button {
+    background-color: #008080;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .inscribir-usuario-container button:hover {
+    background-color: #005f5f;
+  }

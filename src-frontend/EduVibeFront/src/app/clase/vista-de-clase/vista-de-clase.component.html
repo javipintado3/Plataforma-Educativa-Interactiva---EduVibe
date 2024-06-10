@@ -1,4 +1,3 @@
-
 <app-navbar-secundario [clase]="clase"></app-navbar-secundario>
 <div class="container my-5" *ngIf="clase">
   <h2 class="mb-4">{{ clase.nombre }}</h2>
@@ -12,18 +11,20 @@
       </button>
       <div class="tarea-buttons">
         <!-- Botón de editar -->
-        <button class="editar-button" (click)="editarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Editar</button>
+        <button class="editar-button" (click)="editarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Editar</button>
         <br><br>
         <!-- Botón de eliminar -->
-        <button class="eliminar-button" (click)="eliminarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() == true || auth.ifAdmin() == true">Eliminar</button>
+        <button class="eliminar-button" (click)="eliminarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Eliminar</button>
+        <br><br>
+        <!-- Botón de asignar tarea a usuario -->
+        <button class="editar-button" [routerLink]="['/asignar-tarea', tarea.idTarea]" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Asignar</button>
       </div>
     </div>
     <div class="col-md-12 text-right">
-      <a [routerLink]="['/crear-tarea', id]" class="editar-button"  *ngIf="auth.ifProfesor() || auth.ifAdmin()">Crear Nueva Tarea</a>
+      <a [routerLink]="['/crear-tarea', id]" class="editar-button" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Crear Nueva Tarea</a>
     </div>
   </div>
   <div class="mx-auto me-5 mt-4 mb-2 justify-content-center d-flex">
     <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5" (pageChange)="p = $event"></pagination-controls>
   </div>
-
 </div>
