@@ -59,4 +59,9 @@ export class TareaService {
       responseType: 'blob'
     });
   }
+
+    // Obtener todas las tareas por ID de clase para el usuario actual
+    obtenerTareasPorClaseParaUsuarioActual(idClase: number): Observable<any> {
+      return this.http.get<any>(`${this.baseUrl}/clase/user/${idClase}`);
+    }
 }

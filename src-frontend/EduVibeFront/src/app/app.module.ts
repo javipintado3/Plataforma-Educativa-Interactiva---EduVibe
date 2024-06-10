@@ -26,6 +26,7 @@ import { InscribirUsuarioComponent } from './clase/inscribir-usuario/inscribir-u
 import { EditarClaseComponent } from './clase/editar-clase/editar-clase.component';
 import { CrearTareaComponent } from './tarea/crear-tarea/crear-tarea.component';
 import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.component';
+import { VistaUsersComponent } from './user/vista-users/vista-users.component';
 
 
 @NgModule({
@@ -48,6 +49,7 @@ import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.componen
     EditarClaseComponent,
     CrearTareaComponent,
     EditarTareaComponent,
+    VistaUsersComponent,
     
   ],
   imports: [

@@ -76,24 +76,25 @@ public class UserService implements UserDetailsService {
 		return save;
 	}
 	
-	public void changePassword(String email, String newPassword) {
+	public void changePassword(Integer idUsuario, String newPassword) {
+		
+        // Buscar el usuario por su ID
+        User UserLogin = userRepository.findById(idUsuario)
+                .orElseThrow(() -> new GlobalException("Usuario no encontrado"));
+        
         // Verificar que la nueva contraseña cumpla con los requisitos de seguridad
         if (newPassword.length() < 8) {
-            throw new GlobalException("La contraseña debe tener al menos 8 caracteres");
+        	throw new GlobalException("El campo contraseña debe de contener 8 o más caracteres");
         }
-
-        // Buscar el usuario por su correo electrónico
-        User user = userRepository.findByEmail(email)
-                                  .orElseThrow(() -> new GlobalException("Usuario no encontrado con el correo electrónico proporcionado"));
 
         // Codificar la nueva contraseña
         String newPasswordEncoded = encode.encode(newPassword);
 
         // Establecer la nueva contraseña para el usuario
-        user.setPassword(newPasswordEncoded);
+        UserLogin.setPassword(newPasswordEncoded);
 
         // Guardar los cambios en el repositorio
-        userRepository.save(user);
+        userRepository.save(UserLogin);
     }
 	
 	   // Método para obtener todos los usuarios y convertirlos a objetos UsuarioDto
@@ -126,6 +127,31 @@ public class UserService implements UserDetailsService {
         return usuarios.stream()
                 .map(this::convertirAUsuarioDto)
                 .collect(Collectors.toList());
+    }
+    
+    // Nuevo método para editar usuarios
+    public UsuarioDto editarUsuario(Integer idUser, UsuarioDto usuarioDto) {
+        User user = userRepository.findById(idUser)
+                .orElseThrow(() -> new GlobalException("Usuario no encontrado con el ID proporcionado: " + idUser));
+
+        if (usuarioDto.getNombre() != null) {
+            user.setNombre(usuarioDto.getNombre());
+        }
+        if (usuarioDto.getEmail() != null) {
+            if (!user.getEmail().equals(usuarioDto.getEmail()) && userRepository.existsByEmailIgnoreCase(usuarioDto.getEmail())) {
+                throw new GlobalException("El email ya ha sido registrado");
+            }
+            if (!usuarioDto.getEmail().toLowerCase().endsWith("@vibe.com")) {
+                throw new GlobalException("El email debe terminar en '@vibe.com'");
+            }
+            user.setEmail(usuarioDto.getEmail());
+        }
+        if (usuarioDto.getRol() != null) {
+            user.setRol(usuarioDto.getRol());
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return convertirAUsuarioDto(updatedUser);
     }
 
 }

@@ -171,9 +171,9 @@ export class AuthService {
       return this.http.get<UserResp>(`${this.apiUrl}/user/${id}`);
     }
   
-    // Método para actualizar los datos del usuario
-    updateUserProfile(id: number, userData: Partial<UserResp>): Observable<UserResp> {
-      return this.http.put<UserResp>(`${this.apiUrl}/usuarios/${id}`, userData);
+  
+    editarUsuario(id: number, usuarioDto: UserResp): Observable<any> {
+      return this.http.put<any>(`${this.apiUrl}/user/editar/${id}`, usuarioDto)
     }
   
    

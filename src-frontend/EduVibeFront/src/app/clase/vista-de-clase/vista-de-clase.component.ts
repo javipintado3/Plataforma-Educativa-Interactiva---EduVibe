@@ -47,7 +47,7 @@ export class VistaDeClaseComponent {
   }
 
   obtenerTareasPorClase(): void {
-    this.tareaService.obtenerTareasPorClase(this.id).subscribe(
+    this.tareaService.obtenerTareasPorClaseParaUsuarioActual(this.id).subscribe(
       (tareas) => {
         console.log('Tareas obtenidas:', tareas);
         this.tareas = tareas;

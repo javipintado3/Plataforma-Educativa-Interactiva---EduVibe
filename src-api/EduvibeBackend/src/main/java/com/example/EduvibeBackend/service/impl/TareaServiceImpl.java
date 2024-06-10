@@ -24,6 +24,7 @@ import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.TareaRepository;
+import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.TareaService;
 
 @Service
@@ -35,6 +36,8 @@ public class TareaServiceImpl implements TareaService {
     private FileStorageService fileStorageService;
     @Autowired
     private ClaseServiceImpl claseService;
+    @Autowired
+    private UserRepository userRepositoy;
 
     @Override
     public TareaDTO crearTarea(TareaDTO tareaDto) {
@@ -139,6 +142,25 @@ public class TareaServiceImpl implements TareaService {
             throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
         }
     }
+    
+    public void asignarTareaAUsuario(Long idTarea, Integer idUsuario) {
+        // Buscar el usuario por su ID
+        User usuario = userRepositoy.findById(idUsuario)
+                                     .orElseThrow(() -> new GlobalException("El usuario con ID " + idUsuario + " no fue encontrado."));
+
+        // Buscar la tarea por su ID
+        Tarea tarea = tareaRepository.findById(idTarea)
+                                     .orElseThrow(() -> new GlobalException("La tarea con ID " + idTarea + " no fue encontrada."));
+
+        // Agregar la tarea al usuario y viceversa para mantener la coherencia en la relación bidireccional
+        usuario.getTareas().add(tarea);
+        tarea.setUsuario(usuario);
+
+        // Guardar tanto el usuario como la tarea en la base de datos
+        userRepositoy.save(usuario);
+        tareaRepository.save(tarea);
+    }
+
 
     
  

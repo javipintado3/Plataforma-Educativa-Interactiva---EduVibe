@@ -20,10 +20,11 @@ import { InscribirUsuarioComponent } from './clase/inscribir-usuario/inscribir-u
 import { EditarClaseComponent } from './clase/editar-clase/editar-clase.component';
 import { CrearTareaComponent } from './tarea/crear-tarea/crear-tarea.component';
 import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.component';
+import { VistaUsersComponent } from './user/vista-users/vista-users.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'registro', component: RegistroComponent },
+  { path: 'registro', component: RegistroComponent,canActivate:[adminGuard] },
   { path: 'login', component: LoginComponent },
   { 
     path: 'inicio', 
@@ -41,7 +42,7 @@ export const routes: Routes = [
     canActivate: [loginGuard]
   },
   {
-    path: 'perfil/:id', 
+    path: 'perfil/:idUsuario', 
     component: PerfilUsuarioComponent, 
     canActivate: [loginGuard]
   },
@@ -81,6 +82,10 @@ export const routes: Routes = [
     {
       path: 'editar-tarea/:idTarea', component: EditarTareaComponent,
       canActivate: [adminProfesorGuard]
+    },
+    {
+      path: 'users', component:VistaUsersComponent,
+      canActivate:[adminGuard]
     }
 
 

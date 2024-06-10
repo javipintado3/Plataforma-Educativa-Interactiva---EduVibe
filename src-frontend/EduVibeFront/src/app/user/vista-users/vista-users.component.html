@@ -1,0 +1,31 @@
+<div class="container my-5">
+    <h2 class="mb-4">Lista de Usuarios</h2>
+  
+    <!-- Botón para crear usuarios -->
+    <div class="row mb-4">
+      <div class="col-md-12 text-right">
+        <a [routerLink]="['/registro']" class="editar-button">Crear Nuevo Usuario</a>
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col-md-6 mb-4" *ngFor="let usuario of usuarios | paginate: { itemsPerPage: 4, currentPage: p }">
+        <div class="card position-relative">
+          <!-- Botón de edición -->
+          <button class="eliminar-button position-absolute top-0 end-0 m-2" (click)="eliminarUser(usuario.id)" >Eliminar</button>
+          <!-- Aquí va la información del usuario en la tarjeta -->
+          <div class="card-body">
+            <h5 class="card-title">{{ usuario.nombre }}</h5>
+            <p class="card-text">{{ usuario.email }}</p>
+            <p class="card-text">{{ usuario.rol }}</p>
+            <!-- Otros detalles del usuario -->
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Paginación -->
+    <div class="text-center">
+      <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5" (pageChange)="p = $event"></pagination-controls>
+    </div>
+  </div>

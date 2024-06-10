@@ -59,6 +59,12 @@ public class TareaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+    
+
+    @PostMapping("/asignar")
+    public void asignarTareaAUsuario(@RequestParam Long idTarea, @RequestParam Integer idUsuario) {
+    	tareaService.asignarTareaAUsuario(idTarea, idUsuario);
+    }
 
 
     @GetMapping("/{id}")

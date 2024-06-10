@@ -1,28 +1,71 @@
-.profile-info {
-    padding: 10px;
-    border: 2px solid #ccc;
-    background-color: #f9f9f9;
-    /* Agrega más estilos según tus preferencias */
-  }
-  
-  .profile-info img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    /* Estilos para la imagen de perfil */
-  }
-  
-  .profile-info input {
-    margin-bottom: 10px;
-    /* Estilos para los campos de entrada */
-  }
-  
-  .profile-info button {
-    background-color: #2D9596;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    /* Estilos para el botón de actualización */
-  }
-  
+.edit-user-container {
+  width: 50%;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.edit-user-container h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.edit-user-container .form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.edit-user-container label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.edit-user-container .form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.edit-user-container .form-control::placeholder {
+  color: #ccc;
+}
+
+.edit-user-container input[readonly] {
+  color: #666; /* Color de texto gris */
+  background-color: #ece5e5; /* Fondo gris */
+}
+
+.edit-user-container button {
+  background-color: #008080;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.edit-user-container button:hover {
+  background-color: #005f5f;
+}
+
+/* Estilos para la imagen de usuario */
+.user-image {
+  margin-bottom: 20px;
+}
+
+.user-image img {
+  width: 100px; /* Ancho de la imagen */
+  height: 100px; /* Altura de la imagen */
+  border-radius: 50%; /* Para que la imagen sea circular */
+  object-fit: cover; /* Para que la imagen se ajuste al tamaño del contenedor */
+}

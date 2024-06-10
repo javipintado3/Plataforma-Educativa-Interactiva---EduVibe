@@ -31,7 +31,7 @@ export class PerfilUsuarioComponent implements OnInit {
 
   updateProfile(): void {
     if (this.user && this.userId !== null) {
-      this.authService.updateUserProfile(this.userId, this.user).subscribe(
+      this.authService.editarUsuario(this.userId, this.user).subscribe(
         (data) => {
           this.user = data;
           Swal.fire({

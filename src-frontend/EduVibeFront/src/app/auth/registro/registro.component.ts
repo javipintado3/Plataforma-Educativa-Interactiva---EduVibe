@@ -93,16 +93,16 @@ register() {
         .subscribe({
           next: resp => {
             Swal.fire({
-              title: "Registro completado",
+              title: "Usuario Registrado",
               icon: "success",
               showConfirmButton: false
             })
-            this.router.navigateByUrl("/login")
+            this.router.navigateByUrl("/users")
 
           },
           error: err => {
             Swal.fire({
-              title: "Error",
+              title: "Error al crear usuario",
               icon: "error",
               showConfirmButton: false
             })

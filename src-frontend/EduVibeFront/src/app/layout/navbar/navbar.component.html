@@ -15,20 +15,20 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="calendario">Calendario</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="users" *ngIf="authService.ifAdmin()">Usuarios</a>
+        </li>
       </ul>
     </div>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link icon" href="#"><fa-icon [icon]="faMoon"></fa-icon></a>
-        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" id="dropdownUsuario" role="button" data-bs-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             <img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30">
           </a>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUsuario" *ngIf="authService.isAuthenticated() || authService.ifAdmin || authService.ifProfesor || authService.ifAlumno">
-            <a class="dropdown-item" [routerLink]="['/perfil', userResp?.id]">Perfil</a>
+            <a class="dropdown-item" [routerLink]="['/perfil', userResp?.idUsuario]">Perfil</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" (click)="logout()">Cerrar sesión</a>
           </div>
