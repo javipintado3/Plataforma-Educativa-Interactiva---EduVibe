@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -119,6 +120,16 @@ public class TareaController {
         }
     }
     
+    @GetMapping("/mediaCalificaciones/{idClase}")
+    public ResponseEntity<Double> obtenerMediaCalificaciones(@PathVariable Long idClase) {
+        Double media = tareaService.calcularMediaCalificaciones(idClase);
+        if (media != null) {
+            return ResponseEntity.ok(media);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+    
     @GetMapping("/clase/{idClase}")
     public List<GetTareaDTO> getTareasByClase(@PathVariable Long idClase) {
         Clase clase = claseService.obtenerClaseSinDto(idClase);
@@ -140,6 +151,17 @@ public class TareaController {
         List<GetTareaDTO> tareas = tareaService.getTareasByClaseAndUser(clase, user);
         return new ResponseEntity<>(tareas, HttpStatus.OK);
     }
+    
+    @PutMapping("/calificacion/{id}")
+    public ResponseEntity<Void> editarCalificacionTarea(@PathVariable Long id, @RequestParam Double nuevaCalificacion) {
+        try {
+            tareaService.editarCalificacionTarea(id, nuevaCalificacion);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (GlobalException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     
     
 }

@@ -19,7 +19,7 @@ public class TareaDTO {
 	
 	 private String nombreTarea;
 	 private String enunciado;
-	 private Double calificion;
+	 private Double calificacion;
 	 private Boolean estado; 
 	private ClaseDto clase;
 }

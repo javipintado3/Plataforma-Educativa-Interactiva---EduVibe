@@ -1,0 +1,91 @@
+/* Estilos generales */
+.container {
+    margin: 5rem auto;
+    max-width: 1200px;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    font-size: 1.2rem;
+  }
+  
+  /* Contenedor de tareas */
+  .tarea-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .tarea-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .tarea-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tarea-button:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .tarea-icono {
+    font-size: 2rem;
+    color: #007bff;
+    margin-right: 1rem;
+  }
+  
+  .tarea-info {
+    flex-grow: 1;
+  }
+  
+  .tarea-titulo {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  .tarea-descripcion {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .tarea-calificacion {
+    text-align: right;
+  }
+  
+  .tarea-rango {
+    font-size: 0.9rem;
+    color: #999;
+  }
+  
+  .tarea-valor {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .tarea-valor.pendiente {
+    color: #ff0000;
+  }
+  
+  /* Estilos de paginación */
+  .pagination-controls {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  

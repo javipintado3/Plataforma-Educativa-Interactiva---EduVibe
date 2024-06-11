@@ -14,12 +14,13 @@ export class VistaTareaComponent implements OnInit {
   tarea: TareaDto | undefined;
   id: number = 0;
   archivo: File | null = null;
+  nuevaCalificacion: number | null = null;
 
   constructor(
     private tareaService: TareaService,
     private route: ActivatedRoute,
-    public auth:AuthService
-  ) { }
+    public auth: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -31,7 +32,6 @@ export class VistaTareaComponent implements OnInit {
   obtenerTarea(): void {
     this.tareaService.obtenerTareaPorId(this.id).subscribe(
       (tarea) => {
-        console.log('tarea obtenida:', this.id);
         this.tarea = tarea;
       },
       (error) => {
@@ -46,10 +46,15 @@ export class VistaTareaComponent implements OnInit {
 
   subirArchivo(): void {
     if (this.tarea && this.archivo) {
-      this.tareaService.subirArchivo(this.tarea.idTarea, this.archivo).subscribe(() => {
-        alert('Archivo subido exitosamente');
-        this.obtenerTarea(); // Recargar la tarea para obtener la lista actualizada de archivos
-      });
+      this.tareaService.subirArchivo(this.tarea.idTarea, this.archivo).subscribe(
+        () => {
+          alert('Archivo subido exitosamente');
+          this.obtenerTarea(); // Recargar la tarea para obtener la lista actualizada de archivos
+        },
+        (error) => {
+          console.error('Error al subir el archivo:', error);
+        }
+      );
     }
   }
 
@@ -59,6 +64,22 @@ export class VistaTareaComponent implements OnInit {
         const archivoNombre = `archivo_${indice}.pdf`; // Nombre del archivo descargado
         saveAs(blob, archivoNombre);
       });
+    }
+  }
+
+  editarCalificacion(idTarea: number): void {
+    if (this.nuevaCalificacion !== null && this.nuevaCalificacion >= 0 && this.nuevaCalificacion <= 10) {
+      this.tareaService.editarCalificacion(idTarea, this.nuevaCalificacion).subscribe(
+        () => {
+          alert('Calificación actualizada exitosamente');
+          this.obtenerTarea(); // Recargar la tarea para obtener la calificación actualizada
+        },
+        (error) => {
+          console.error('Error al actualizar la calificación:', error);
+        }
+      );
+    } else {
+      alert('Por favor, ingrese una calificación válida entre 0 y 10.');
     }
   }
 }

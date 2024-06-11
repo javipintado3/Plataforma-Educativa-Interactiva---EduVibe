@@ -1,5 +1,3 @@
-<app-navbar-secundario [clase]="tarea?.clase"></app-navbar-secundario>
-
 <div class="container my-5">
   <div class="tarea-container">    
     <div class="tarea-item" *ngIf="tarea">
@@ -9,12 +7,22 @@
       </div>
       <p class="tarea-enunciado">{{ tarea.enunciado }}</p>
       <p class="tarea-date">Fecha de apertura: {{ tarea.fechaApertura | date }}</p>
-      <p class="tarea-calificacion">Calificación: {{ tarea.calificacion }}</p>
+      <p class="tarea-calificacion"><strong>Calificación:</strong> {{ tarea.calificacion ?? 'Sin asignar' }}</p>
+      <p class="usuario-asignado">
+        Alumno asignado: {{ tarea.user?.email ?? 'Ninguno' }}
+      </p>
       
       <!-- Control para subir archivo -->
-      <div class="archivo-subida">
+      <div class="archivo-subida" *ngIf="auth.ifAlumno()">
         <input type="file" (change)="onArchivoSeleccionado($event)">
         <button (click)="subirArchivo()" [disabled]="!archivo">Subir Archivo</button>
+      </div>
+
+      <!-- Controles para editar calificación -->
+      <div *ngIf="auth.ifProfesor() || auth.ifAdmin()">
+        <label for="calificacion">Editar Calificación:</label>
+        <input type="number" [(ngModel)]="nuevaCalificacion" min="0" max="10">
+        <button class="editar-button" (click)="editarCalificacion(tarea.idTarea)">Poner Calificación</button>
       </div>
 
       <!-- Lista de archivos adjuntos -->

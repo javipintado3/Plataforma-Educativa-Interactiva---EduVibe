@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.core.io.Resource;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -114,7 +115,8 @@ public class TareaServiceImpl implements TareaService {
     
     
  
- // Método para agregar archivo a una tarea
+ 
+    // Método para agregar archivo a una tarea
     public void agregarArchivoAdjunto(Long idTarea, MultipartFile archivo) throws IOException, SQLException {
         Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
         if (optionalTarea.isPresent()) {
@@ -142,6 +144,7 @@ public class TareaServiceImpl implements TareaService {
             throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
         }
     }
+
     
     public void asignarTareaAUsuario(Long idTarea, Integer idUsuario) {
         // Buscar el usuario por su ID
@@ -160,6 +163,22 @@ public class TareaServiceImpl implements TareaService {
         userRepositoy.save(usuario);
         tareaRepository.save(tarea);
     }
+    
+ 
+    public void editarCalificacionTarea(Long idTarea, Double nuevaCalificacion) {
+        if (nuevaCalificacion < 0 || nuevaCalificacion > 10) {
+            throw new GlobalException("La calificación debe estar en el rango de 0 a 10.");
+        }
+
+        Tarea tarea = tareaRepository.findById(idTarea)
+                .orElseThrow(() -> new GlobalException("La tarea con ID " + idTarea + " no fue encontrada."));
+
+        tarea.setCalificacion(nuevaCalificacion);
+        tareaRepository.save(tarea);
+    }
+    
+    
+
 
 
     
@@ -186,6 +205,18 @@ public class TareaServiceImpl implements TareaService {
         tareaDto.setEnunciado(tarea.getEnunciado());
         return tareaDto;
     }
+    
+    public Double calcularMediaCalificaciones(Long idClase) {
+        List<Double> calificaciones = tareaRepository.findCalificacionesByClaseId(idClase);
+        if (calificaciones.isEmpty()) {
+            return null; // O devolver 0.0, dependiendo de cómo quieras manejar esto
+        }
+        double sum = 0;
+        for (Double calificacion : calificaciones) {
+            sum += calificacion;
+        }
+        return sum / calificaciones.size();
+    }
 
     private GetTareaDTO mapToGetDto(Tarea tarea) {
         GetTareaDTO getTareaDto = new GetTareaDTO();
@@ -193,7 +224,7 @@ public class TareaServiceImpl implements TareaService {
         getTareaDto.setNombreTarea(tarea.getNombreTarea());
         getTareaDto.setEnunciado(tarea.getEnunciado());
         getTareaDto.setFechaApertura(tarea.getFechaApertura());
-        getTareaDto.setCalificion(tarea.getCalificacion());
+        getTareaDto.setCalificacion(tarea.getCalificacion());
         getTareaDto.setEstado(tarea.getEstado());
         
         // Convertir Clase a ClaseDto

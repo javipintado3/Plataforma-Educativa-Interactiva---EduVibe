@@ -3,12 +3,11 @@
   align-items: center;
 }
 
-
 .navbar-divider {
   height: 40px;
   width: 2px;
   background-color: black;
-  margin-right: 15px;
+  margin-right: 20px; /* Aumenta el espacio entre el divisor y la imagen de perfil */
 }
 
 .nav-link {
@@ -28,8 +27,14 @@
 
 .navbar-nav .nav-item img {
   height: 35px; /* Aumenta el tamaño de la imagen de perfil */
-  margin-right: 10px;
 }
+
+span {
+  font-size: 1.2rem;
+  color: #2D9596;
+  margin-right: 20px;
+}
+
 
 .navbar-nav.ml-auto {
   margin-left: auto; /* Alinea los elementos de la derecha */

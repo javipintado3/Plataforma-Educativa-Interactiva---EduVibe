@@ -45,20 +45,26 @@ export class TareaService {
   obtenerTareasPorClase(idClase: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/clase/${idClase}`);
   }
-
-  // Subir un archivo a una tarea
   subirArchivo(idTarea: number, archivo: File): Observable<any> {
     const formData: FormData = new FormData();
     formData.append('archivo', archivo, archivo.name);
     return this.http.post<any>(`${this.baseUrl}/${idTarea}/archivo`, formData);
   }
 
-  // Descargar un archivo de una tarea
   descargarArchivo(idTarea: number, indice: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${idTarea}/archivo/${indice}`, {
       responseType: 'blob'
     });
   }
+
+  obtenerMediaCalificaciones(idClase: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/mediaCalificaciones/${idClase}`);
+  }
+
+    // Editar la calificación de una tarea
+    editarCalificacion(id: number, nuevaCalificacion: number): Observable<void> {
+      return this.http.put<void>(`${this.baseUrl}/calificacion/${id}?nuevaCalificacion=${nuevaCalificacion}`, null);
+    }
 
     // Obtener todas las tareas por ID de clase para el usuario actual
     obtenerTareasPorClaseParaUsuarioActual(idClase: number): Observable<any> {

@@ -69,6 +69,7 @@ export class EditarTareaComponent implements OnInit {
         calificacion: this.tarea.calificacion, // Conservar la calificación original
         clase: this.tarea.clase, // Conservar la clase original
         archivos: this.tarea.archivos, // Conservar los archivos originales
+        user: this.tarea.user
       };
       // Llamada al servicio para editar la tarea
       this.tareaService.editarTarea(this.idTarea, tarea).subscribe({

@@ -22,6 +22,7 @@ import { CrearTareaComponent } from './tarea/crear-tarea/crear-tarea.component';
 import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.component';
 import { VistaUsersComponent } from './user/vista-users/vista-users.component';
 import { AsignarTareaUsuarioComponent } from './tarea/asignar-tarea-usuario/asignar-tarea-usuario.component';
+import { CalificacionesDeClaseComponent } from './clase/calificaciones-de-clase/calificaciones-de-clase.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -60,6 +61,16 @@ export const routes: Routes = [
   {
     path: "personasClase/:id",
     component:PersonasDeClaseComponent,
+    canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
+  },
+  {
+    path: "calificaciones/:id",
+    component:CalificacionesDeClaseComponent,
+    canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
+  },
+  {
+    path: "tarea/:id",
+    component:VistaTareaComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
   },
   {

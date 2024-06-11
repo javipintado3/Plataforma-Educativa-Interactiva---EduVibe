@@ -51,7 +51,6 @@ export class AuthService {
         })
       );
   }
-
   logout(): void {
     if (this.isLocalStorageAvailable()) {
       localStorage.removeItem('token'); // Elimina el token del LocalStorage
@@ -63,7 +62,7 @@ export class AuthService {
     });
     this.router.navigate(['/login']); // Redirige al login
   }
-
+  
   isLogged(): boolean {
     return this.isLocalStorageAvailable() && !!localStorage.getItem("token");
   }

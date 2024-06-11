@@ -1,5 +1,5 @@
 <div class="container my-5">
-    <h2 class="mb-4">Mis clases</h2>
+    <h2 class="mb-4">{{ auth.ifAdmin() ? 'Todas las clases' : 'Mis clases' }}</h2>
     <div class="row mb-4">
         <div class="col-md-12 text-right">
             <a [routerLink]="['/crear-clase']" class="editar-button" *ngIf="auth.ifAdmin()">Crear Nueva Clase</a>
