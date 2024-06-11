@@ -56,7 +56,9 @@ export class CrearTareaComponent implements OnInit {
         calificacion: 0,
         clase: this.clase,
         archivos: [],
-        idTarea: 0
+        idTarea: 0,
+        user: null,
+        solucionEscrita: ""
       };
 
       this.tareaService.crearTareaAsignandoClase(this.idClase, tarea).subscribe({

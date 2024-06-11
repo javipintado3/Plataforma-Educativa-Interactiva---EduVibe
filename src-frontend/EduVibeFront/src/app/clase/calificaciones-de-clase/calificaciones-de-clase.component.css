@@ -43,10 +43,12 @@
   .tarea-button:hover {
     background-color: #f9f9f9;
   }
+
+  
   
   .tarea-icono {
     font-size: 2rem;
-    color: #007bff;
+    color: #2D9596;
     margin-right: 1rem;
   }
   
@@ -62,6 +64,10 @@
   .tarea-descripcion {
     font-size: 1rem;
     color: #666;
+  }
+
+  .tarea-rango {
+    margin-right: 100px;
   }
   
   .tarea-calificacion {

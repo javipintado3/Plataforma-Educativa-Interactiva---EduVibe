@@ -33,11 +33,13 @@
     font-weight: bold;
   }
   
-  .subnav-link.active {
-    border-bottom: 2px solid white;
-  }
+
   
   .subnav-link:hover {
     text-decoration: underline;
   }
-  
+  /* Agrega esto en tu archivo CSS global o en el archivo CSS correspondiente */
+.subnav-link.active {
+  text-decoration: underline;
+  font-weight: bold; /* Opcional: para resaltar aún más el enlace activo */
+}

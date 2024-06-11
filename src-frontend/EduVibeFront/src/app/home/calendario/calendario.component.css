@@ -1,29 +1,50 @@
 /* calendario.component.css */
 .calendario-container {
-    max-width: 700px; /* ajusta el tamaño máximo según tus necesidades */
-    width: 100%; /* asegura que el contenedor ocupe todo el ancho disponible */
-    height: auto; /* permite que la altura del contenedor se ajuste según el contenido */
-    margin: 0 auto; /* centra el contenedor horizontalmente */
-  }
-  
-
-  
-  .fc-day-number {
-    color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+  max-width: 700px; /* ajusta el tamaño máximo según tus necesidades */
+  width: 100%; /* asegura que el contenedor ocupe todo el ancho disponible */
+  height: auto; /* permite que la altura del contenedor se ajuste según el contenido */
+  margin: 0 auto; /* centra el contenedor horizontalmente */
 }
 
-.fc-today {
-    background-color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+/* Cambia el color del texto de los días */
+.fc-daygrid-day-number {
+  color: #2D9596;
 }
 
-  
-  /* Cambia el color de las flechas de navegación */
-  .fc-icon {
-    color: #2D9596;
-  }
-  
-  .fc-prev-button, .fc-next-button {
-    color: #2D9596; /* Reemplaza #tuColorDeseado con el código hexadecimal del color que prefieras */
+/* Cambia el color de fondo del día actual */
+.fc-daygrid-day.fc-day-today {
+  background-color: #2D9596;
+  color: #fff; /* Color del texto en el día actual */
 }
 
-  
+/* Cambia el color de las flechas de navegación */
+.fc-icon {
+  color: #2D9596;
+}
+
+/* Cambia el color del texto de los encabezados */
+.fc .fc-col-header-cell-cushion {
+  color: #2D9596;
+}
+
+/* Cambia el color de fondo de los botones y su texto */
+.fc .fc-button-primary {
+  background-color: #2D9596;
+  border-color: #2D9596;
+  color: #fff; /* Color del texto en los botones */
+}
+
+/* Cambia el color de fondo y el texto de los botones al pasar el ratón */
+.fc .fc-button-primary:not(:disabled).fc-button-active, 
+.fc .fc-button-primary:not(:disabled):active, 
+.fc .fc-button-primary:not(:disabled):focus {
+  background-color: #1e7a7a; /* Color de fondo al hacer clic */
+  border-color: #1e7a7a;
+  color: #fff; /* Color del texto al hacer clic */
+}
+
+/* Cambia el color de los enlaces */
+a {
+  color: #2D9596;
+  text-decoration: underline;
+}

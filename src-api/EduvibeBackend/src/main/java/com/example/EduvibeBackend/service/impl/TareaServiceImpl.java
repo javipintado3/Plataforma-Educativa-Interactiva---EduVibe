@@ -180,6 +180,15 @@ public class TareaServiceImpl implements TareaService {
     
 
 
+    public TareaDTO editarSolucionEscrita(Long id, String nuevaSolucionEscrita) {
+        return tareaRepository.findById(id)
+                .map(tarea -> {
+                    tarea.setSolucionEscrita(nuevaSolucionEscrita);
+                    return mapToDto(tareaRepository.save(tarea));
+                })
+                .orElse(null); // O lanzar una excepción personalizada
+    }
+
 
     
  
@@ -226,6 +235,7 @@ public class TareaServiceImpl implements TareaService {
         getTareaDto.setFechaApertura(tarea.getFechaApertura());
         getTareaDto.setCalificacion(tarea.getCalificacion());
         getTareaDto.setEstado(tarea.getEstado());
+        getTareaDto.setSolucionEscrita(tarea.getSolucionEscrita());
         
         // Convertir Clase a ClaseDto
         ClaseDto claseDto = mapClaseToDto(tarea.getClase());

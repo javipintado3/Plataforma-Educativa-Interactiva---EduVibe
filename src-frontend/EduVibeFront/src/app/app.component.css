@@ -1,0 +1,43 @@
+/* Asegúrate de que el body y el html ocupen toda la altura */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* El contenedor principal toma todo el espacio restante */
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* El contenido principal debe crecer para ocupar el espacio disponible */
+  #main-content {
+    flex: 1;
+  }
+  
+  /* Estilos para el footer */
+  .bg-green {
+    background-color: #2D9596;
+  }
+  
+  footer hr {
+    border-top: 1px solid white;
+  }
+  
+  footer a {
+    text-decoration: none;
+  }
+  
+  footer a:hover {
+    text-decoration: underline;
+  }
+  
+  footer {
+    width: 100%;
+    padding: 20px 0;
+    background-color: #2D9596; /* Reiterar el color de fondo */
+  }
+  

@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.css */
+
+/* Cambia el color del texto de los días */
+.fc-daygrid-day-number {
+    color: #2D9596 !important;
+  }
+  
+
+  
+  /* Cambia el color de las flechas de navegación */
+  .fc-icon {
+    color: #fff !important;
+  }
+  
+  /* Cambia el color del texto de los encabezados */
+  .fc .fc-col-header-cell-cushion {
+    color: #2D9596 !important;
+  }
+  
+  /* Cambia el color de fondo de los botones y su texto */
+  .fc .fc-button-primary {
+    background-color: #2D9596 !important;
+    border-color: #2D9596 !important;
+    color: #fff !important; /* Color del texto en los botones */
+  }
+  
+  /* Cambia el color de fondo y el texto de los botones al pasar el ratón */
+  .fc .fc-button-primary:not(:disabled).fc-button-active, 
+  .fc .fc-button-primary:not(:disabled):active, 
+  .fc .fc-button-primary:not(:disabled):focus {
+    background-color: #1e7a7a !important; /* Color de fondo al hacer clic */
+    border-color: #1e7a7a !important;
+    color: #fff !important; /* Color del texto al hacer clic */
+  }
+  

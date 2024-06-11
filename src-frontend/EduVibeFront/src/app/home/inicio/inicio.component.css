@@ -1,8 +1,10 @@
 /* vistas-clases.component.css */
 .card {
-    border: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
+  border: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-right: 50px; /* Aumentar espacio entre las tarjetas */
+}
+
   
   .card-title {
     font-size: 1.5rem;
@@ -15,6 +17,7 @@
     justify-content: space-between;
     margin-top: 10px;
   }
+
   
   .card-buttons .btn {
     width: 45%;

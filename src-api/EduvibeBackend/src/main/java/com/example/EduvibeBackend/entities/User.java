@@ -60,7 +60,7 @@ public class User implements UserDetails {
     )
     private Set<Clase> clases = new HashSet<>();
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = { CascadeType.PERSIST, CascadeType.MERGE})
     private List<Tarea> tareas = new ArrayList<>();
 
     @Override

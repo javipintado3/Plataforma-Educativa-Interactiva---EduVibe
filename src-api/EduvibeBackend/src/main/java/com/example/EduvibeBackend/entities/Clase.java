@@ -33,7 +33,7 @@ public class Clase {
     @ManyToMany(mappedBy = "clases")
     private Set<User> usuarios = new HashSet<>();
     
-    @OneToMany(mappedBy = "clase", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "clase", cascade = { CascadeType.PERSIST, CascadeType.MERGE})
     private List<Tarea> tareas;
 }
 

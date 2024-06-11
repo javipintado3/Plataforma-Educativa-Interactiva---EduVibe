@@ -11,7 +11,23 @@
       <p class="usuario-asignado">
         Alumno asignado: {{ tarea.user?.email ?? 'Ninguno' }}
       </p>
-      
+
+      <!-- Textarea para escribir la solución escrita (visible solo para alumnos) -->
+      <div *ngIf="auth.ifAlumno()">
+        <label for="solucionEscrita">Solución Escrita:</label>
+          <!-- Textarea para la solución escrita -->
+      <textarea class="form-control" [(ngModel)]="solucionEscrita" name="solucionEscrita" rows="5"></textarea>
+
+      <!-- Botón para enviar la solución escrita -->
+      <button class="btn btn-primary mt-3" (click)="enviarSolucionEscrita()">Enviar Solución</button>
+      </div>
+
+      <!-- Área de visualización de la solución escrita (visible solo para profesores) -->
+      <div >
+        <label for="visualizarSolucion">Solución Escrita:</label>
+        <div id="visualizarSolucion" class="solucion-escrita">{{ tarea.solucionEscrita }}</div>
+      </div>
+
       <!-- Control para subir archivo -->
       <div class="archivo-subida" *ngIf="auth.ifAlumno()">
         <input type="file" (change)="onArchivoSeleccionado($event)">

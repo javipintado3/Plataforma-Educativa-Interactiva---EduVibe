@@ -3,6 +3,7 @@ package com.example.EduvibeBackend.entities;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +39,8 @@ public class Tarea {
     @ElementCollection
     @Lob
     private List<java.sql.Blob> archivoAdjunto; // Lista para archivos adjuntos
+    
+    private String solucionEscrita;
 
     @ManyToOne
     @JoinColumn(name = "id_clase")

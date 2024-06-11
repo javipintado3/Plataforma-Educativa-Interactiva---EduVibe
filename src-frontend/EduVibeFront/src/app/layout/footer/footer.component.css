@@ -2,24 +2,23 @@
     background-color: #2D9596;
   }
   
-  footer hr {
-    border-top: 1px solid white;
-  }
-  
-  footer a {
-    text-decoration: none;
-  }
-  
-  footer a:hover {
-    text-decoration: underline;
-  }
+footer hr {
+  border-top: 1px solid white;
+}
 
-  footer {
-    position: fixed; /* o 'absolute' dependiendo del caso */
-    bottom: 0;
-    width: 100%;
-    height: 20%;
-    
-  }
+footer a {
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+footer {
+  width: 100%;
+  height: 200px;
+  
+  background-color: #2D9596; /* Reiterar el color de fondo */
+}
   
   

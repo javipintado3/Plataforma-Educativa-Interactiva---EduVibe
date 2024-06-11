@@ -5,10 +5,10 @@
             <a [routerLink]="['/crear-clase']" class="editar-button" *ngIf="auth.ifAdmin()">Crear Nueva Clase</a>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-6 mb-4" *ngFor="let clase of clases; let i = index">
+    <div class="row justify-content-center"> <!-- Centra las tarjetas horizontalmente -->
+        <div class="col-md-5 mb-4" *ngFor="let clase of clases; let i = index">
             <div class="card">
-                <img src="assets/{{ clase.nombre | lowercase }}.jpg" class="card-img-top" alt="{{ clase.nombre }}">
+                <img src="../../../assets/Img/ImagenClase3.png" class="card-img-top" alt="{{ clase.nombre }}">
                 <div class="card-body">
                     <h5 class="card-title"><a [routerLink]="['/clase', clase.idClase]">{{ clase.nombre }}</a></h5>
                     <p class="card-text">{{ clase.descripcion }}</p>

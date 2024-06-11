@@ -1,3 +1,18 @@
+/* Define la animación */
+@keyframes bell-ring {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Aplica la animación cuando se pasa el ratón sobre la campana */
+.navbar-nav .nav-link.icon:hover {
+  animation: bell-ring 0.5s ease-in-out;
+}
+
+/* Otros estilos existentes */
 .navbar-left {
   display: flex;
   align-items: center;
@@ -7,13 +22,13 @@
   height: 40px;
   width: 2px;
   background-color: black;
-  margin-right: 20px; /* Aumenta el espacio entre el divisor y la imagen de perfil */
+  margin-right: 20px;
 }
 
 .nav-link {
   font-weight: bold;
-  margin-right: 10px; /* Reduce el margen entre enlaces */
-  font-size: 1.4rem; /* Aumenta el tamaño de fuente */
+  margin-right: 10px;
+  font-size: 1.4rem;
 }
 
 .navbar-nav .icon {
@@ -21,12 +36,12 @@
 }
 
 .navbar-nav .nav-link i {
-  font-size: 1.8rem; /* Aumenta el tamaño de los iconos */
+  font-size: 1.8rem;
   margin-right: 10px;
 }
 
 .navbar-nav .nav-item img {
-  height: 35px; /* Aumenta el tamaño de la imagen de perfil */
+  height: 35px;
 }
 
 span {
@@ -35,7 +50,6 @@ span {
   margin-right: 20px;
 }
 
-
 .navbar-nav.ml-auto {
-  margin-left: auto; /* Alinea los elementos de la derecha */
+  margin-left: auto;
 }

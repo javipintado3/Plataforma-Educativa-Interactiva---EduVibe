@@ -61,6 +61,11 @@ export class TareaService {
     return this.http.get<number>(`${this.baseUrl}/mediaCalificaciones/${idClase}`);
   }
 
+    // Editar la solución escrita de una tarea
+    editarSolucionEscrita(id: number, nuevaSolucionEscrita: string): Observable<any> {
+      return this.http.put<any>(`${this.baseUrl}/solucion/${id}`, nuevaSolucionEscrita);
+    }
+
     // Editar la calificación de una tarea
     editarCalificacion(id: number, nuevaCalificacion: number): Observable<void> {
       return this.http.put<void>(`${this.baseUrl}/calificacion/${id}?nuevaCalificacion=${nuevaCalificacion}`, null);

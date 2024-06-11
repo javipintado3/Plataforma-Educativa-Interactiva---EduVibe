@@ -15,6 +15,9 @@ export class VistaTareaComponent implements OnInit {
   id: number = 0;
   archivo: File | null = null;
   nuevaCalificacion: number | null = null;
+  solucionEscrita: string = ''; // Definición de la propiedad solucionEscrita
+
+
 
   constructor(
     private tareaService: TareaService,
@@ -80,6 +83,22 @@ export class VistaTareaComponent implements OnInit {
       );
     } else {
       alert('Por favor, ingrese una calificación válida entre 0 y 10.');
+    }
+  }
+
+  enviarSolucionEscrita(): void {
+    if (this.tarea && this.solucionEscrita.trim() !== '') {
+      this.tareaService.editarSolucionEscrita(this.tarea.idTarea, this.solucionEscrita).subscribe(
+        () => {
+          alert('Solución escrita enviada exitosamente');
+          // Opcional: Puedes actualizar la tarea aquí si es necesario
+        },
+        (error) => {
+          console.error('Error al enviar la solución escrita:', error);
+        }
+      );
+    } else {
+      alert('Por favor, ingrese una solución escrita válida.');
     }
   }
 }

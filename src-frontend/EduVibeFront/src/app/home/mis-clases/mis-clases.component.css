@@ -1,7 +1,9 @@
 .card {
-    border: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  }
+  border: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-right: 50px; /* Aumentar espacio entre las tarjetas */
+  margin-bottom: 20px;
+}
   
   .card-title {
     font-size: 1.5rem;

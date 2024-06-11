@@ -17,5 +17,6 @@ public class GetTareaDTO {
 	 private LocalDate fechaApertura;
 	 private Double calificacion;	 private Boolean estado; 
 	 private ClaseDto clase;
+	 private String solucionEscrita;
 	 private UsuarioDto user;
 }

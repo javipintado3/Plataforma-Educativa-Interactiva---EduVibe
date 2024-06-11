@@ -19,4 +19,5 @@ export class CalendarioComponent {
     eventColor: '#2D9596', // Cambia el color de los eventos
 
   };
+  
 }

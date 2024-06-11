@@ -34,6 +34,6 @@ export class NavbarComponent implements OnInit {
     this.authService.logout();
   }
 
-  faMoon = faMoon;
+  
   faBell = faBell;
 }

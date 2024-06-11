@@ -11,4 +11,5 @@ export interface TareaDto {
   clase: ClaseDto;
   archivos: any[];  // Asegúrate de definir esta propiedad
   user?: UserResp | null; // Usuario opcional o null
+  solucionEscrita:string
 }

@@ -109,6 +109,8 @@ public class TareaController {
             return ResponseEntity.status(500).body("Error al agregar archivo adjunto: " + e.getMessage());
         }
     }
+    
+    
 
     @GetMapping("/{id}/archivo/{indice}")
     public ResponseEntity<byte[]> descargarArchivoAdjunto(@PathVariable Long id, @PathVariable int indice) {
@@ -129,6 +131,17 @@ public class TareaController {
             return ResponseEntity.noContent().build();
         }
     }
+    
+    @PutMapping("/solucion/{id}")
+    public ResponseEntity<TareaDTO> editarSolucionEscrita(@PathVariable Long id, @RequestBody String nuevaSolucionEscrita) {
+        TareaDTO tareaActualizada = tareaService.editarSolucionEscrita(id, nuevaSolucionEscrita);
+        if (tareaActualizada != null) {
+            return new ResponseEntity<>(tareaActualizada, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     
     @GetMapping("/clase/{idClase}")
     public List<GetTareaDTO> getTareasByClase(@PathVariable Long idClase) {

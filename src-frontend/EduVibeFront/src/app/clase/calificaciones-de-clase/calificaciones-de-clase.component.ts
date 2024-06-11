@@ -5,6 +5,7 @@ import { TareaService } from '../../services/tarea.service';
 import { ClaseService } from '../../services/clase.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { faClipboard, faListCheck } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-calificaciones-de-clase',
@@ -16,6 +17,8 @@ export class CalificacionesDeClaseComponent {
   clase: ClaseDto | undefined;
   id: number = 0;
   p: number = 1;
+  faListCheck = faListCheck;
+
 
   constructor(
     private tareaService: TareaService,
@@ -68,6 +71,5 @@ export class CalificacionesDeClaseComponent {
       );
     }
   }
-
-
+  faClipboard = faClipboard
 }

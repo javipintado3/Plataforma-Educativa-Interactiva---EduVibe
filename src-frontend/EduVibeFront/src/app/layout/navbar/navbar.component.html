@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
   <div class="container">
     <div class="navbar-left">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" >
         <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="50" class="navbar-logo">
       </a>
       <div class="navbar-divider"></div>
@@ -12,7 +12,6 @@
         <li class="nav-item" *ngIf="authService.isAuthenticated()">
           <a class="nav-link" routerLink="misClases">{{ authService.ifAdmin() ? 'Clases' : 'Mis clases' }}</a>
         </li>
-
         <li class="nav-item" *ngIf="authService.isAuthenticated()">
           <a class="nav-link" routerLink="calendario">Calendario</a>
         </li>
@@ -22,7 +21,6 @@
         <li class="nav-item" *ngIf="!authService.isAuthenticated()">
           <a class="nav-link" routerLink="login">Iniciar Sesión</a>
         </li>
-        
       </ul>
     </div>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -30,11 +28,10 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" id="dropdownUsuario" role="button" data-bs-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
-         <span *ngIf="userResp">{{ userResp.nombre || 'Sin logear' }}</span>
-         <ng-container *ngIf="!userResp">Sin logear</ng-container>
-         <img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30">
-       </a>
-       
+            <span *ngIf="userResp">{{ userResp.nombre || 'Sin logear' }}</span>
+            <ng-container *ngIf="!userResp">Sin logear</ng-container>
+            <img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30">
+          </a>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUsuario">
             <a class="dropdown-item" [routerLink]="['/perfil', userResp?.id]">Perfil</a>
             <div class="dropdown-divider"></div>
