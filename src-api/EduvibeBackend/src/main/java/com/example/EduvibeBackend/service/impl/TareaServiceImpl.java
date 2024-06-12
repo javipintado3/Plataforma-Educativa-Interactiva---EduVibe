@@ -33,9 +33,7 @@ public class TareaServiceImpl implements TareaService {
 
     @Autowired
     private TareaRepository tareaRepository;
-    @Autowired
-    private FileStorageService fileStorageService;
-    @Autowired
+     @Autowired
     private ClaseServiceImpl claseService;
     @Autowired
     private UserRepository userRepositoy;
@@ -116,34 +114,7 @@ public class TareaServiceImpl implements TareaService {
     
  
  
-    // Método para agregar archivo a una tarea
-    public void agregarArchivoAdjunto(Long idTarea, MultipartFile archivo) throws IOException, SQLException {
-        Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
-        if (optionalTarea.isPresent()) {
-            Tarea tarea = optionalTarea.get();
-            Blob archivoBlob = new SerialBlob(archivo.getBytes());
-            tarea.getArchivoAdjunto().add(archivoBlob);
-            tareaRepository.save(tarea);
-        } else {
-            throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
-        }
-    }
-
-    // Método para descargar archivo de una tarea
-    public byte[] descargarArchivoAdjunto(Long idTarea, int indiceArchivo) throws SQLException {
-        Optional<Tarea> optionalTarea = tareaRepository.findById(idTarea);
-        if (optionalTarea.isPresent()) {
-            Tarea tarea = optionalTarea.get();
-            if (indiceArchivo >= 0 && indiceArchivo < tarea.getArchivoAdjunto().size()) {
-                Blob archivoBlob = tarea.getArchivoAdjunto().get(indiceArchivo);
-                return archivoBlob.getBytes(1, (int) archivoBlob.length());
-            } else {
-                throw new GlobalException("Índice de archivo inválido: " + indiceArchivo);
-            }
-        } else {
-            throw new GlobalException("Tarea no encontrada con el ID proporcionado: " + idTarea);
-        }
-    }
+    
 
     
     public void asignarTareaAUsuario(Long idTarea, Integer idUsuario) {

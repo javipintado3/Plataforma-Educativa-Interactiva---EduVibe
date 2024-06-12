@@ -23,34 +23,35 @@ import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.componen
 import { VistaUsersComponent } from './user/vista-users/vista-users.component';
 import { AsignarTareaUsuarioComponent } from './tarea/asignar-tarea-usuario/asignar-tarea-usuario.component';
 import { CalificacionesDeClaseComponent } from './clase/calificaciones-de-clase/calificaciones-de-clase.component';
+import { DesignarUsuarioDeClaseComponent } from './clase/designar-usuario-de-clase/designar-usuario-de-clase.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'registro', component: RegistroComponent,canActivate:[adminGuard] },
+  { path: 'registro', component: RegistroComponent, canActivate: [adminGuard] },
   { path: 'login', component: LoginComponent },
-  { 
-    path: 'inicio', 
-    component: InicioComponent, 
-    canActivate: [loginGuard] 
-  },
-  { 
-    path: 'calendario', 
-    component: CalendarioComponent, 
-    canActivate: [loginGuard] 
-  },
-  { 
-    path: "renew", 
-    component: RenewComponent, 
+  {
+    path: 'inicio',
+    component: InicioComponent,
     canActivate: [loginGuard]
   },
   {
-    path: 'perfil/:idUsuario', 
-    component: PerfilUsuarioComponent, 
+    path: 'calendario',
+    component: CalendarioComponent,
+    canActivate: [loginGuard]
+  },
+  {
+    path: "renew",
+    component: RenewComponent,
+    canActivate: [loginGuard]
+  },
+  {
+    path: 'perfil/:idUsuario',
+    component: PerfilUsuarioComponent,
     canActivate: [loginGuard]
   },
   {
     path: "misClases",
-    component:MisClasesComponent,
+    component: MisClasesComponent,
     canActivate: [loginGuard]
   },
   {
@@ -60,52 +61,59 @@ export const routes: Routes = [
   },
   {
     path: "personasClase/:id",
-    component:PersonasDeClaseComponent,
+    component: PersonasDeClaseComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
   },
   {
     path: "calificaciones/:id",
-    component:CalificacionesDeClaseComponent,
+    component: CalificacionesDeClaseComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
   },
   {
     path: "tarea/:id",
-    component:VistaTareaComponent,
+    component: VistaTareaComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
   },
   {
     path: "tarea/:id",
-    component:VistaTareaComponent,
+    component: VistaTareaComponent,
     canActivate: [loginGuard] // Puedes agregar guardias de ruta según sea necesario
   },
-  { path: 'crear-clase', component:CrearClaseComponent,
+  {
+    path: 'crear-clase', component: CrearClaseComponent,
     canActivate: [adminGuard]
-   },
-   { path: 'inscribir-usuario/:idClase', component: InscribirUsuarioComponent,
+  },
+  {
+    path: 'inscribir-usuario/:idClase', component: InscribirUsuarioComponent,
     canActivate: [adminGuard]
-    },
-    { path: 'editar-clase/:idClase', component: EditarClaseComponent,
-      canActivate: [adminProfesorGuard]
-      },
-    {
-      path: 'crear-tarea/:idClase', component: CrearTareaComponent,
-      canActivate: [adminProfesorGuard]
-    },
-    {
-      path: 'editar-tarea/:idTarea', component: EditarTareaComponent,
-      canActivate: [adminProfesorGuard]
-    },{
-      path: 'asignar-tarea/:idTarea', // Ruta para asignar tarea a usuario
-      component: AsignarTareaUsuarioComponent,
-      canActivate: [adminProfesorGuard]
-    },
-    {
-      path: 'users', component:VistaUsersComponent,
-      canActivate:[adminGuard]
-    }
+  },
+  {
+    path: 'designar-usuario/:idClase', component: DesignarUsuarioDeClaseComponent,
+    canActivate: [adminGuard]
+  },
+  {
+    path: 'editar-clase/:idClase', component: EditarClaseComponent,
+    canActivate: [adminProfesorGuard]
+  },
+  {
+    path: 'crear-tarea/:idClase', component: CrearTareaComponent,
+    canActivate: [adminProfesorGuard]
+  },
+  {
+    path: 'editar-tarea/:idTarea', component: EditarTareaComponent,
+    canActivate: [adminProfesorGuard]
+  }, {
+    path: 'asignar-tarea/:idTarea/:idClase', // Ruta para asignar tarea a usuario
+    component: AsignarTareaUsuarioComponent,
+    canActivate: [adminProfesorGuard]
+  },
+  {
+    path: 'users', component: VistaUsersComponent,
+    canActivate: [adminGuard]
+  }
 
 
-  
+
 ];
 
 @NgModule({

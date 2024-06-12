@@ -36,9 +36,7 @@ public class Tarea {
     @JoinColumn(name = "usuario_id")
     private User usuario;
     
-    @ElementCollection
-    @Lob
-    private List<java.sql.Blob> archivoAdjunto; // Lista para archivos adjuntos
+
     
     private String solucionEscrita;
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TareaService } from '../../services/tarea.service';
+import { ClaseService } from '../../services/clase.service';
 import { UserResp } from '../../interfaces/userResp';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,9 +15,11 @@ export class AsignarTareaUsuarioComponent implements OnInit {
   alumnos: UserResp[] = [];
   selectedUser: number | null = null;
   idTarea: number | null = null;
+  idClase: number | null = null; // Añadir idClase para filtrar los usuarios por clase
 
   constructor(
     private tareaService: TareaService,
+    private claseService: ClaseService,
     private route: ActivatedRoute,
     private auth: AuthService,
     private router: Router
@@ -25,22 +28,28 @@ export class AsignarTareaUsuarioComponent implements OnInit {
     if (idTarea) {
       this.idTarea = +idTarea;
     }
+    const idClase = this.route.snapshot.paramMap.get('idClase');
+    if (idClase) {
+      this.idClase = +idClase;
+    }
   }
 
   ngOnInit(): void {
-    this.obtenerUsuarios();
+    this.obtenerUsuariosDeClase();
   }
 
-  obtenerUsuarios(): void {
-    this.auth.obtenerUsuarios().subscribe(
-      (usuarios: UserResp[]) => {
-        // Filtrar usuarios para obtener solo aquellos con rol de alumno
-        this.alumnos = usuarios.filter(usuario => usuario.rol.includes('alumno'));
-      },
-      error => {
-        console.error('Error al obtener usuarios:', error);
-      }
-    );
+  obtenerUsuariosDeClase(): void {
+    if (this.idClase !== null) {
+      this.auth.obtenerUsuariosDeClase(this.idClase).subscribe(
+        (usuarios: UserResp[]) => {
+          // Filtrar usuarios para obtener solo aquellos con rol de alumno
+          this.alumnos = usuarios.filter(usuario => usuario.rol.includes('alumno'));
+        },
+        error => {
+          console.error('Error al obtener usuarios de la clase:', error);
+        }
+      );
+    }
   }
 
   asignarTareaAUsuario(): void {

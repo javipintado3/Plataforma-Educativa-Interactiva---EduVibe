@@ -1,34 +1,61 @@
 .clase-usuarios {
-    padding: 20px;
-  }
-  
-  .seccion {
-    margin-bottom: 20px;
-  }
-  
-  .seccion h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-  }
-  
-  .usuario {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .usuario .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  
-  .profesor {
-    font-weight: bold;
-  }
-  
-  .alumno {
-    font-weight: normal;
-  }
-  
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 30px auto 0; /* Added top margin to separate from the subnavbar */
+}
+
+
+
+.seccion {
+  margin-bottom: 30px;
+}
+
+.seccion h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  color: #2D9596;
+}
+
+.separador {
+  border: none;
+  height: 1px;
+  background-color: #ddd;
+  margin: 10px 0;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  transition: background-color 0.3s;
+}
+
+.usuario:hover {
+  background-color: #f1f1f1;
+}
+
+.usuario .avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #2D9596;
+}
+
+.profesor {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.alumno {
+  font-weight: normal;
+  color: #333;
+}

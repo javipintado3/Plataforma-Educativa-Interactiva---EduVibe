@@ -17,7 +17,7 @@
         <button class="eliminar-button" (click)="eliminarTarea(tarea.idTarea)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Eliminar</button>
         <br><br>
         <!-- Botón de asignar tarea a usuario -->
-        <button class="editar-button" [routerLink]="['/asignar-tarea', tarea.idTarea]" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Asignar</button>
+        <button class="editar-button" [routerLink]="['/asignar-tarea', tarea.idTarea, clase.idClase]" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Asignar</button>
       </div>
     </div>
     <div class="col-md-12 text-right">

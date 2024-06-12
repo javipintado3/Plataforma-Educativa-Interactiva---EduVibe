@@ -1,40 +1,52 @@
+.container {
+  margin-top: 20px;
+}
+
 .card {
-  border: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin-right: 50px; /* Aumentar espacio entre las tarjetas */
-  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-img-top {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
   
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #2D9596;
-  }
-  
-  .card-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
+.card-body {
+  padding: 20px;
+}
 
-  .card-buttons .btn {
-    width: 45%;
-    border-color: #2D9596;
-    color: #2D9596;
-    font-weight: bold;
-    background-color: white;
-  }
-  
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
 
-  
-  a {
-    text-decoration: none;
-    color: #2D9596;
-  }
+.card-buttons a {
+  flex: 1;
+  margin: 0 5px;
+}
 
-  
-.editar-button{
+.card-buttons .btn {
+  width: 45%;
+  border-color: #2D9596;
+  color: #2D9596;
+  font-weight: bold;
+  background-color: white;
+}
+
+a {
+  text-decoration: none;
+  color: #2D9596;
+}
+
+.editar-button {
   background-color: #2D9596; /* Color de fondo del botón */
   color: white; /* Color del texto del botón */
   border: none; /* Sin borde */
@@ -45,11 +57,11 @@
   transition: background-color 0.3s ease; /* Transición suave del color de fondo */
 }
 
-.editar-button:hover{
-  background-color: #2D9596; /* Color de fondo del botón al pasar el ratón */
+.editar-button:hover {
+  background-color: #267a79; /* Color de fondo del botón al pasar el ratón */
 }
 
-.eliminar-button{
+.eliminar-button {
   background-color: #962d2d; /* Color de fondo del botón */
   color: white; /* Color del texto del botón */
   border: none; /* Sin borde */
@@ -60,6 +72,15 @@
   transition: background-color 0.3s ease; /* Transición suave del color de fondo */
 }
 
+.eliminar-button:hover {
+  background-color: #b33a3a; /* Color de fondo del botón al pasar el ratón */
+}
 
+.tarea-buttons {
+  margin-top: 20px;
+}
 
-  
+.mx-2 {
+  margin-left: 10px;
+  margin-right: 10px;
+}

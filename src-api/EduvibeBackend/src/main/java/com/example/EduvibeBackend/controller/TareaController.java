@@ -100,27 +100,7 @@ public class TareaController {
         return new ResponseEntity<>(tareas, HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/archivo")
-    public ResponseEntity<String> agregarArchivoAdjunto(@PathVariable Long id, @RequestParam("archivo") MultipartFile archivo) throws java.io.IOException {
-        try {
-            tareaService.agregarArchivoAdjunto(id, archivo);
-            return ResponseEntity.ok("Archivo adjunto agregado exitosamente.");
-        } catch (IOException | SQLException e) {
-            return ResponseEntity.status(500).body("Error al agregar archivo adjunto: " + e.getMessage());
-        }
-    }
-    
-    
 
-    @GetMapping("/{id}/archivo/{indice}")
-    public ResponseEntity<byte[]> descargarArchivoAdjunto(@PathVariable Long id, @PathVariable int indice) {
-        try {
-            byte[] archivo = tareaService.descargarArchivoAdjunto(id, indice);
-            return ResponseEntity.ok(archivo);
-        } catch (SQLException e) {
-            return ResponseEntity.status(500).body(null);
-        }
-    }
     
     @GetMapping("/mediaCalificaciones/{idClase}")
     public ResponseEntity<Double> obtenerMediaCalificaciones(@PathVariable Long idClase) {

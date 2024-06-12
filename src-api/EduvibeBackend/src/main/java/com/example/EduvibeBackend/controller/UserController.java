@@ -24,6 +24,12 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
+	   @GetMapping("/{idClase}/usuarios")
+	    public ResponseEntity<List<UsuarioDto>> obtenerUsuariosDeClase(@PathVariable Long idClase) {
+	        List<UsuarioDto> usuarios = userService.obtenerUsuariosDeClase(idClase);
+	        return ResponseEntity.ok(usuarios);
+	    }
+	
 	@GetMapping("/user/existeEmail")
 	public ResponseEntity<?> existeEmail(@RequestParam Optional<String> email){
 		User user = null;

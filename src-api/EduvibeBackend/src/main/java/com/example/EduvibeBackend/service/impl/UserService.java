@@ -1,5 +1,6 @@
 package com.example.EduvibeBackend.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +40,18 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new GlobalException("Usuario no encontrado con el ID proporcionado: " + idUser));
         return convertirAUsuarioDto(user);
+    }
+    
+
+    public List<UsuarioDto> obtenerUsuariosDeClase(Long idClase) {
+        Clase clase = claseRepository.findById(idClase)
+                .orElseThrow(() -> new GlobalException("Clase no encontrada"));
+        
+        List<User> users = userRepository.findUsersByClaseId(idClase);
+        
+        return users.stream().map(this::convertirAUsuarioDto).collect(Collectors.toList());
+        
+        
     }
 
 	@Override

@@ -1,6 +1,10 @@
 .container {
   max-width: 800px;
   margin: 0 auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tarea-container {
@@ -10,9 +14,9 @@
 }
 
 .tarea-item {
-  background-color: white;
+  background-color: #ffffff;
   border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
+  border-radius: 10px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -21,11 +25,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .tarea-title {
   margin: 0;
   font-size: 1.5rem;
+  font-weight: bold;
+  color: #2D9596;
 }
 
 .tarea-status {
@@ -33,23 +42,25 @@
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   color: white;
-  background-color: #2D9596;
 }
 
 .tarea-status.completed {
   background-color: #28a745; /* Color verde para tarea completada */
 }
 
+.tarea-status.pending {
+  background-color: #ffcc00; /* Color amarillo para tarea pendiente */
+}
+
 .tarea-enunciado {
+  font-size: 1.1rem;
+  color: #333;
   margin-top: 1rem;
 }
 
-.tarea-date, .tarea-calificacion {
+.tarea-date, .tarea-calificacion, .usuario-asignado {
   margin-top: 0.5rem;
-}
-
-.tarea-calificacion {
-
+  color: #555;
 }
 
 .archivo-subida {
@@ -64,6 +75,8 @@
 
 .archivo-lista h3 {
   margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #2D9596;
 }
 
 .archivo-lista ul {
@@ -79,28 +92,59 @@
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
   margin-bottom: 0.5rem;
+  background-color: #f1f1f1;
 }
 
 .archivo-lista button {
-  background-color: #007bff;
+  background-color: #2D9596;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .archivo-lista button:hover {
-  background-color: #0056b3;
+  background-color: #1b6d73;
 }
 
-.editar-button{
-  background-color: #2D9596; /* Color de fondo del botón */
-  color: white; /* Color del texto del botón */
-  border: none; /* Sin borde */
-  padding: 0.5rem 1rem; /* Espaciado interno */
-  font-size: 1rem; /* Tamaño de fuente */
-  border-radius: 0.25rem; /* Borde redondeado */
-  cursor: pointer; /* Cambiar el cursor al pasar el ratón */
-  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+.editar-button {
+  background-color: #2D9596;
+  color: white;
+  width: 30%;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.editar-button:hover {
+  background-color: #1b6d73;
+}
+
+.solucion-escrita-alumno {
+  margin-top: 1.5rem;
+}
+
+.solucion-escrita-profesor {
+  margin-top: 2rem; /* Aumentado para mejor separación */
+}
+
+.solucion-escrita {
+  background-color: #eef5f9;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #dee2e6;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.calificacion-profesor {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

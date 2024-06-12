@@ -1,22 +1,29 @@
-/* vistas-clases.component.css */
 .card {
-  border: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin-right: 50px; /* Aumentar espacio entre las tarjetas */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
 }
 
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-img-top {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
   
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #2D9596;
-  }
-  
-  .card-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
+.card-body {
+  padding: 20px;
+}
+
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
 
   
   .card-buttons .btn {

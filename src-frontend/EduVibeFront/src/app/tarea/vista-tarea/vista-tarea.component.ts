@@ -4,6 +4,8 @@ import { TareaService } from '../../services/tarea.service';
 import { ActivatedRoute } from '@angular/router';
 import { saveAs } from 'file-saver';
 import { AuthService } from '../../services/auth.service';
+import Swal from 'sweetalert2';
+import { ClaseDto } from '../../interfaces/clase';
 
 @Component({
   selector: 'app-vista-tarea',
@@ -15,9 +17,8 @@ export class VistaTareaComponent implements OnInit {
   id: number = 0;
   archivo: File | null = null;
   nuevaCalificacion: number | null = null;
+
   solucionEscrita: string = ''; // Definición de la propiedad solucionEscrita
-
-
 
   constructor(
     private tareaService: TareaService,
@@ -51,7 +52,7 @@ export class VistaTareaComponent implements OnInit {
     if (this.tarea && this.archivo) {
       this.tareaService.subirArchivo(this.tarea.idTarea, this.archivo).subscribe(
         () => {
-          alert('Archivo subido exitosamente');
+          Swal.fire('Éxito', 'Archivo subido exitosamente', 'success');
           this.obtenerTarea(); // Recargar la tarea para obtener la lista actualizada de archivos
         },
         (error) => {
@@ -74,7 +75,7 @@ export class VistaTareaComponent implements OnInit {
     if (this.nuevaCalificacion !== null && this.nuevaCalificacion >= 0 && this.nuevaCalificacion <= 10) {
       this.tareaService.editarCalificacion(idTarea, this.nuevaCalificacion).subscribe(
         () => {
-          alert('Calificación actualizada exitosamente');
+          Swal.fire('Éxito', 'Calificación actualizada exitosamente', 'success');
           this.obtenerTarea(); // Recargar la tarea para obtener la calificación actualizada
         },
         (error) => {
@@ -82,7 +83,7 @@ export class VistaTareaComponent implements OnInit {
         }
       );
     } else {
-      alert('Por favor, ingrese una calificación válida entre 0 y 10.');
+      Swal.fire('Error', 'Por favor, ingrese una calificación válida entre 0 y 10.', 'error');
     }
   }
 
@@ -90,15 +91,18 @@ export class VistaTareaComponent implements OnInit {
     if (this.tarea && this.solucionEscrita.trim() !== '') {
       this.tareaService.editarSolucionEscrita(this.tarea.idTarea, this.solucionEscrita).subscribe(
         () => {
-          alert('Solución escrita enviada exitosamente');
-          // Opcional: Puedes actualizar la tarea aquí si es necesario
+          Swal.fire('Éxito', 'Solución escrita enviada exitosamente', 'success');
+          if (this.tarea) {
+            this.tarea.solucionEscrita = this.solucionEscrita;
+            this.tarea.estado = true; // Cambiar el estado a "completado"
+          }
         },
         (error) => {
           console.error('Error al enviar la solución escrita:', error);
         }
       );
     } else {
-      alert('Por favor, ingrese una solución escrita válida.');
+      Swal.fire('Error', 'Por favor, ingrese una solución escrita válida.', 'error');
     }
   }
 }

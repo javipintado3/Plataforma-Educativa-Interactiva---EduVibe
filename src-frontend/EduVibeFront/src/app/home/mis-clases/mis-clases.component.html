@@ -5,7 +5,12 @@
             <a [routerLink]="['/crear-clase']" class="editar-button" *ngIf="auth.ifAdmin()">Crear Nueva Clase</a>
         </div>
     </div>
-    <div class="row justify-content-center"> <!-- Centra las tarjetas horizontalmente -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <input type="text" class="form-control" placeholder="Buscar clase por nombre" [(ngModel)]="searchText" (input)="buscarClase()">
+        </div>
+    </div>
+    <div class="row justify-content-center">
         <div class="col-md-5 mb-4" *ngFor="let clase of clases; let i = index">
             <div class="card">
                 <img src="../../../assets/Img/ImagenClase3.png" class="card-img-top" alt="{{ clase.nombre }}">
@@ -14,17 +19,14 @@
                     <p class="card-text">{{ clase.descripcion }}</p>
                     <div class="card-buttons">
                         <a [routerLink]="['/clase', clase.idClase]" class="btn btn-primary">Tareas</a>
-                        <a href="#" class="btn btn-secondary">Calificaciones</a>
+                        <a [routerLink]="['/calificaciones', clase.idClase]" class="btn btn-secondary">Calificaciones</a>
                     </div>
-                    <div class="tarea-buttons">
-                        <br>
-                        <!-- Botón de editar -->
-                        <button class="editar-button" (click)="editarClase(clase.idClase)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Editar</button>
-                        <br><br>
-                        <!-- Botón de eliminar -->
-                        <button class="eliminar-button" (click)="eliminarClase(clase.idClase)" *ngIf="auth.ifAdmin()">Eliminar</button>
-                        <br><br>
-                        <a [routerLink]="['/inscribir-usuario', clase.idClase]" *ngIf="auth.ifAdmin()" class="editar-button">Inscribir en Clase Un usuario</a> <!-- Nuevo botón para inscripción -->
+                    <div class="tarea-buttons d-flex justify-content-center">
+                        <button class="editar-button mx-2" (click)="editarClase(clase.idClase)" *ngIf="auth.ifProfesor() || auth.ifAdmin()">Editar</button>
+                        <button class="eliminar-button mx-2" (click)="eliminarClase(clase.idClase)" *ngIf="auth.ifAdmin()">Eliminar</button>
+                        <a [routerLink]="['/inscribir-usuario', clase.idClase]" *ngIf="auth.ifAdmin()" class="editar-button mx-2">Inscribir</a>
+                        <a [routerLink]="['/designar-usuario', clase.idClase]" *ngIf="auth.ifAdmin()" class="eliminar-button mx-2">Desinscribir</a>
+
                     </div>
                 </div>
             </div>

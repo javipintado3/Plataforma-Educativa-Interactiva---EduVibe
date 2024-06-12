@@ -1,0 +1,32 @@
+# Etapa de construcción
+FROM maven:3-openjdk-17 as builder
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
+
+# Etapa de producción
+FROM openjdk:17-alpine
+LABEL authors="Javier Pintado Navarro"
+
+# Variables de entorno
+ENV BBDD_HOST="db"
+ENV BBDD_NAME="eduvibe"
+ENV APP_PORT=9090
+ENV LOG_LEVEL="INFO"
+ENV DLL_AUTO="update"
+
+# Volumen para datos temporales y archivos multimedia
+VOLUME /tmp
+VOLUME /mediafiles
+RUN mkdir -p /mediafiles
+
+# Puerto expuesto
+EXPOSE 8080
+
+# Copiar el archivo JAR construido de la etapa de construcción
+COPY --from=builder /usr/src/app/target/tracer-0.0.1-SNAPSHOT.jar /app/app.jar
+
+# Establecer directorio de trabajo
+
+# Comando de inicio
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

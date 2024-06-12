@@ -181,4 +181,10 @@ export class AuthService {
     return this.http.get<UserResp[]>(`${this.apiUrl}/usuarios`);
   }
 
+    // Obtener usuarios de una clase específica
+    obtenerUsuariosDeClase(idClase: number): Observable<UserResp[]> {
+      return this.http.get<UserResp[]>(`${this.apiUrl}/${idClase}/usuarios`)
+  
+    }
+
 }

@@ -29,6 +29,7 @@ import { EditarTareaComponent } from './tarea/editar-tarea/editar-tarea.componen
 import { VistaUsersComponent } from './user/vista-users/vista-users.component';
 import { AsignarTareaUsuarioComponent } from './tarea/asignar-tarea-usuario/asignar-tarea-usuario.component';
 import { CalificacionesDeClaseComponent } from './clase/calificaciones-de-clase/calificaciones-de-clase.component';
+import { DesignarUsuarioDeClaseComponent } from './clase/designar-usuario-de-clase/designar-usuario-de-clase.component';
 
 
 @NgModule({
@@ -54,6 +55,7 @@ import { CalificacionesDeClaseComponent } from './clase/calificaciones-de-clase/
     VistaUsersComponent,
     AsignarTareaUsuarioComponent,
     CalificacionesDeClaseComponent,
+    DesignarUsuarioDeClaseComponent,
     
   ],
   imports: [
