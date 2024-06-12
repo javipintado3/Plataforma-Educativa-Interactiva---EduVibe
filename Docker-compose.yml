@@ -1,0 +1,43 @@
+version: '3.1'
+services:
+  db:
+    image: mysql:latest
+    container_name: bbdd-eduvibe
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: eduvibe
+
+  eduvibe_api:
+    build:
+      context: ./src-api/EduvibeBackend
+      dockerfile: ./Dockerfile
+    container_name: api-eduvibe
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    environment:
+      BBDD_HOST: db
+      BBDD_NAME: eduvibe
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      APP_PORT: 9090
+      LOG_LEVEL: DEBUG
+      DLL_AUTO: create
+    volumes:
+      - ./src/main/resources:/app/resources
+    depends_on:
+      - db
+
+  eduvibe_front:
+    build:
+      context: ./src-frontend/EduVibeFront
+      dockerfile: ./Dockerfile
+    container_name: eduvibe_front
+    restart: unless-stopped
+    ports:
+      - "80:4200"
+    depends_on:
+      - eduvibe_api

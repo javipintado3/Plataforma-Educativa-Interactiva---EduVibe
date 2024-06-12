@@ -6,7 +6,6 @@ RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
 
 # Etapa de producción
 FROM openjdk:17-alpine
-LABEL authors="Javier Pintado Navarro"
 
 # Variables de entorno
 ENV BBDD_HOST="db"
@@ -21,10 +20,10 @@ VOLUME /mediafiles
 RUN mkdir -p /mediafiles
 
 # Puerto expuesto
-EXPOSE 8080
+EXPOSE 9090
 
 # Copiar el archivo JAR construido de la etapa de construcción
-COPY --from=builder /usr/src/app/target/tracer-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=builder /usr/src/app/target/EduvibeBackend-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Establecer directorio de trabajo
 
