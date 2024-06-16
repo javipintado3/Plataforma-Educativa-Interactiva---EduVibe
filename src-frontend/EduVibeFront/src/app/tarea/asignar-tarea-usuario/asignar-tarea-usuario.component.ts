@@ -4,6 +4,7 @@ import { ClaseService } from '../../services/clase.service';
 import { UserResp } from '../../interfaces/userResp';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-asignar-tarea-usuario',
@@ -15,7 +16,7 @@ export class AsignarTareaUsuarioComponent implements OnInit {
   alumnos: UserResp[] = [];
   selectedUser: number | null = null;
   idTarea: number | null = null;
-  idClase: number | null = null; // Añadir idClase para filtrar los usuarios por clase
+  idClase: number | null = null;
 
   constructor(
     private tareaService: TareaService,
@@ -42,7 +43,6 @@ export class AsignarTareaUsuarioComponent implements OnInit {
     if (this.idClase !== null) {
       this.auth.obtenerUsuariosDeClase(this.idClase).subscribe(
         (usuarios: UserResp[]) => {
-          // Filtrar usuarios para obtener solo aquellos con rol de alumno
           this.alumnos = usuarios.filter(usuario => usuario.rol.includes('alumno'));
         },
         error => {
@@ -56,13 +56,28 @@ export class AsignarTareaUsuarioComponent implements OnInit {
     if (this.selectedUser !== null && this.idTarea !== null) {
       this.tareaService.asignarTareaAUsuario(this.idTarea, this.selectedUser).subscribe(
         () => {
-          alert('Tarea asignada exitosamente');
-          this.router.navigate(['/tareas', this.idTarea]);
+          Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: 'Tarea asignada exitosamente',
+          });
+          this.router.navigate(['/tarea', this.idTarea]);
         },
         error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al asignar tarea',
+          });
           console.error('Error al asignar tarea:', error);
         }
       );
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Advertencia',
+        text: 'Por favor, seleccione un usuario',
+      });
     }
   }
 }

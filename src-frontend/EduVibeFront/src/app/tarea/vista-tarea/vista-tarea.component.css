@@ -129,6 +129,13 @@
   margin-top: 1.5rem;
 }
 
+.solucion-escrita-alumno .btn-primary {
+  background-color: #2D9596; /* Color verde */
+  border-color: #2D9596; /* Color verde */
+  display: block;
+  margin: 0 auto;
+}
+
 .solucion-escrita-profesor {
   margin-top: 2rem; /* Aumentado para mejor separación */
 }

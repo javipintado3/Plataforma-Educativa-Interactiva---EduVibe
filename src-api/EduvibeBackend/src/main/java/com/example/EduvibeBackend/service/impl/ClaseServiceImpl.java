@@ -8,14 +8,20 @@ import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.UserRepository;
 import com.example.EduvibeBackend.service.ClaseService;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación del servicio de gestión de clases.
+ */
 @Service
 public class ClaseServiceImpl implements ClaseService {
 
@@ -70,7 +76,20 @@ public class ClaseServiceImpl implements ClaseService {
 
 
     @Override
+    @Transactional
     public void eliminarClase(Long id) {
+        Clase clase = claseRepository.findById(id)
+                .orElseThrow(() -> new GlobalException("Clase no encontrada"));
+
+        // Remove associations with users
+        Set<User> usuarios = clase.getUsuarios();
+        for (User usuario : usuarios) {
+            usuario.getClases().remove(clase);
+            userRepository.save(usuario);
+        }
+        clase.getUsuarios().clear();
+        claseRepository.save(clase);
+
         claseRepository.deleteById(id);
     }
 
@@ -80,28 +99,42 @@ public class ClaseServiceImpl implements ClaseService {
         return clases.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
+
+
     @Override
-    public void inscribirUsuarioEnClase(String email, Long idClase) {
-        User usuario = userRepository.findByEmail(email).orElseThrow(() -> new GlobalException("Usuario no encontrado"));
-        Clase clase = claseRepository.findById(idClase).orElseThrow(() -> new GlobalException("Clase no encontrada"));
+    public void inscribirUsuarioEnClase(Integer idUsuario, Long idClase) {
+        User usuario = userRepository.findById(idUsuario)
+                .orElseThrow(() -> new GlobalException("Usuario no encontrado"));
+        Clase clase = claseRepository.findById(idClase)
+                .orElseThrow(() -> new GlobalException("Clase no encontrada"));
 
-        boolean hayProfesor = clase.getUsuarios().stream()
-                .anyMatch(user -> "profesor".equals(user.getRol()));
-
-        boolean usuarioYaInscrito = clase.getUsuarios().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-
-        if (usuarioYaInscrito) {
-            throw new IllegalStateException("El usuario ya está inscrito en esta clase.");
+        // Verificar si el usuario ya está inscrito en la clase
+        if (usuario.getClases().contains(clase)) {
+            throw new GlobalException("El usuario ya está inscrito en esta clase.");
         }
 
-        if ("profesor".equals(usuario.getRol()) && hayProfesor) {
-            throw new IllegalStateException("Ya hay un profesor inscrito en esta clase.");
+        // Verificar si el usuario tiene el rol de administrador
+        if ("administrador".equalsIgnoreCase(usuario.getRol())) {
+            throw new GlobalException("No se puede inscribir un administrador a una clase.");
         }
 
+        // Verificar si ya hay un usuario con el rol de profesor en la clase
+        boolean profesorPresente = clase.getUsuarios().stream()
+                .anyMatch(u -> "profesor".equalsIgnoreCase(u.getRol()));
+        if (profesorPresente && "profesor".equalsIgnoreCase(usuario.getRol())) {
+            throw new GlobalException("Ya hay un usuario con el rol de profesor en esta clase.");
+        }
+
+        usuario.getClases().add(clase);
         clase.getUsuarios().add(usuario);
+
+        userRepository.save(usuario);
         claseRepository.save(clase);
     }
+
+
+
+
 
     @Override
     public Clase obtenerClaseSinDto(Long id) {

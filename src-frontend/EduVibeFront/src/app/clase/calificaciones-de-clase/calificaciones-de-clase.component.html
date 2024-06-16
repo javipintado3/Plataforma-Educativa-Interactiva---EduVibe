@@ -5,16 +5,16 @@
 
     <div class="tarea-item" *ngFor="let tarea of tareas | paginate: { itemsPerPage: 4, currentPage: p }">
       <button class="tarea-button" [routerLink]="['/tarea', tarea.idTarea]">
-        <span class="tarea-icono">+</span>
-        <div class="tarea-info">
-          <span class="tarea-titulo">TAREA: </span>
-          <span class="tarea-descripcion">{{ tarea.nombreTarea }}</span>
+        <div class="tarea-content">
+          <span class="tarea-icono">+</span>
+          <div class="tarea-info">
+            <span class="tarea-titulo">TAREA: {{ tarea.nombreTarea }}</span>
+            <p class="tarea-alumno"><strong>Alumno asignado:</strong> {{ tarea.user?.email ?? 'Ninguno' }}</p>
+          </div>
         </div>
-        <div>
+        <div class="tarea-detalles">
           <span class="tarea-rango">RANGO 0-10</span>
-        </div>
-        <div class="tarea-calificacion">
-          <span class="tarea-valor" [class.pendiente]="!tarea.calificacion">
+          <span class="tarea-valor" [ngClass]="{'aprobado': tarea.calificacion >= 5, 'suspenso': tarea.calificacion < 5}">
             {{ tarea.calificacion ? tarea.calificacion : '---' }}
           </span>
         </div>

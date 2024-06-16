@@ -9,6 +9,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: eduvibe
+    volumes:
+     - mysql_data:/data/db
 
   eduvibe_api:
     build:
@@ -38,6 +40,9 @@ services:
     container_name: eduvibe_front
     restart: unless-stopped
     ports:
-      - "80:4200"
+      - "80:80"
     depends_on:
       - eduvibe_api
+
+volumes:
+  mysql_data:

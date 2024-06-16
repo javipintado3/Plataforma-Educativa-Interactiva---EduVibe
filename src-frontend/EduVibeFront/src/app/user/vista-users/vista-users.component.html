@@ -1,31 +1,42 @@
 <div class="container my-5">
-    <h2 class="mb-4">Lista de Usuarios</h2>
-  
-    <!-- Botón para crear usuarios -->
-    <div class="row mb-4">
-      <div class="col-md-12 text-right">
-        <a [routerLink]="['/registro']" class="editar-button">Crear Nuevo Usuario</a>
-      </div>
+  <h2 class="mb-4">Lista de Usuarios</h2>
+
+  <!-- Botón para crear usuarios -->
+  <div class="row mb-4">
+    <div class="col-md-12 text-right">
+      <a [routerLink]="['/registro']" class="editar-button">Crear Nuevo Usuario</a>
     </div>
-  
-    <div class="row">
-      <div class="col-md-6 mb-4" *ngFor="let usuario of usuarios | paginate: { itemsPerPage: 4, currentPage: p }">
-        <div class="card position-relative">
-          <!-- Botón de edición -->
-          <button class="eliminar-button position-absolute top-0 end-0 m-2" (click)="eliminarUser(usuario.id)" >Eliminar</button>
-          <!-- Aquí va la información del usuario en la tarjeta -->
-          <div class="card-body">
-            <h5 class="card-title">{{ usuario.nombre }}</h5>
-            <p class="card-text">Email: {{ usuario.email }}</p>
-            <p class="card-text">Rol: {{ usuario.rol }}</p>
-            <!-- Otros detalles del usuario -->
-          </div>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <input type="text" class="form-control" placeholder="Buscar usuario por nombre" [(ngModel)]="searchText" (input)="buscarUsuario()">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4" *ngFor="let usuario of usuariosFiltrados | paginate: { itemsPerPage: 4, currentPage: p }">
+      <div class="card position-relative">
+        <!-- Botones de edición y eliminación -->
+        <div class="position-absolute top-0 end-0 m-2 d-flex flex-column">
+          <button class="editar-button" [routerLink]="['/perfil', usuario.id]">Editar</button>
+          <br>
+          <button class="eliminar-button" (click)="eliminarUser(usuario.id)">Eliminar</button>
+        </div>
+        <!-- Aquí va la información del usuario en la tarjeta -->
+        <div class="card-body">
+          <h5 class="card-title">{{ usuario.nombre }}</h5>
+          <p class="card-text">Email: {{ usuario.email }}</p>
+          <p class="card-text">Rol: {{ usuario.rol }}</p>
+          <!-- Otros detalles del usuario -->
         </div>
       </div>
     </div>
-  
-    <!-- Paginación -->
-    <div class="text-center">
-      <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5" (pageChange)="p = $event"></pagination-controls>
-    </div>
   </div>
+
+  <!-- Paginación -->
+  <div class="text-center">
+    <pagination-controls class="paginacion" [autoHide]="true" [responsive]="true" [maxSize]="5" (pageChange)="p = $event"></pagination-controls>
+  </div>
+</div>

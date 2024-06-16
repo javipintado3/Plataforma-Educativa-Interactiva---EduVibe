@@ -1,6 +1,5 @@
 package com.example.EduvibeBackend.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,28 +20,49 @@ import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.ClaseRepository;
 import com.example.EduvibeBackend.repository.UserRepository;
 
+/**
+ * Servicio para la gestión de usuarios.
+ */
 @Service
 public class UserService implements UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private PasswordEncoder encode;
-	
-	 @Autowired
-	    private ClaseRepository claseRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-	public User getUserByEmail(String email) {
-		return userRepository.findByEmail(email).orElse(null);
-	}
-	
+    @Autowired
+    private PasswordEncoder encode;
+    
+    @Autowired
+    private ClaseRepository claseRepository;
+
+    /**
+     * Obtiene un usuario por su email.
+     * 
+     * @param email el email del usuario a buscar
+     * @return el usuario encontrado o null si no existe
+     */
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    /**
+     * Obtiene un usuario por su ID y lo convierte a DTO.
+     * 
+     * @param idUser el ID del usuario a buscar
+     * @return el usuario encontrado convertido a DTO
+     */
     public UsuarioDto getUserById(Integer idUser) {
         User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new GlobalException("Usuario no encontrado con el ID proporcionado: " + idUser));
         return convertirAUsuarioDto(user);
     }
-    
 
+    /**
+     * Obtiene los usuarios de una clase específica.
+     * 
+     * @param idClase el ID de la clase
+     * @return una lista de usuarios en la clase convertidos a DTO
+     */
     public List<UsuarioDto> obtenerUsuariosDeClase(Long idClase) {
         Clase clase = claseRepository.findById(idClase)
                 .orElseThrow(() -> new GlobalException("Clase no encontrada"));
@@ -50,77 +70,92 @@ public class UserService implements UserDetailsService {
         List<User> users = userRepository.findUsersByClaseId(idClase);
         
         return users.stream().map(this::convertirAUsuarioDto).collect(Collectors.toList());
-        
-        
     }
 
-	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Optional<User> userOptional = userRepository.findByEmail(email);
-		if (userOptional.isEmpty()) {
-			throw new UsernameNotFoundException("El usuario no ha sido encontrado: " + email);
-		}
-		return userOptional.get();
-	}
+    /**
+     * Carga un usuario por su nombre de usuario (email).
+     * 
+     * @param email el email del usuario
+     * @return los detalles del usuario
+     * @throws UsernameNotFoundException si el usuario no es encontrado
+     */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("El usuario no ha sido encontrado: " + email);
+        }
+        return userOptional.get();
+    }
 
-	public User registroUsuario(RegistroUserDto userDto) {
-	
-		
-		// Verificar que el email termine en "@vibe.com"
+    /**
+     * Registra un nuevo usuario.
+     * 
+     * @param userDto los datos del usuario a registrar
+     * @return el usuario registrado
+     * @throws GlobalException si el email ya está registrado o no es válido
+     */
+    public User registroUsuario(RegistroUserDto userDto) {
+        // Verificar que el email termine en "@vibe.com"
         if (!userDto.email().toLowerCase().endsWith("@vibe.com")) {
             throw new GlobalException("El email debe terminar en '@vibe.com'");
         }
-	
 
-		if (userRepository.existsByEmailIgnoreCase(userDto.email())) {
-			throw new GlobalException("El email ya ha sido registrado");
-		}
-		if (userDto.password().length() < 8) {
-			throw new GlobalException("El campo contraseña debe de contener 8 o más caracteres");
-		}
-
-		User user = new User();
-		user.setEmail(userDto.email());
-		user.setNombre(userDto.nombre());
-		user.setPassword(encode.encode(userDto.password()));
-		user.setRol((userDto.rol() != null) ? userDto.rol() : "alumno"); // Asignar "user" si el rol es null
-
-		User save = userRepository.save(user);
-		return save;
-	}
-	
-	public void changePassword(Integer idUsuario, String newPassword) {
-		
-        // Buscar el usuario por su ID
-        User UserLogin = userRepository.findById(idUsuario)
-                .orElseThrow(() -> new GlobalException("Usuario no encontrado"));
-        
-        // Verificar que la nueva contraseña cumpla con los requisitos de seguridad
-        if (newPassword.length() < 8) {
-        	throw new GlobalException("El campo contraseña debe de contener 8 o más caracteres");
+        if (userRepository.existsByEmailIgnoreCase(userDto.email())) {
+            throw new GlobalException("El email ya ha sido registrado");
+        }
+        if (userDto.password().length() < 8) {
+            throw new GlobalException("El campo contraseña debe de contener 8 o más caracteres");
         }
 
-        // Codificar la nueva contraseña
+        User user = new User();
+        user.setEmail(userDto.email());
+        user.setNombre(userDto.nombre());
+        user.setPassword(encode.encode(userDto.password()));
+        user.setRol((userDto.rol() != null) ? userDto.rol() : "alumno"); // Asignar "user" si el rol es null
+
+        User save = userRepository.save(user);
+        return save;
+    }
+
+    /**
+     * Cambia la contraseña de un usuario.
+     * 
+     * @param idUsuario el ID del usuario
+     * @param newPassword la nueva contraseña
+     * @throws GlobalException si la contraseña no cumple con los requisitos
+     */
+    public void changePassword(Integer idUsuario, String newPassword) {
+        User user = userRepository.findById(idUsuario)
+                .orElseThrow(() -> new GlobalException("Usuario no encontrado"));
+        
+        if (newPassword.length() < 8) {
+            throw new GlobalException("El campo contraseña debe de contener 8 o más caracteres");
+        }
+
         String newPasswordEncoded = encode.encode(newPassword);
-
-        // Establecer la nueva contraseña para el usuario
-        UserLogin.setPassword(newPasswordEncoded);
-
-        // Guardar los cambios en el repositorio
-        userRepository.save(UserLogin);
+        user.setPassword(newPasswordEncoded);
+        userRepository.save(user);
     }
-	
-	   // Método para obtener todos los usuarios y convertirlos a objetos UsuarioDto
+
+    /**
+     * Obtiene todos los usuarios y los convierte a DTO.
+     * 
+     * @return una lista de usuarios convertidos a DTO
+     */
     public List<UsuarioDto> listarTodosUsuarios() {
-        List<User> usuarios = userRepository.findAll(); // Consulta todos los usuarios en la base de datos
-        // Convierte la lista de usuarios a una lista de UsuarioDto
-        List<UsuarioDto> usuariosDto = usuarios.stream()
-                .map(this::convertirAUsuarioDto) // Utiliza el método convertirAUsuarioDto para convertir cada usuario
-                .collect(Collectors.toList()); // Recolecta los resultados en una lista
-        return usuariosDto; // Devuelve la lista de UsuarioDto
+        List<User> usuarios = userRepository.findAll();
+        return usuarios.stream()
+                .map(this::convertirAUsuarioDto)
+                .collect(Collectors.toList());
     }
 
-    // Método para convertir un objeto User a UsuarioDto
+    /**
+     * Convierte un objeto User a UsuarioDto.
+     * 
+     * @param usuario el usuario a convertir
+     * @return el usuario convertido a DTO
+     */
     private UsuarioDto convertirAUsuarioDto(User usuario) {
         UsuarioDto usuarioDto = new UsuarioDto();
         usuarioDto.setId(usuario.getId());
@@ -129,7 +164,13 @@ public class UserService implements UserDetailsService {
         usuarioDto.setRol(usuario.getRol());
         return usuarioDto;
     }
-    
+
+    /**
+     * Obtiene los usuarios de una clase específica.
+     * 
+     * @param idClase el ID de la clase
+     * @return una lista de usuarios en la clase convertidos a DTO
+     */
     public List<UsuarioDto> obtenerUsuariosPorClase(Long idClase) {
         List<User> usuarios = userRepository.findUsersByClaseId(idClase);
 
@@ -141,8 +182,15 @@ public class UserService implements UserDetailsService {
                 .map(this::convertirAUsuarioDto)
                 .collect(Collectors.toList());
     }
-    
-    // Nuevo método para editar usuarios
+
+    /**
+     * Edita un usuario.
+     * 
+     * @param idUser el ID del usuario
+     * @param usuarioDto los datos del usuario a editar
+     * @return el usuario editado convertido a DTO
+     * @throws GlobalException si el email ya está registrado o no es válido
+     */
     public UsuarioDto editarUsuario(Integer idUser, UsuarioDto usuarioDto) {
         User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new GlobalException("Usuario no encontrado con el ID proporcionado: " + idUser));
@@ -167,4 +215,16 @@ public class UserService implements UserDetailsService {
         return convertirAUsuarioDto(updatedUser);
     }
 
+    /**
+     * Elimina un usuario.
+     * 
+     * @param idUser el ID del usuario a eliminar
+     * @throws GlobalException si el usuario no es encontrado
+     */
+    public void eliminarUsuario(Integer idUser) {
+        if (!userRepository.existsById(idUser)) {
+            throw new GlobalException("Usuario no encontrado con el ID proporcionado: " + idUser);
+        }
+        userRepository.deleteById(idUser);
+    }
 }

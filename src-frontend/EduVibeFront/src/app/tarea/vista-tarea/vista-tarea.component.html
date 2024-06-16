@@ -1,4 +1,3 @@
-
 <div class="container my-5">
   <div class="tarea-container">    
     <div class="tarea-item" *ngIf="tarea">
@@ -15,11 +14,13 @@
         <strong>Alumno asignado:</strong> {{ tarea.user?.email ?? 'Ninguno' }}
       </p>
 
-      <!-- Textarea para escribir la solución escrita (visible solo para alumnos) -->
-      <div class="solucion-escrita-alumno" *ngIf="auth.ifAlumno()">
+      <!-- Textarea para escribir la solución escrita (visible solo para alumnos y si no está calificada) -->
+      <div class="solucion-escrita-alumno" *ngIf="auth.ifAlumno() && tarea.calificacion == null">
         <label for="solucionEscrita">Solución Escrita:</label>
         <textarea class="form-control" [(ngModel)]="solucionEscrita" name="solucionEscrita" rows="5"></textarea>
-        <button class="btn btn-primary mt-3" (click)="enviarSolucionEscrita()">Enviar Solución</button>
+        <div class="text-center">
+          <button class="btn btn-primary mt-3" (click)="enviarSolucionEscrita()">Enviar Solución</button>
+        </div>
       </div>
 
       <!-- Área de visualización de la solución escrita (visible solo para profesores) -->
@@ -28,18 +29,12 @@
         <div id="visualizarSolucion" class="solucion-escrita">{{ tarea.solucionEscrita }}</div>
       </div>
 
-
-
       <!-- Controles para editar calificación -->
-      <div class=" calificacion-profesor" *ngIf="auth.ifProfesor() || auth.ifAdmin()">
+      <div class="calificacion-profesor" *ngIf="auth.ifProfesor() || auth.ifAdmin()">
         <label for="calificacion">Editar Calificación:</label>
         <input type="number" [(ngModel)]="nuevaCalificacion" min="0" max="10" class="form-control">
         <button class="editar-button mx-auto justify-content-center d-flex" (click)="editarCalificacion(tarea.idTarea)">Poner Calificación</button>
       </div>
-
-
-
- 
     </div>
   </div>
 </div>

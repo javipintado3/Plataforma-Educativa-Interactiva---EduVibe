@@ -54,8 +54,8 @@ export class ClaseService {
   }
   
   // Método para inscribir un usuario en una clase
-  inscribirUsuario(email: string, idClase: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/inscribir`, null, { params: { email, idClase: idClase.toString() } });
+  inscribirUsuario(idUsuario: number, idClase: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/inscribir`, null, { params: { idUsuario: idUsuario, idClase: idClase } });
   }
 
 

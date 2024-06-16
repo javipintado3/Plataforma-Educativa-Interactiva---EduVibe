@@ -13,6 +13,6 @@ FROM nginx:stable-alpine
 # Copia los archivos 
 COPY --from=build /app/dist/edu-vibe-front/browser /usr/share/nginx/html
 
-EXPOSE 4200
+EXPOSE 80
 # Comando para iniciar Nginx
 CMD ["nginx", "-g", "daemon off;"]

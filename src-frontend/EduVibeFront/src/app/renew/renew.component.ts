@@ -23,7 +23,7 @@ export class RenewComponent implements OnInit{
           title:"Sesion renovada correctamente",
           icon:"success"
         })
-        this.router.navigateByUrl("/dashboard")
+        this.router.navigateByUrl("/inicio")
         
       },
       error:err=>{

@@ -1,16 +1,16 @@
 <div class="inscribir-usuario-container">
-    <h2>Inscribir Usuario en Clase</h2>
-    <form (ngSubmit)="inscribirUsuario()" #inscribirForm="ngForm">
-      <div class="form-group">
-        <label for="usuario">Seleccionar Usuario a inscribir</label>
-        <select id="usuario" [(ngModel)]="selectedUser" name="usuario" class="form-control" required>
-          <option value="" disabled [selected]="true">Seleccionar usuario</option>
-          <option *ngFor="let usuario of usuarios" [value]="usuario.email">{{ usuario.email }}</option>
-        </select>
-        <div *ngIf="inscribirForm.controls['usuario'].invalid && (inscribirForm.controls['usuario'].dirty || inscribirForm.controls['usuario'].touched)" class="text-danger">
-          Debes seleccionar un usuario.
-        </div>
+  <h2>Inscribir Usuario en Clase</h2>
+  <form (ngSubmit)="inscribirUsuario()" #inscribirForm="ngForm">
+    <div class="form-group">
+      <label for="usuario">Seleccionar Usuario a inscribir</label>
+      <select id="usuario" [(ngModel)]="selectedUser" name="usuario" class="form-control" required>
+        <option value="" disabled [selected]="true">Seleccionar usuario</option>
+        <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.email }}</option>
+      </select>
+      <div *ngIf="inscribirForm.controls['usuario']?.invalid && (inscribirForm.controls['usuario']?.dirty || inscribirForm.controls['usuario']?.touched)" class="text-danger">
+        Debes seleccionar un usuario.
       </div>
-      <button type="submit" class="btn btn-primary mt-3" [disabled]="!inscribirForm.valid">Inscribir</button>
-    </form>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3" [disabled]="!inscribirForm.valid">Inscribir</button>
+  </form>
 </div>

@@ -11,6 +11,8 @@ export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService)
   const router = inject(Router)
   const loader = inject(NgxUiLoaderService)
+
+  
   if(!req.url.includes("/user/existeEmail")
   && !req.url.includes("/clases")
 ) {

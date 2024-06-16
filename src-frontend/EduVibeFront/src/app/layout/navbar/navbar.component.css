@@ -50,6 +50,44 @@ span {
   margin-right: 20px;
 }
 
-.navbar-nav.ml-auto {
+.navbar-nav.ms-auto {
   margin-left: auto;
+}
+
+/* Media queries for mobile responsiveness */
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .navbar-nav .nav-item {
+    text-align: center;
+  }
+  
+  .navbar-nav .nav-link {
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  .navbar-nav.ms-auto {
+    margin-left: 0;
+  }
+
+  .navbar-brand {
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .navbar-toggler {
+    margin-left: auto;
+  }
+
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+
+  .navbar-brand img {
+    height: 40px;
+  }
 }

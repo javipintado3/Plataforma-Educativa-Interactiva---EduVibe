@@ -22,6 +22,8 @@ export class AuthService {
     this.isAuthenticated$ = new BehaviorSubject<boolean>(this.isAuthenticated());
   }
 
+  
+
   private isLocalStorageAvailable(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
   }
@@ -62,7 +64,7 @@ export class AuthService {
     });
     this.router.navigate(['/login']); // Redirige al login
   }
-  
+
   isLogged(): boolean {
     return this.isLocalStorageAvailable() && !!localStorage.getItem("token");
   }
@@ -110,33 +112,34 @@ export class AuthService {
 
 
   getUserData() {
+
     let token: string = localStorage.getItem("token") as any;
     const { name, rol, id } = jwtDecode(token) as any;
     return {
       nombre: name,
-      rol: rol, 
+      rol: rol,
       id: id
     };
 
   }
 
   //metodo para calcular los minutos restantes del token
-  minutosRestantes(){
+  minutosRestantes() {
     //creamos la variable
     let minutosRestantes = -1
     //si hay token en el localstorage entocnes entra
-    if(localStorage.getItem("token")){
+    if (localStorage.getItem("token")) {
       //sacamos los milisegundos del token
-      let expiracion:number = jwtDecode((localStorage.getItem("token") || "") ).exp as any
+      let expiracion: number = jwtDecode((localStorage.getItem("token") || "")).exp as any
       //lo seteamos en una nueva fecha
-      let dateExp = new Date(expiracion*1000)
+      let dateExp = new Date(expiracion * 1000)
       //creamos una fecha de hoy
       let now = new Date()
       //si el tiempo que hay de diferencia en minutos es mayor que 0 entra
-      if(((dateExp.getTime()-now.getTime())/(1000*60))>0){
+      if (((dateExp.getTime() - now.getTime()) / (1000 * 60)) > 0) {
         //sacamos el valor absoluto entre la fecha de expiracion y hoy, en minutos
-        minutosRestantes = Math.abs(dateExp.getTime()-now.getTime())/(1000*60)
-      }else{
+        minutosRestantes = Math.abs(dateExp.getTime() - now.getTime()) / (1000 * 60)
+      } else {
         //si no pues seguimos dejando la variable por defecto
         minutosRestantes = -1
       }
@@ -145,10 +148,10 @@ export class AuthService {
     // devolvemos los minutos
     return minutosRestantes
   }
-  
+
   // Método para obtener el ID del usuario del token decodificado
   getUserId(): number | null {
-    const token = localStorage.getItem('token');
+    const token: string = localStorage.getItem("token")!; // Usamos el operador de aserción no nulo aquí también
     if (token) {
       const decodedToken: any = jwtDecode(token);
       return decodedToken.id; // Cambia 'id' por el nombre correcto del campo en el token
@@ -165,26 +168,35 @@ export class AuthService {
     );
   }
 
-    // Método para obtener los datos del usuario
-    getUserProfile(id: number): Observable<UserResp> {
-      return this.http.get<UserResp>(`${this.apiUrl}/user/${id}`);
-    }
-  
-  
-    editarUsuario(id: number, usuarioDto: UserResp): Observable<any> {
-      return this.http.put<any>(`${this.apiUrl}/user/editar/${id}`, usuarioDto)
-    }
-  
-   
+  // Método para obtener los datos del usuario
+  getUserProfile(id: number): Observable<UserResp> {
+    return this.http.get<UserResp>(`${this.apiUrl}/user/${id}`);
+  }
+
+
+  editarUsuario(id: number, usuarioDto: UserResp): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/user/editar/${id}`, usuarioDto)
+  }
+
+  // Método para eliminar usuario
+  eliminarUsuario(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/user/${id}`).pipe(
+      catchError(error => {
+        console.error('Error al eliminar usuario', error);
+        return throwError(error);
+      })
+    );
+  }
+
   // Método para obtener todos los usuarios
   obtenerUsuarios(): Observable<UserResp[]> {
     return this.http.get<UserResp[]>(`${this.apiUrl}/usuarios`);
   }
 
-    // Obtener usuarios de una clase específica
-    obtenerUsuariosDeClase(idClase: number): Observable<UserResp[]> {
-      return this.http.get<UserResp[]>(`${this.apiUrl}/${idClase}/usuarios`)
-  
-    }
+  // Obtener usuarios de una clase específica
+  obtenerUsuariosDeClase(idClase: number): Observable<UserResp[]> {
+    return this.http.get<UserResp[]>(`${this.apiUrl}/${idClase}/usuarios`)
+
+  }
 
 }

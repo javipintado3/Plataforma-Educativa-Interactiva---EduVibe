@@ -5,6 +5,7 @@ import { ClaseDto } from '../../interfaces/clase';
 import { ClaseService } from '../../services/clase.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vista-de-clase',
@@ -74,6 +75,35 @@ export class VistaDeClaseComponent implements OnInit {
   }
 
   eliminarTarea(idTarea: number): void {
-    // Implementa la lógica para eliminar la tarea
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'No podrás revertir esto',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminarla'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.tareaService.eliminarTarea(idTarea).subscribe(
+          () => {
+            Swal.fire(
+              'Eliminada',
+              'La tarea ha sido eliminada.',
+              'success'
+            );
+            this.obtenerTareasPorClase(); // Recargar la lista de tareas después de eliminar
+          },
+          (error) => {
+            Swal.fire(
+              'Error',
+              'Hubo un problema al eliminar la tarea.',
+              'error'
+            );
+            console.error('Error al eliminar la tarea:', error);
+          }
+        );
+      }
+    });
   }
 }

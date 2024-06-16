@@ -32,9 +32,10 @@ ngOnInit(): void {
 myForm: FormGroup = this.fb.group({
   email: ["", [Validators.required, Validators.pattern(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/), this.validators.correoVibe]],
   nombre: ["", [Validators.required]],
-  rol: [""],
+  rol: ["", [Validators.required]],  
   password: ["", [Validators.required, Validators.pattern(/^.{8,}$/)]]
 });
+
 
 // Objeto de usuario para almacenar datos
 user = {

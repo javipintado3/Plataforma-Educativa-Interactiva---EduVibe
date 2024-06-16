@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth.service';
 import { ClaseService } from '../../services/clase.service';
 import { UserResp } from '../../interfaces/userResp';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import Swal from 'sweetalert2';
-import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-inscribir-usuario',
@@ -13,8 +12,9 @@ import { catchError, throwError } from 'rxjs';
 })
 export class InscribirUsuarioComponent implements OnInit {
   usuarios: UserResp[] = [];
-  selectedUser: string = '';
-  idClase: number | null = null; // Change to handle null
+  selectedUser: number | null = null;
+  idClase: number | null = null;
+  profesorInscrito: boolean = false;
 
   constructor(
     private claseService: ClaseService,
@@ -36,20 +36,24 @@ export class InscribirUsuarioComponent implements OnInit {
     if (this.idClase !== null) {
       this.auth.obtenerUsuariosPorClase(this.idClase).subscribe(
         (usuariosInscritos: UserResp[]) => {
+          console.log('Usuarios inscritos:', usuariosInscritos);
+          // Verificar si ya hay un profesor inscrito
+          this.profesorInscrito = usuariosInscritos.some(u => u.rol === 'profesor');
+          
           this.auth.obtenerUsuarios().subscribe(
-            (usuarios: UserResp[]) => {
-              this.usuarios = usuarios.filter(usuario => {
-                const esProfesor = usuario.rol === 'profesor';
-                const yaInscrito = usuariosInscritos.some(u => u.email === usuario.email);
-                const hayProfesor = usuariosInscritos.some(u => u.rol === 'profesor');
-                if (esProfesor && hayProfesor) {
-                  return false;
-                }
-                return !yaInscrito;
-              });
+            (todosUsuarios: UserResp[]) => {
+              console.log('Todos los usuarios:', todosUsuarios);
+              if (usuariosInscritos && todosUsuarios) {
+                this.usuarios = todosUsuarios.filter(usuario => {
+                  return !usuariosInscritos.some(u => u.id === usuario.id) && (usuario.rol !== 'profesor' || !this.profesorInscrito);
+                });
+              } else {
+                this.usuarios = todosUsuarios.filter(usuario => usuario.rol !== 'profesor' || !this.profesorInscrito);
+              }
+              console.log('Usuarios no inscritos:', this.usuarios);
             },
             error => {
-              console.error('Error al obtener usuarios:', error);
+              console.error('Error al obtener todos los usuarios:', error);
             }
           );
         },
@@ -61,24 +65,8 @@ export class InscribirUsuarioComponent implements OnInit {
   }
 
   inscribirUsuario(): void {
-    if (this.selectedUser && this.idClase !== null) {
+    if (this.selectedUser !== null && this.idClase !== null) {
       this.claseService.inscribirUsuario(this.selectedUser, this.idClase)
-        .pipe(
-          catchError(error => {
-            let errorMessage = 'Error al inscribir usuario';
-            if (error.status === 409) { // HTTP 409: Conflict
-              errorMessage = 'Ya hay un profesor en la clase';
-            } else if (error.status === 400) { // HTTP 400: Bad Request
-              errorMessage = 'Este alumno ya está inscrito en la clase';
-            }
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: errorMessage,
-            });
-            return throwError(error);
-          })
-        )
         .subscribe(
           () => {
             Swal.fire({
@@ -90,8 +78,19 @@ export class InscribirUsuarioComponent implements OnInit {
           },
           error => {
             console.error('Error al inscribir usuario:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Hubo un error al inscribir al usuario. Por favor, inténtalo nuevamente.',
+            });
           }
         );
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor selecciona un usuario y asegúrate de que la clase esté definida.',
+      });
     }
   }
 }

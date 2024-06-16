@@ -23,7 +23,21 @@ export class MisClasesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.obtenerTodasLasClases();
+    // Verificar si el usuario es admin
+    if (this.auth.ifAdmin()) {
+      this.obtenerTodasLasClases();
+    } else {
+      // Obtener el ID del usuario del token almacenado en el localStorage
+      const id = this.auth.getUserId();
+
+      // Verificar si el ID del usuario está disponible
+      if (id) {
+        // Llamar al servicio para obtener las clases del usuario
+        this.obtenerClasesPorUsuario(id);
+      } else {
+        console.error('No se pudo obtener el ID del usuario.');
+      }
+    }
   }
 
   obtenerTodasLasClases(): void {
@@ -35,6 +49,19 @@ export class MisClasesComponent implements OnInit {
       },
       error => {
         console.error('Error al obtener todas las clases:', error);
+      }
+    );
+  }
+
+
+  obtenerClasesPorUsuario(id: number): void {
+    // Llamar al servicio para obtener las clases del usuario por su ID
+    this.claseService.obtenerClasesPorUsuario(id).subscribe(
+      clases => {
+        this.clases = clases;
+      },
+      error => {
+        console.error('Error al obtener las clases del usuario:', error);
       }
     );
   }

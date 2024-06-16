@@ -6,7 +6,7 @@ export const adminProfesorGuard: CanActivateFn = (route, state) => {
   const authservice = inject(AuthService)
   const router = inject(Router)
 
-  // Si el token no es admin nos manda al login
+  // Si el token no es admin o profesor nos manda al login
   return authservice.getUserData().rol = "admin" || "profesor"? true : router.navigateByUrl("/login");
 
 };

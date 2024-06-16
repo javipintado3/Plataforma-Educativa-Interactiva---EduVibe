@@ -29,3 +29,5 @@ COPY --from=builder /usr/src/app/target/EduvibeBackend-0.0.1-SNAPSHOT.jar /app/a
 
 # Comando de inicio
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+

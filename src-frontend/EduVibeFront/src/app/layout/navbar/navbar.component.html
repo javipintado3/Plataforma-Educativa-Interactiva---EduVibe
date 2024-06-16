@@ -1,11 +1,13 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
   <div class="container">
-    <div class="navbar-left">
-      <a class="navbar-brand" >
-        <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="50" class="navbar-logo">
-      </a>
-      <div class="navbar-divider"></div>
-      <ul class="navbar-nav">
+    <a class="navbar-brand">
+      <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="50" class="navbar-logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
         <li class="nav-item" *ngIf="authService.isAuthenticated()">
           <a class="nav-link" routerLink="inicio">Inicio</a>
         </li>
@@ -22,9 +24,7 @@
           <a class="nav-link" routerLink="login">Iniciar Sesión</a>
         </li>
       </ul>
-    </div>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto" *ngIf="authService.isAuthenticated()">
+      <ul class="navbar-nav ms-auto" *ngIf="authService.isAuthenticated()">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" id="dropdownUsuario" role="button" data-bs-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
@@ -39,7 +39,7 @@
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link icon" href="#"><fa-icon [icon]="faBell"></fa-icon></a>
+          <a class="nav-link icon"><fa-icon [icon]="faBell"></fa-icon></a>
         </li>
       </ul>
     </div>

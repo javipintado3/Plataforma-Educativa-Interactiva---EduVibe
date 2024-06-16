@@ -63,7 +63,7 @@ public interface ClaseService {
      * @param email El correo electrónico del usuario a inscribir.
      * @param idClase El identificador único de la clase a la que se inscribirá el usuario.
      */
-    void inscribirUsuarioEnClase(String email, Long idClase);
+    void inscribirUsuarioEnClase(Integer idUsuario, Long idClase);
     
     /**
      * Elimina a un usuario de una clase.
