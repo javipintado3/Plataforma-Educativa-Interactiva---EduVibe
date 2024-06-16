@@ -46,19 +46,15 @@ educativa en línea.
 | Usuario   | UsuarioID, Nombre, Correo, Contraseña, RolID  |
 | ListadoClase  | ClaseID, UsuarioID |
 | Clase     | ClaseID, Nombre, Descripcion |
-| Rol       | RolID, Nombre |
 | Tarea     | TareaID, Titulo, Descripcion, Fecha_Entrega, Nota, ClaseID, UsuarioID |
-| Anuncios  | AnuncioID, Contenido, Fecha, UsuarioID |
+
 
 #### Relaciones
 
 - Relacion entre Usuario y Anuncio: un anuncio es publicado por un unico profesor y un profesor publica uno o muchos anuncios.
 - Relación entre Usuario y Clase: se crea una nueva tabla llamada ListadoClase ya que es una relación uno a muchos donde se guarda el id del alumno y de la clase.
-- Relación entre Usuario y Rol: un usuario solo tiene un unico rol y los roles pueden tenerlos muchos usuarios.
 - Relación entre Clase y Tarea: una clase tiene muchas tareas, pero una tarea solo tiene una clase.
 - Relación entre Usuario y Tarea: un usuario tiene una o muchas tareas, pero una tarea esta asignada solo a ese usuario.
 
-#### Imagen del Modelo E/R
 
-![Modelo E/R](docs/img/ModeloEntidadRelacion.jpg)
 
