@@ -1,9 +1,9 @@
-<div class="container-fluid">
+<div class="container-fluid auth-page">
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-6 col-lg-5">
       <div class="RegisterContainer">
         <div class="RegisterCard">
-          <h2 class="mt-2 mb-3">CREACIÓN DE USUARIO</h2>
+          <h2 class="mt-2 mb-3">Crear cuenta</h2>
           <form [formGroup]="myForm">
             <!-- Campo Nombre -->
             <div class="form-group">
@@ -60,7 +60,7 @@
 
             <!-- Botón de Registro -->
             <div class="form-group d-flex justify-content-center">
-              <button type="submit" class="boton" id="botonRegistro" (click)="register()"
+              <button type="button" class="boton" id="botonRegistro" (click)="register()"
                 [disabled]="myForm.invalid">Crear</button>
             </div>
 
