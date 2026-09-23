@@ -1,45 +1,48 @@
+.subnavbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  position: relative;
+  top: 0;
+  box-sizing: border-box;
+}
 
-  .navbar, .subnavbar {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .subnavbar {
-    background-color: #2ca39b;
-    padding: 0.5rem 1rem;
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    position: relative;
-    top: 0;
-  }
-  
-  .subnavbar-nav {
-    list-style: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .subnav-item {
-    margin: 0 1rem;
-  }
-  
-  .subnav-link {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
+.subnavbar-nav {
+  list-style: none;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+}
 
-  
-  .subnav-link:hover {
-    text-decoration: underline;
-  }
-  /* Agrega esto en tu archivo CSS global o en el archivo CSS correspondiente */
+.subnav-item {
+  margin: 0;
+}
+
+.subnav-link {
+  display: inline-block;
+  color: #6b7280;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.subnav-link:hover {
+  text-decoration: none;
+  background-color: #eef2ff;
+  color: #2952e3;
+}
+
 .subnav-link.active {
-  text-decoration: underline;
-  font-weight: bold; /* Opcional: para resaltar aún más el enlace activo */
+  background-color: #2952e3;
+  color: #ffffff;
+  font-weight: 700;
 }

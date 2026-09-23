@@ -7,51 +7,76 @@
   100% { transform: rotate(0); }
 }
 
-/* Aplica la animación cuando se pasa el ratón sobre la campana */
 .navbar-nav .nav-link.icon:hover {
   animation: bell-ring 0.5s ease-in-out;
 }
 
-/* Otros estilos existentes */
+:host ::ng-deep nav.navbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.navbar-logo {
+  height: 40px;
+}
+
 .navbar-left {
   display: flex;
   align-items: center;
 }
 
 .navbar-divider {
-  height: 40px;
-  width: 2px;
-  background-color: black;
+  height: 32px;
+  width: 1px;
+  background-color: #e5e7eb;
   margin-right: 20px;
 }
 
-.nav-link {
-  font-weight: bold;
-  margin-right: 10px;
-  font-size: 1.4rem;
+.navbar-nav .nav-link {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #374151;
+  margin-right: 6px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  background-color: #eef2ff;
+  color: #2952e3;
 }
 
 .navbar-nav .icon {
-  color: #2D9596;
+  color: #2952e3;
 }
 
 .navbar-nav .nav-link i {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   margin-right: 10px;
 }
 
 .navbar-nav .nav-item img {
-  height: 35px;
+  height: 32px;
+}
+
+.navbar-nav .nav-item img.rounded-circle {
+  border: 2px solid #eef2ff;
 }
 
 span {
-  font-size: 1.2rem;
-  color: #2D9596;
-  margin-right: 20px;
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 600;
+  margin-right: 10px;
 }
 
 .navbar-nav.ms-auto {
   margin-left: auto;
+  align-items: center;
 }
 
 /* Media queries for mobile responsiveness */
@@ -60,11 +85,11 @@ span {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .navbar-nav .nav-item {
     text-align: center;
   }
-  
+
   .navbar-nav .nav-link {
     margin: 0;
     padding: 0.5rem 0;
