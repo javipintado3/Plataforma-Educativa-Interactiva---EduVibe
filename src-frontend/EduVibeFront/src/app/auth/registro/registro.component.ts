@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth.service';
 import { ExisteCorreoService } from '../../validators/existe-correo.service';
-import { ValidatorService } from '../../validators/validator.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,7 +12,6 @@ import { Router } from '@angular/router';
 })
 export class RegistroComponent {
   constructor(private fb: FormBuilder, // Inyección del FormBuilder para construir formularios
-  private validators: ValidatorService, // Inyección del servicio ValidatorService para validaciones personalizadas
   private emailTaken: ExisteCorreoService, // Inyección del servicio ExisteCorreoService para verificar la disponibilidad de un correo electrónico
   private authService: AuthService,
   private router: Router,
@@ -30,7 +28,7 @@ ngOnInit(): void {
 // Definición del formulario utilizando FormBuilder
 
 myForm: FormGroup = this.fb.group({
-  email: ["", [Validators.required, Validators.pattern(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/), this.validators.correoVibe]],
+  email: ["", [Validators.required, Validators.pattern(/^[^\.\s][\w\-]+(\.[\w\-]+)*@([\w-]+\.)+[\w-]{2,}$/)]],
   nombre: ["", [Validators.required]],
   rol: ["", [Validators.required]],  
   password: ["", [Validators.required, Validators.pattern(/^.{8,}$/)]]
@@ -58,9 +56,7 @@ get emailError(): string {
     if (errors['required']) {
       msg = "El Email es necesario"
     } else if (errors["pattern"]) {
-      msg = "Formato de email necesario (ejemplo@vibe.com)"
-    } else if (errors["noVibeMail"]) {
-      msg = "No es un correo de EduVibe"
+      msg = "Formato de email no válido"
     } else if (errors["emailTaken"]) {
       msg = "Este correo no está disponible"
     }

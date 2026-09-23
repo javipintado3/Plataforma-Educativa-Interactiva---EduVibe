@@ -10,7 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: eduvibe
     volumes:
-     - mysql_data:/data/db
+     - mysql_data:/var/lib/mysql
 
   eduvibe_api:
     build:
@@ -27,7 +27,7 @@ services:
       DATABASE_PASSWORD: root
       APP_PORT: 9090
       LOG_LEVEL: DEBUG
-      DLL_AUTO: create
+      DLL_AUTO: update
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     volumes:

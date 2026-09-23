@@ -96,11 +96,6 @@ public class UserService implements UserDetailsService {
      * @throws GlobalException si el email ya está registrado o no es válido
      */
     public User registroUsuario(RegistroUserDto userDto) {
-        // Verificar que el email termine en "@vibe.com"
-        if (!userDto.email().toLowerCase().endsWith("@vibe.com")) {
-            throw new GlobalException("El email debe terminar en '@vibe.com'");
-        }
-
         if (userRepository.existsByEmailIgnoreCase(userDto.email())) {
             throw new GlobalException("El email ya ha sido registrado");
         }
@@ -201,9 +196,6 @@ public class UserService implements UserDetailsService {
         if (usuarioDto.getEmail() != null) {
             if (!user.getEmail().equals(usuarioDto.getEmail()) && userRepository.existsByEmailIgnoreCase(usuarioDto.getEmail())) {
                 throw new GlobalException("El email ya ha sido registrado");
-            }
-            if (!usuarioDto.getEmail().toLowerCase().endsWith("@vibe.com")) {
-                throw new GlobalException("El email debe terminar en '@vibe.com'");
             }
             user.setEmail(usuarioDto.getEmail());
         }

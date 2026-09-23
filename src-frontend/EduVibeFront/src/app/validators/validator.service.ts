@@ -7,13 +7,6 @@ import { AbstractControl, FormControl, ValidationErrors, ValidatorFn } from '@an
 export class ValidatorService {
   constructor() { }
 
-  correoVibe(control:AbstractControl){
-    const email:string = control.value
-    let esCorreoValido:boolean = email.includes("@vibe.com")
-
-    return esCorreoValido? null: {noEvidenMail:true} 
-  }
-
   equalsFields(field1:string, field2:string):ValidatorFn{
     return(formControl:AbstractControl):ValidationErrors | null =>{
       const control2 : FormControl = <FormControl>formControl.get(field2)

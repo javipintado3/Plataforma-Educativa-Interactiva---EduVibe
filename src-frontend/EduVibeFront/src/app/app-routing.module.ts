@@ -27,7 +27,7 @@ import { DesignarUsuarioDeClaseComponent } from './clase/designar-usuario-de-cla
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'registro', component: RegistroComponent, canActivate: [adminGuard] },
+  { path: 'registro', component: RegistroComponent },
   { path: 'login', component: LoginComponent },
   {
     path: 'inicio',
