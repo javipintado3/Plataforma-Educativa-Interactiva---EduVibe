@@ -1,0 +1,73 @@
+package com.eduvibe.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import com.eduvibe.model.User;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Envío de correo.
+ *
+ * Un fallo al enviar no tumba la operación que lo provocó: dar de alta a un
+ * usuario tiene que funcionar aunque el servidor de correo no esté configurado,
+ * que es lo normal en un entorno de demostración. Por eso los métodos devuelven
+ * si se ha podido enviar en lugar de propagar la excepción, y el enlace de
+ * invitación viaja también en la respuesta de la API.
+ */
+@Service
+@RequiredArgsConstructor
+public class MailService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
+
+    private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username:}")
+    private String remitente;
+
+    /**
+     * @return true si el correo ha salido; false si no hay remitente
+     *         configurado o el envío ha fallado.
+     */
+    public boolean enviarInvitacion(User destinatario, String enlace) {
+        if (remitente == null || remitente.isBlank()) {
+            LOG.info("Correo no configurado. Enlace de invitación para {}: {}",
+                    destinatario.getEmail(), enlace);
+            return false;
+        }
+
+        try {
+            SimpleMailMessage mensaje = new SimpleMailMessage();
+            mensaje.setFrom(remitente);
+            mensaje.setTo(destinatario.getEmail());
+            mensaje.setSubject("Tu acceso a Eduvibe");
+            mensaje.setText("""
+                    Hola %s:
+
+                    Se ha creado una cuenta para ti en Eduvibe. Para activarla y
+                    establecer tu contraseña, entra en este enlace:
+
+                    %s
+
+                    El enlace sirve una sola vez. Si caduca, pide a tu centro que
+                    te lo vuelva a enviar.
+                    """.formatted(destinatario.getName(), enlace));
+
+            mailSender.send(mensaje);
+            return true;
+
+        } catch (Exception e) {
+            // No se propaga: el alta ya se ha hecho y el enlace se devuelve en
+            // la respuesta, así que el administrador puede entregarlo a mano.
+            LOG.warn("No se ha podido enviar la invitación a {}: {}",
+                    destinatario.getEmail(), e.getMessage());
+            return false;
+        }
+    }
+}

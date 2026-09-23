@@ -10,9 +10,9 @@ FROM eclipse-temurin:17-jre
 # Variables de entorno
 ENV BBDD_HOST="db"
 ENV BBDD_NAME="eduvibe"
+ENV BBDD_PORT=5432
 ENV APP_PORT=9090
 ENV LOG_LEVEL="INFO"
-ENV DLL_AUTO="update"
 ENV MAIL_USERNAME=""
 ENV MAIL_PASSWORD=""
 
@@ -25,7 +25,7 @@ RUN mkdir -p /mediafiles
 EXPOSE 9090
 
 # Copiar el archivo JAR construido de la etapa de construcción
-COPY --from=builder /usr/src/app/target/EduvibeBackend-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=builder /usr/src/app/target/eduvibe-api-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Establecer directorio de trabajo
 
