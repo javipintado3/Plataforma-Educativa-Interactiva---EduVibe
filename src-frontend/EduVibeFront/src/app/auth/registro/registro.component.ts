@@ -84,17 +84,19 @@ get passwordError(): string {
 register() {
   this.myForm.markAllAsTouched()
   if (this.myForm.valid) {
-    if (this.myForm.valid) {
-      console.log(this.myForm.value)
+    {
       this.authService.register(this.myForm.value)
         .subscribe({
           next: resp => {
             Swal.fire({
-              title: "Usuario Registrado",
+              title: "Registro completado",
               icon: "success",
-              showConfirmButton: false
+              showConfirmButton: false,
+              timer: 1800
             })
-            this.router.navigateByUrl("/users")
+            // Al registrarse todavía no hay sesión: /users exige estar
+            // autenticado y el guard rebotaba de vuelta al login.
+            this.router.navigateByUrl("/login")
 
           },
           error: err => {

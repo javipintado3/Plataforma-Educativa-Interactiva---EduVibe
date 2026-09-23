@@ -50,15 +50,27 @@ export class AuthService {
         })
       );
   }
-  logout(): void {
+  /**
+   * Cierra la sesión. El interceptor lo llama de forma automática cuando el
+   * token caduca, y en ese caso muestra su propio mensaje, así que se puede
+   * pedir que este no avise con { avisar: false }.
+   */
+  logout(opciones: { avisar?: boolean } = {}): void {
+    const { avisar = true } = opciones;
+
     if (this.isLocalStorageAvailable()) {
       localStorage.removeItem('token'); // Elimina el token del LocalStorage
+      localStorage.removeItem('name');
+      localStorage.removeItem('rol');
+      localStorage.removeItem('id');
     }
     this.isAuthenticated$.next(false);
-    Swal.fire({
-      title: "Sesión cerrada",
-      icon: "success"
-    });
+    if (avisar) {
+      Swal.fire({
+        title: "Sesión cerrada",
+        icon: "success"
+      });
+    }
     this.router.navigate(['/login']); // Redirige al login
   }
 
@@ -114,12 +126,18 @@ export class AuthService {
     if (!token) {
       return null;
     }
-    const { name, rol, id } = jwtDecode(token) as any;
-    return {
-      nombre: name,
-      rol: rol,
-      id: id
-    };
+    try {
+      const { name, rol, id } = jwtDecode(token) as any;
+      return {
+        nombre: name,
+        rol: rol,
+        id: id
+      };
+    } catch {
+      // Token corrupto: se trata como si no hubiera sesión en vez de propagar
+      // la excepción, que dejaba la aplicación inservible.
+      return null;
+    }
 
   }
 
@@ -130,7 +148,13 @@ export class AuthService {
     //si hay token en el localstorage entocnes entra
     if (this.getToken()) {
       //sacamos los milisegundos del token
-      let expiracion: number = jwtDecode(this.getToken() || "").exp as any
+      let expiracion: number
+      try {
+        expiracion = jwtDecode(this.getToken() || "").exp as any
+      } catch {
+        // Token ilegible: se considera sin sesión
+        return -1
+      }
       //lo seteamos en una nueva fecha
       let dateExp = new Date(expiracion * 1000)
       //creamos una fecha de hoy
