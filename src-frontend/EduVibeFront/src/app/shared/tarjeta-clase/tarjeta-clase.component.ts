@@ -4,12 +4,14 @@ import { RouterLink } from '@angular/router';
 
 import { Clase } from '../../core/models';
 import { PlazoPipe } from '../pipes/fecha.pipe';
+import { PortadaClaseComponent } from '../portada-clase/portada-clase.component';
 
 /**
  * Tarjeta de una clase para el panel principal.
  *
- * La franja de color superior es la identidad de la asignatura en toda la
- * aplicación: permite reconocer la clase sin leer el título.
+ * La portada es la identidad de la clase: permite reconocerla sin leer el
+ * título. Si no tiene imagen propia se compone una a partir de su
+ * identificador y su color, de modo que ninguna tarjeta queda desnuda.
  *
  * La línea de estado —la próxima entrega— es lo que hace útil esta pantalla.
  * Sin ella habría que entrar en cada clase para saber qué toca.
@@ -17,10 +19,15 @@ import { PlazoPipe } from '../pipes/fecha.pipe';
 @Component({
   selector: 'app-tarjeta-clase',
   standalone: true,
-  imports: [NgIf, RouterLink, PlazoPipe],
+  imports: [NgIf, RouterLink, PlazoPipe, PortadaClaseComponent],
   template: `
     <a class="tarjeta tarjeta-clase" [routerLink]="['/clases', clase.id]">
-      <span class="franja" [style.background]="clase.color || 'var(--verde-500)'"></span>
+      <app-portada-clase
+        [semilla]="clase.id"
+        [imageUrl]="clase.imageUrl"
+        [color]="clase.color"
+        [titulo]="clase.name"
+        [alto]="104"></app-portada-clase>
 
       <div class="cuerpo">
         <div class="fila-entre" style="align-items:flex-start">
@@ -62,8 +69,6 @@ import { PlazoPipe } from '../pipes/fecha.pipe';
       transform: translateY(-2px);
       border-color: var(--verde-200);
     }
-
-    .franja { display: block; height: 5px; }
 
     .cuerpo { padding: 16px 18px 14px; }
 

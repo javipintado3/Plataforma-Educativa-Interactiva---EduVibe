@@ -58,6 +58,14 @@ public class SchoolClass {
     @Column(name = "color", length = 20)
     private String color;
 
+    /**
+     * Portada de la clase. Si es null, la interfaz compone una propia a partir
+     * del identificador y el color, de modo que toda clase tiene portada sin
+     * depender de que exista ningún archivo.
+     */
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", insertable = false, updatable = false)
     private Instant createdAt;
@@ -66,10 +74,12 @@ public class SchoolClass {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Instant updatedAt;
 
-    public SchoolClass(Organization organization, String name, String subject, String color) {
+    public SchoolClass(Organization organization, String name, String subject,
+                       String color, String imageUrl) {
         this.organization = organization;
         this.name = name;
         this.subject = subject;
         this.color = color;
+        this.imageUrl = imageUrl;
     }
 }

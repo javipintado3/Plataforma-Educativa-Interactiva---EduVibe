@@ -59,7 +59,7 @@ public class SchoolClassService {
                 .orElseThrow(() -> NotFoundException.de("Organización", admin.organizationId()));
 
         SchoolClass clase = new SchoolClass(organizacion, peticion.name().trim(),
-                normalizar(peticion.subject()), peticion.color());
+                normalizar(peticion.subject()), peticion.color(), normalizar(peticion.imageUrl()));
         schoolClassRepository.saveAndFlush(clase);
 
         return ClassDetailResponse.de(clase, ROL_ADMINISTRACION, true, List.of(), 0, List.of());
@@ -148,6 +148,7 @@ public class SchoolClassService {
         clase.setName(peticion.name().trim());
         clase.setSubject(normalizar(peticion.subject()));
         clase.setColor(peticion.color());
+        clase.setImageUrl(normalizar(peticion.imageUrl()));
         schoolClassRepository.save(clase);
 
         return detalle(classId);

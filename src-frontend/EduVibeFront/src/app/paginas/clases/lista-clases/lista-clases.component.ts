@@ -59,6 +59,7 @@ export class ListaClasesComponent implements OnInit {
     name: ['', [Validators.required]],
     subject: [''],
     color: [PALETA[0].valor],
+    imageUrl: [''],
   });
 
   ngOnInit(): void {
@@ -82,7 +83,7 @@ export class ListaClasesComponent implements OnInit {
   }
 
   abrirDialogo(): void {
-    this.formulario.reset({ name: '', subject: '', color: PALETA[0].valor });
+    this.formulario.reset({ name: '', subject: '', color: PALETA[0].valor, imageUrl: '' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }
@@ -97,9 +98,14 @@ export class ListaClasesComponent implements OnInit {
     this.creando.set(true);
     this.errorFormulario.set(null);
 
-    const { name, subject, color } = this.formulario.getRawValue();
+    const { name, subject, color, imageUrl } = this.formulario.getRawValue();
 
-    this.clasesService.crear({ name, subject: subject || undefined, color }).subscribe({
+    this.clasesService.crear({
+      name,
+      subject: subject || undefined,
+      color,
+      imageUrl: imageUrl.trim() || undefined,
+    }).subscribe({
       next: () => {
         this.creando.set(false);
         this.dialogoAbierto.set(false);

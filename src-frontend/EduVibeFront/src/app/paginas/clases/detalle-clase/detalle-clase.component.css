@@ -1,9 +1,19 @@
 .cabecera {
   background: var(--blanco);
   border-bottom: 1px solid var(--borde);
-  padding: 18px 0 0;
+  padding: 0 0;
   margin-top: -28px;
-  border-top: 4px solid var(--color-clase);
+}
+
+/* El contenido de la cabecera monta sobre la portada, para que el título se
+   lea sobre blanco y la imagen no compita con él */
+.cabecera .contenedor {
+  position: relative;
+  margin-top: -18px;
+  background: var(--blanco);
+  border-radius: var(--radio-lg) var(--radio-lg) 0 0;
+  padding-top: 16px;
+  max-width: 1140px;
 }
 
 .volver {

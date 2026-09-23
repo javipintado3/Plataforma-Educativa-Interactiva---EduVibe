@@ -10,6 +10,7 @@ import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { PestanaCalificacionesComponent } from './pestanas/pestana-calificaciones.component';
 import { PestanaPersonasComponent } from './pestanas/pestana-personas.component';
 import { PestanaTrabajoComponent } from './pestanas/pestana-trabajo.component';
+import { PortadaClaseComponent } from '../../../shared/portada-clase/portada-clase.component';
 
 type Pestana = 'trabajo' | 'personas' | 'calificaciones';
 
@@ -25,7 +26,7 @@ type Pestana = 'trabajo' | 'personas' | 'calificaciones';
   selector: 'app-detalle-clase',
   standalone: true,
   imports: [
-    NgIf, RouterLink, CargandoComponent, AvisoComponent,
+    NgIf, RouterLink, CargandoComponent, AvisoComponent, PortadaClaseComponent,
     PestanaTrabajoComponent, PestanaPersonasComponent, PestanaCalificacionesComponent,
   ],
   templateUrl: './detalle-clase.component.html',

@@ -15,5 +15,9 @@ public record CreateClassRequest(
 
         /** Color en hexadecimal, del estilo #2563eb. */
         @Pattern(regexp = "^#[0-9a-fA-F]{6}$", message = "El color debe ser hexadecimal, por ejemplo #2563eb")
-        String color) {
+        String color,
+
+        /** Enlace a la portada. Opcional: sin él se compone una automática. */
+        @Size(max = 2000, message = "El enlace de la portada es demasiado largo")
+        String imageUrl) {
 }

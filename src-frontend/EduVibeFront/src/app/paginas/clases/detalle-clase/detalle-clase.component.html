@@ -8,7 +8,15 @@
 <ng-container *ngIf="clase() as detalle">
 
   <!-- Cabecera -->
-  <header class="cabecera" [style.--color-clase]="detalle.color || 'var(--verde-600)'">
+  <header class="cabecera" [style.--color-clase]="detalle.color || '#059669'">
+
+    <app-portada-clase
+      [semilla]="detalle.id"
+      [imageUrl]="detalle.imageUrl"
+      [color]="detalle.color"
+      [titulo]="detalle.name"
+      [alto]="120"></app-portada-clase>
+
     <div class="contenedor">
 
       <a routerLink="/clases" class="volver">

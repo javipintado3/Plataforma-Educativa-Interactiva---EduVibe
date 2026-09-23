@@ -27,11 +27,11 @@ export class ClasesService {
     return this.http.get<DetalleClase>(`${this.api}/${claseId}`);
   }
 
-  crear(datos: { name: string; subject?: string; color?: string }): Observable<DetalleClase> {
+  crear(datos: { name: string; subject?: string; color?: string; imageUrl?: string }): Observable<DetalleClase> {
     return this.http.post<DetalleClase>(this.api, datos);
   }
 
-  actualizar(claseId: string, datos: { name: string; subject?: string; color?: string }): Observable<DetalleClase> {
+  actualizar(claseId: string, datos: { name: string; subject?: string; color?: string; imageUrl?: string }): Observable<DetalleClase> {
     return this.http.put<DetalleClase>(`${this.api}/${claseId}`, datos);
   }
 

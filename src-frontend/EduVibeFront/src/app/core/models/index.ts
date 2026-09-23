@@ -59,6 +59,7 @@ export interface Clase {
   name: string;
   subject: string | null;
   color: string | null;
+  imageUrl: string | null;
   miRol: RolEnClase | 'admin' | null;
   proximaEntrega: string | null;
   profesores: string[];
@@ -84,6 +85,7 @@ export interface DetalleClase {
   name: string;
   subject: string | null;
   color: string | null;
+  imageUrl: string | null;
   miRol: RolEnClase | 'admin' | null;
   puedoEditar: boolean;
   profesores: Miembro[];
