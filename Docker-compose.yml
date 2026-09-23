@@ -28,6 +28,8 @@ services:
       APP_PORT: 9090
       LOG_LEVEL: DEBUG
       DLL_AUTO: create
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     volumes:
       - ./src/main/resources:/app/resources
     depends_on:

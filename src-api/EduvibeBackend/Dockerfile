@@ -1,11 +1,11 @@
 # Etapa de construcción
-FROM maven:3-openjdk-17 as builder
+FROM maven:3.9-eclipse-temurin-17 AS builder
 COPY src /usr/src/app/src
 COPY pom.xml /usr/src/app
 RUN mvn -f /usr/src/app/pom.xml clean package -DskipTests
 
 # Etapa de producción
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jre
 
 # Variables de entorno
 ENV BBDD_HOST="db"
@@ -13,6 +13,8 @@ ENV BBDD_NAME="eduvibe"
 ENV APP_PORT=9090
 ENV LOG_LEVEL="INFO"
 ENV DLL_AUTO="update"
+ENV MAIL_USERNAME=""
+ENV MAIL_PASSWORD=""
 
 # Volumen para datos temporales y archivos multimedia
 VOLUME /tmp
