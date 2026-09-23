@@ -97,6 +97,13 @@ public class SecurityConfig {
                     // La gestión de usuarios es cosa de la administración
                     .requestMatchers("/api/users/**").hasRole("ADMIN")
 
+                    // Crear una clase también. El resto de operaciones sobre
+                    // clases dependen de la relación con esa clase concreta y
+                    // no de un rol, así que las decide ClassAccessService: una
+                    // regla hasRole("TEACHER") aquí dejaría a cualquier
+                    // profesor del centro entrar en la clase de otro.
+                    .requestMatchers(HttpMethod.POST, "/api/classes").hasRole("ADMIN")
+
                     .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

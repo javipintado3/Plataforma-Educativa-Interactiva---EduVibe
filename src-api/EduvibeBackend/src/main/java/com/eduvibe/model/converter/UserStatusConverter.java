@@ -2,22 +2,17 @@ package com.eduvibe.model.converter;
 
 import com.eduvibe.model.enums.UserStatus;
 
-import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 /**
- * Equivalente a {@link UserRoleConverter} para el estado de la cuenta.
+ * Conversión del estado de cuenta. La lógica está en {@link EnumConValorConverter};
+ * aquí solo se fija el tipo concreto, que es lo que JPA necesita para poder
+ * aplicarlo automáticamente.
  */
 @Converter(autoApply = true)
-public class UserStatusConverter implements AttributeConverter<UserStatus, String> {
+public class UserStatusConverter extends EnumConValorConverter<UserStatus> {
 
-    @Override
-    public String convertToDatabaseColumn(UserStatus estado) {
-        return estado == null ? null : estado.getValor();
-    }
-
-    @Override
-    public UserStatus convertToEntityAttribute(String valor) {
-        return valor == null ? null : UserStatus.desdeValor(valor);
+    public UserStatusConverter() {
+        super(UserStatus.class);
     }
 }

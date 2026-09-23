@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.eduvibe.dto.common.ErrorResponse;
 
@@ -60,6 +63,39 @@ public class GlobalExceptionHandler {
             campos.putIfAbsent(error.getField(), error.getDefaultMessage());
         }
         return ResponseEntity.badRequest().body(ErrorResponse.deValidacion(ruta(peticion), campos));
+    }
+
+    /**
+     * Cuerpo de la petición ilegible: JSON mal formado, mal codificado, o un
+     * campo con un tipo que no encaja. Es culpa de quien llama, así que es un
+     * 400; sin este manejador caía en la red de seguridad y se devolvía un 500,
+     * que haría buscar el problema en el sitio equivocado.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> manejarCuerpoIlegible(HttpMessageNotReadableException ex,
+                                                               WebRequest peticion) {
+        LOG.debug("Cuerpo de petición ilegible en {}: {}", ruta(peticion), ex.getMessage());
+        return construir(HttpStatus.BAD_REQUEST,
+                "El cuerpo de la petición no se ha podido interpretar. Revisa que sea JSON válido en UTF-8.",
+                peticion);
+    }
+
+    /** Ruta inexistente: 404 y no 500. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> manejarRutaInexistente(NoResourceFoundException ex,
+                                                                WebRequest peticion) {
+        return construir(HttpStatus.NOT_FOUND, "No existe el recurso solicitado", peticion);
+    }
+
+    /**
+     * Un parámetro de ruta con formato imposible, por ejemplo un identificador
+     * que no es un UUID. También es culpa de quien llama.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> manejarTipoIncorrecto(MethodArgumentTypeMismatchException ex,
+                                                               WebRequest peticion) {
+        return construir(HttpStatus.BAD_REQUEST,
+                "El valor de '" + ex.getName() + "' no tiene el formato esperado", peticion);
     }
 
     /**

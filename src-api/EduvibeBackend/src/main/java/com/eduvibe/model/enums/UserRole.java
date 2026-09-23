@@ -7,7 +7,7 @@ package com.eduvibe.model.enums;
  * restricción CHECK con esta misma lista. Si se añade un rol aquí hay que
  * añadirlo también en una migración.
  */
-public enum UserRole {
+public enum UserRole implements EnumConValor {
 
     /** Da de alta y de baja usuarios, crea clases y gestiona la organización. */
     ADMIN("admin"),
@@ -27,22 +27,12 @@ public enum UserRole {
         this.valor = valor;
     }
 
-    /** Valor tal y como se almacena en base de datos y viaja en el JWT. */
+    @Override
     public String getValor() {
         return valor;
     }
 
-    /**
-     * Convierte el valor almacenado en el enumerado.
-     *
-     * @throws IllegalArgumentException si el valor no corresponde a ningún rol.
-     */
     public static UserRole desdeValor(String valor) {
-        for (UserRole rol : values()) {
-            if (rol.valor.equalsIgnoreCase(valor)) {
-                return rol;
-            }
-        }
-        throw new IllegalArgumentException("Rol no reconocido: " + valor);
+        return EnumConValor.desde(UserRole.class, valor);
     }
 }

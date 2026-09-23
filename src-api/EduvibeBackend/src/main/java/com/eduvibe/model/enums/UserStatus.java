@@ -10,7 +10,7 @@ package com.eduvibe.model.enums;
  *
  * Solo las cuentas ACTIVE pueden iniciar sesión.
  */
-public enum UserStatus {
+public enum UserStatus implements EnumConValor {
 
     PENDING("pending"),
     ACTIVE("active"),
@@ -22,16 +22,12 @@ public enum UserStatus {
         this.valor = valor;
     }
 
+    @Override
     public String getValor() {
         return valor;
     }
 
     public static UserStatus desdeValor(String valor) {
-        for (UserStatus estado : values()) {
-            if (estado.valor.equalsIgnoreCase(valor)) {
-                return estado;
-            }
-        }
-        throw new IllegalArgumentException("Estado no reconocido: " + valor);
+        return EnumConValor.desde(UserStatus.class, valor);
     }
 }
