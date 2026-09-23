@@ -1,0 +1,147 @@
+.pagina {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  background: var(--blanco);
+}
+
+/* ---------------------------------------------------------- panel de marca */
+
+.panel {
+  background: linear-gradient(150deg, var(--verde-600) 0%, var(--verde-800) 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dos círculos muy tenues que rompen el plano sin robar atención */
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .06);
+}
+
+.panel::before { width: 420px; height: 420px; top: -140px; right: -120px; }
+.panel::after  { width: 300px; height: 300px; bottom: -110px; left: -80px; }
+
+.panel-contenido { position: relative; max-width: 440px; }
+
+.titular {
+  font-size: 2.1rem;
+  line-height: 1.22;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  margin: 36px 0 18px;
+  color: #fff;
+}
+
+.subtitulo {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, .82);
+  margin-bottom: 32px;
+}
+
+.ventajas { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+
+.ventajas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: .93rem;
+  color: rgba(255, 255, 255, .92);
+}
+
+.marca-lista {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .18);
+  flex-shrink: 0;
+  margin-top: 2px;
+  position: relative;
+}
+
+.marca-lista::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* --------------------------------------------------------------- formulario */
+
+.formulario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+}
+
+.caja { width: 100%; max-width: 384px; }
+
+.logo-movil { display: none; margin-bottom: 28px; }
+
+/* ------------------------------------------------------------------- demo */
+
+.demo {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--borde);
+}
+
+.demo-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.demo-cuentas { display: grid; gap: 7px; }
+
+.demo-cuenta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: left;
+  font: inherit;
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  padding: 9px 13px;
+  cursor: pointer;
+  transition: border-color .14s ease, background .14s ease;
+}
+
+.demo-cuenta:hover { border-color: var(--verde-300); background: var(--verde-50); }
+
+.demo-rol { font-size: .87rem; font-weight: 600; color: var(--tinta); }
+
+code {
+  background: var(--borde-sutil);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .82em;
+  color: var(--tinta-70);
+}
+
+/* -------------------------------------------------------------------- móvil */
+
+@media (max-width: 900px) {
+  .pagina { grid-template-columns: 1fr; }
+  .panel { display: none; }
+  .logo-movil { display: block; }
+  .formulario { padding: 40px 20px; align-items: flex-start; }
+}

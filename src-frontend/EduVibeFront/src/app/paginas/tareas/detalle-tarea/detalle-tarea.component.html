@@ -1,0 +1,178 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<div class="contenedor" *ngIf="!cargando() && !tarea()">
+  <app-aviso tipo="error" [mensaje]="error()"></app-aviso>
+  <a routerLink="/clases" class="boton boton-contorno mt-2">Volver a mis clases</a>
+</div>
+
+<div class="contenedor" *ngIf="tarea() as t">
+
+  <a [routerLink]="['/clases', t.classId]" class="volver mb-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    {{ t.className }}{{ t.classSubject ? ' · ' + t.classSubject : '' }}
+  </a>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <div class="disposicion">
+
+    <!-- Enunciado -->
+    <article class="tarjeta">
+      <div class="tarjeta-cuerpo">
+        <div class="fila-entre envolver mb-2">
+          <h1 class="mb-0">{{ t.title }}</h1>
+          <span class="pastilla" [class.pastilla-ambar]="!t.haVencido" [class.pastilla-gris]="t.haVencido">
+            {{ t.dueDate ? (t.dueDate | plazo) : 'Sin fecha límite' }}
+          </span>
+        </div>
+
+        <p class="pequeno apagado mb-3">
+          {{ t.points }} puntos
+          <span *ngIf="t.dueDate"> · Entrega hasta el {{ t.dueDate | fecha }}</span>
+        </p>
+
+        <div class="enunciado" *ngIf="t.description">{{ t.description }}</div>
+        <p class="apagado" *ngIf="!t.description">Esta tarea no tiene enunciado escrito.</p>
+      </div>
+    </article>
+
+    <!-- Columna derecha: entrega propia o corrección -->
+    <aside>
+
+      <!-- ============ Alumnado ============ -->
+      <div class="tarjeta" *ngIf="!t.puedoEditar">
+        <div class="tarjeta-cabecera fila-entre">
+          <h3 class="mb-0">Tu entrega</h3>
+          <app-pastilla-estado [valor]="t.miEntrega?.status || 'sin-empezar'"></app-pastilla-estado>
+        </div>
+
+        <div class="tarjeta-cuerpo">
+
+          <!-- Nota, si ya está corregida -->
+          <div class="nota-caja mb-3" *ngIf="t.miEntrega?.grade as nota">
+            <div class="fila-entre">
+              <span class="pequeno apagado">Calificación</span>
+              <span class="nota">{{ nota.score }} <span class="sobre">/ {{ t.points }}</span></span>
+            </div>
+            <p class="pequeno mb-0 mt-1" *ngIf="nota.feedback">{{ nota.feedback }}</p>
+            <p class="pequeno apagado mb-0 mt-1">
+              {{ nota.gradedByName }} · {{ nota.gradedAt | fecha }}
+            </p>
+          </div>
+
+          <div class="aviso aviso-atencion mb-2" *ngIf="t.miEntrega?.entregadaTarde">
+            <span>Esta entrega llegó fuera de plazo.</span>
+          </div>
+
+          <app-aviso class="mb-2" tipo="exito" [mensaje]="mensajeEntrega()"></app-aviso>
+
+          <form [formGroup]="formEntrega" novalidate>
+            <div class="campo">
+              <label class="etiqueta" for="respuesta">Respuesta</label>
+              <textarea id="respuesta" class="area" formControlName="content"
+                        [attr.disabled]="bloqueada ? '' : null"
+                        placeholder="Escribe aquí tu respuesta."></textarea>
+            </div>
+
+            <div class="campo">
+              <label class="etiqueta" for="archivo">Enlace al archivo</label>
+              <input id="archivo" class="entrada" formControlName="fileUrl"
+                     [attr.disabled]="bloqueada ? '' : null"
+                     placeholder="https://…">
+              <span class="ayuda-campo">Si lo has subido a otro sitio, pega aquí el enlace.</span>
+            </div>
+          </form>
+
+          <div class="fila espaciado-sm" *ngIf="!bloqueada">
+            <button type="button" class="boton boton-contorno crecer"
+                    [disabled]="guardando()" (click)="guardar(false)">
+              Guardar borrador
+            </button>
+            <button type="button" class="boton boton-primario crecer"
+                    [disabled]="guardando()" (click)="guardar(true)">
+              {{ guardando() ? 'Enviando…' : 'Entregar' }}
+            </button>
+          </div>
+
+          <p class="pequeno apagado mb-0" *ngIf="bloqueada">
+            Ya está corregida, así que no se puede modificar.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============ Profesorado ============ -->
+      <div class="tarjeta" *ngIf="t.puedoEditar">
+        <div class="tarjeta-cabecera fila-entre">
+          <h3 class="mb-0">Entregas</h3>
+          <span class="pastilla pastilla-ambar" *ngIf="pendientesDeCorregir">
+            {{ pendientesDeCorregir }} por corregir
+          </span>
+        </div>
+
+        <app-estado-vacio *ngIf="!entregas().length"
+          titulo="Todavía no hay entregas"
+          descripcion="Aquí aparecerá el trabajo del alumnado según lo vaya enviando."></app-estado-vacio>
+
+        <button type="button" class="entrega" *ngFor="let entrega of entregas()"
+                (click)="abrirCorreccion(entrega)">
+          <app-avatar [nombre]="entrega.studentName" [pequeno]="true"></app-avatar>
+
+          <span class="crecer" style="min-width:0;text-align:left">
+            <span class="alumno">{{ entrega.studentName }}</span>
+            <span class="pequeno apagado bloque">
+              {{ entrega.submittedAt ? (entrega.submittedAt | fecha) : 'Sin enviar' }}
+            </span>
+          </span>
+
+          <span class="fila espaciado-sm">
+            <span class="pastilla pastilla-roja" *ngIf="entrega.entregadaTarde">Tarde</span>
+            <span class="nota-lista" *ngIf="entrega.grade">{{ entrega.grade.score }}</span>
+            <app-pastilla-estado *ngIf="!entrega.grade" [valor]="entrega.status"></app-pastilla-estado>
+          </span>
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Corrección de una entrega -->
+<app-dialogo [abierto]="entregaElegida() !== null"
+             [titulo]="'Corregir · ' + (entregaElegida()?.studentName || '')"
+             [cierraAlPulsarFuera]="false"
+             (cerrar)="entregaElegida.set(null)">
+
+  <ng-container *ngIf="entregaElegida() as entrega">
+
+    <div class="trabajo mb-3">
+      <p class="pequeno apagado mb-1">Lo entregado</p>
+      <p class="mb-1" *ngIf="entrega.content" style="white-space:pre-wrap">{{ entrega.content }}</p>
+      <p class="apagado mb-1" *ngIf="!entrega.content">Sin respuesta escrita.</p>
+      <a *ngIf="entrega.fileUrl" [href]="entrega.fileUrl" target="_blank" rel="noopener"
+         class="pequeno">Ver archivo entregado</a>
+    </div>
+
+    <app-aviso class="mb-2" tipo="error" [mensaje]="errorNota()"></app-aviso>
+
+    <form [formGroup]="formNota" (ngSubmit)="calificar()" novalidate id="form-nota">
+      <div class="campo">
+        <label class="etiqueta" for="nota">Nota sobre {{ tarea()?.points }}</label>
+        <input id="nota" type="number" step="0.01" min="0" [attr.max]="tarea()?.points"
+               class="entrada" formControlName="score">
+      </div>
+
+      <div class="campo mb-0">
+        <label class="etiqueta" for="comentario">Comentario</label>
+        <textarea id="comentario" class="area" formControlName="feedback"
+                  placeholder="Qué ha estado bien y qué se puede mejorar."></textarea>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="entregaElegida.set(null)">Cancelar</button>
+    <button type="submit" form="form-nota" class="boton boton-primario" [disabled]="calificando()">
+      {{ calificando() ? 'Guardando…' : 'Guardar calificación' }}
+    </button>
+  </ng-container>
+</app-dialogo>

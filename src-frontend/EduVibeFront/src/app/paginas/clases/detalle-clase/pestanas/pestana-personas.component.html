@@ -1,0 +1,50 @@
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<ng-container *ngIf="!cargando()">
+
+  <section class="mb-3">
+    <h3 class="titulo-grupo">Profesorado · {{ profesorado().length }}</h3>
+
+    <div class="tarjeta">
+      <div class="persona" *ngFor="let miembro of profesorado()">
+        <app-avatar [nombre]="miembro.name"></app-avatar>
+        <div class="crecer" style="min-width:0">
+          <p class="nombre mb-0">{{ miembro.name }}</p>
+          <p class="pequeno apagado mb-0 correo">{{ miembro.email }}</p>
+        </div>
+        <button type="button" class="boton boton-peligro boton-pequeno"
+                *ngIf="auth.esAdmin()"
+                [disabled]="quitando() === miembro.userId"
+                (click)="quitar(miembro)">Quitar</button>
+      </div>
+
+      <app-estado-vacio *ngIf="!profesorado().length"
+        titulo="Sin profesorado asignado"
+        descripcion="Matricula a un profesor desde el panel de usuarios."></app-estado-vacio>
+    </div>
+  </section>
+
+  <section>
+    <h3 class="titulo-grupo">Alumnado · {{ alumnado().length }}</h3>
+
+    <div class="tarjeta">
+      <div class="persona" *ngFor="let miembro of alumnado()">
+        <app-avatar [nombre]="miembro.name"></app-avatar>
+        <div class="crecer" style="min-width:0">
+          <p class="nombre mb-0">{{ miembro.name }}</p>
+          <p class="pequeno apagado mb-0 correo">{{ miembro.email }}</p>
+        </div>
+        <button type="button" class="boton boton-peligro boton-pequeno"
+                *ngIf="auth.esAdmin()"
+                [disabled]="quitando() === miembro.userId"
+                (click)="quitar(miembro)">Quitar</button>
+      </div>
+
+      <app-estado-vacio *ngIf="!alumnado().length"
+        titulo="Todavía no hay alumnado"
+        descripcion="Matricula alumnos en esta clase para que puedan ver las tareas."></app-estado-vacio>
+    </div>
+  </section>
+</ng-container>

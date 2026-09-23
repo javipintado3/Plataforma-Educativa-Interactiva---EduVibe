@@ -1,47 +1,58 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-  <div class="container">
-    <a class="navbar-brand">
-      <img src="../../../assets/Img/LogoEduVibe.png" alt="EduVibe" height="50" class="navbar-logo">
+<header class="barra">
+  <div class="contenedor fila-entre" style="height:60px">
+
+    <a routerLink="/clases" class="marca" (click)="cerrarTodo()">
+      <app-logo [size]="30"></app-logo>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item" *ngIf="authService.isAuthenticated()">
-          <a class="nav-link" routerLink="inicio">Inicio</a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isAuthenticated()">
-          <a class="nav-link" routerLink="misClases">{{ authService.ifAdmin() ? 'Clases' : 'Mis clases' }}</a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isAuthenticated()">
-          <a class="nav-link" routerLink="calendario">Calendario</a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isAuthenticated() && authService.ifAdmin()">
-          <a class="nav-link" routerLink="users">Usuarios</a>
-        </li>
-        <li class="nav-item" *ngIf="!authService.isAuthenticated()">
-          <a class="nav-link" routerLink="login">Iniciar Sesión</a>
-        </li>
-      </ul>
-      <ul class="navbar-nav ms-auto" *ngIf="authService.isAuthenticated()">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" id="dropdownUsuario" role="button" data-bs-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-            <span *ngIf="userResp">{{ userResp.nombre || 'Sin logear' }}</span>
-            <ng-container *ngIf="!userResp">Sin logear</ng-container>
-            <img src="../../../assets/Img/ImagenSinLogear.png" alt="Profile" class="rounded-circle" height="30">
-          </a>
-          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUsuario">
-            <a class="dropdown-item" [routerLink]="['/perfil', userResp?.id]">Perfil</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" (click)="logout()">Cerrar sesión</a>
+
+    <!-- Navegación principal -->
+    <nav class="nav" [class.desplegada]="navegacionAbierta()">
+      <a routerLink="/clases" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
+        Mis clases
+      </a>
+      <a routerLink="/admin/usuarios" routerLinkActive="activo" class="enlace"
+         *ngIf="auth.esAdmin()" (click)="cerrarTodo()">
+        Usuarios
+      </a>
+    </nav>
+
+    <div class="fila espaciado-sm">
+
+      <!-- Menú de la persona -->
+      <div class="menu-usuario" data-menu-usuario>
+        <button type="button" class="disparador" (click)="alternarMenu()"
+                [attr.aria-expanded]="menuAbierto()" aria-haspopup="true">
+          <app-avatar [nombre]="auth.usuario()?.name || ''" [pequeno]="true"></app-avatar>
+          <span class="nombre">{{ auth.usuario()?.name }}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+               [class.girado]="menuAbierto()">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="desplegable" *ngIf="menuAbierto()">
+          <div class="ficha">
+            <p class="fuerte mb-0">{{ auth.usuario()?.name }}</p>
+            <p class="pequeno apagado mb-1" style="word-break:break-all">{{ auth.usuario()?.email }}</p>
+            <app-pastilla-estado [valor]="auth.usuario()?.role"></app-pastilla-estado>
           </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link icon"><fa-icon [icon]="faBell"></fa-icon></a>
-        </li>
-      </ul>
+          <button type="button" class="opcion" (click)="salir()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+            </svg>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón de navegación en móvil -->
+      <button type="button" class="boton boton-fantasma hamburguesa" (click)="alternarNavegacion()"
+              aria-label="Abrir navegación">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
     </div>
   </div>
-</nav>
+</header>

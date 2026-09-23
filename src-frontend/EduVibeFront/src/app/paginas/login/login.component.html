@@ -1,0 +1,97 @@
+<div class="pagina">
+
+  <!-- Panel de marca -->
+  <aside class="panel">
+    <div class="panel-contenido">
+      <app-logo class="sobre-color" [size]="40" [mono]="false"></app-logo>
+
+      <h1 class="titular">
+        Las clases, las tareas y las notas.<br>
+        En un solo sitio.
+      </h1>
+
+      <p class="subtitulo">
+        Lo justo para dar clase sin pelearse con la herramienta: qué hay que entregar,
+        cuándo, y cómo ha ido.
+      </p>
+
+      <ul class="ventajas">
+        <li>
+          <span class="marca-lista"></span>
+          Ve de un vistazo qué entrega toca en cada clase
+        </li>
+        <li>
+          <span class="marca-lista"></span>
+          Corrige con el trabajo y la nota en la misma pantalla
+        </li>
+        <li>
+          <span class="marca-lista"></span>
+          Altas por invitación: ninguna contraseña viaja por correo
+        </li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Formulario -->
+  <main class="formulario">
+    <div class="caja">
+
+      <div class="logo-movil">
+        <app-logo [size]="34"></app-logo>
+      </div>
+
+      <h2 class="mb-1">Bienvenido de nuevo</h2>
+      <p class="apagado mb-3">Accede con la cuenta de tu centro.</p>
+
+      <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+      <form [formGroup]="formulario" (ngSubmit)="entrar()" novalidate>
+
+        <div class="campo">
+          <label class="etiqueta" for="email">Email</label>
+          <input id="email" type="email" class="entrada" formControlName="email"
+                 [class.invalida]="campoInvalido('email')"
+                 autocomplete="username" placeholder="nombre@centro.es">
+          <span class="error-campo" *ngIf="campoInvalido('email')">
+            Escribe un email válido
+          </span>
+        </div>
+
+        <div class="campo">
+          <label class="etiqueta" for="password">Contraseña</label>
+          <input id="password" type="password" class="entrada" formControlName="password"
+                 [class.invalida]="campoInvalido('password')"
+                 autocomplete="current-password" placeholder="••••••••">
+          <span class="error-campo" *ngIf="campoInvalido('password')">
+            La contraseña es obligatoria
+          </span>
+        </div>
+
+        <button type="submit" class="boton boton-primario boton-bloque mt-1" [disabled]="enviando()">
+          <span class="cargando" *ngIf="enviando()" style="width:15px;height:15px;border-color:rgba(255,255,255,.4);border-top-color:#fff"></span>
+          {{ enviando() ? 'Entrando…' : 'Entrar' }}
+        </button>
+      </form>
+
+      <!-- Puerta de demostración -->
+      <div class="demo">
+        <div class="demo-cabecera">
+          <span class="pastilla pastilla-verde">Demostración</span>
+          <span class="pequeno apagado">Pulsa una cuenta para probarla</span>
+        </div>
+
+        <div class="demo-cuentas">
+          <button type="button" class="demo-cuenta" *ngFor="let cuenta of cuentasDemo"
+                  (click)="usarCuenta(cuenta)">
+            <span class="demo-rol">{{ cuenta.rol }}</span>
+            <span class="pequeno apagado">{{ cuenta.descripcion }}</span>
+          </button>
+        </div>
+
+        <p class="pequeno apagado mb-0 mt-1">
+          Todas usan la contraseña <code>{{ contrasenaDemo }}</code>
+        </p>
+      </div>
+    </div>
+  </main>
+</div>

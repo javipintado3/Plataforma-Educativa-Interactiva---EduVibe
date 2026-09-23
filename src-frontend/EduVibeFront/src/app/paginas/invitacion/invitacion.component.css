@@ -1,0 +1,19 @@
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background:
+    radial-gradient(900px 420px at 50% -8%, var(--verde-50), transparent 70%),
+    var(--fondo);
+}
+
+.caja { width: 100%; max-width: 420px; }
+
+.ficha {
+  background: var(--verde-50);
+  border: 1px solid var(--verde-100);
+  border-radius: var(--radio-sm);
+  padding: 13px 15px;
+}

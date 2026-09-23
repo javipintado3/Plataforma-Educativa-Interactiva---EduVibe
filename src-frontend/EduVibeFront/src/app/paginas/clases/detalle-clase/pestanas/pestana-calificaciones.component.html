@@ -1,0 +1,53 @@
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<ng-container *ngIf="!cargando()">
+
+  <div class="resumen mb-3" *ngIf="media() !== null">
+    <div>
+      <p class="pequeno apagado mb-0">Media de lo corregido</p>
+      <p class="media mb-0">{{ media() }}</p>
+    </div>
+    <p class="pequeno apagado mb-0">
+      {{ calificadas().length }} de {{ entregas().length }} entrega(s) calificada(s)
+    </p>
+  </div>
+
+  <div class="tarjeta" *ngIf="entregas().length; else sinEntregas">
+    <div class="tabla-envoltorio">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Tarea</th>
+            <th>Estado</th>
+            <th>Entregada</th>
+            <th style="text-align:right">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entrega of entregas()">
+            <td>
+              <a [routerLink]="['/tareas', entrega.assignmentId]" class="fuerte">{{ entrega.assignmentTitle }}</a>
+              <span class="pastilla pastilla-roja separado" *ngIf="entrega.entregadaTarde">Tarde</span>
+            </td>
+            <td><app-pastilla-estado [valor]="entrega.status"></app-pastilla-estado></td>
+            <td class="pequeno apagado">{{ entrega.submittedAt | fecha }}</td>
+            <td style="text-align:right">
+              <span class="nota" *ngIf="entrega.grade">{{ entrega.grade.score }}</span>
+              <span class="apagado" *ngIf="!entrega.grade">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <ng-template #sinEntregas>
+    <div class="tarjeta">
+      <app-estado-vacio
+        titulo="Todavía no has entregado nada"
+        descripcion="Las tareas que entregues aparecerán aquí con su calificación."></app-estado-vacio>
+    </div>
+  </ng-template>
+</ng-container>

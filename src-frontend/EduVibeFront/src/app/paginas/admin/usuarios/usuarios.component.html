@@ -1,0 +1,183 @@
+<div class="contenedor">
+
+  <div class="fila-entre envolver mb-3">
+    <div>
+      <h1>Usuarios</h1>
+      <p class="apagado mb-0">
+        Las cuentas se crean aquí y se activan con una invitación. Nunca se envía una contraseña.
+      </p>
+    </div>
+
+    <button type="button" class="boton boton-primario" (click)="abrirDialogo()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Nuevo usuario
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <form class="filtros mb-2" [formGroup]="filtros" (ngSubmit)="cargar()">
+    <input class="entrada" formControlName="q" placeholder="Buscar por nombre o email">
+
+    <select class="selector" formControlName="role" (change)="cargar()">
+      <option value="">Cualquier rol</option>
+      <option value="admin">Administración</option>
+      <option value="teacher">Profesorado</option>
+      <option value="student">Alumnado</option>
+      <option value="guardian">Tutor legal</option>
+    </select>
+
+    <select class="selector" formControlName="status" (change)="cargar()">
+      <option value="">Cualquier estado</option>
+      <option value="pending">Pendiente</option>
+      <option value="active">Activa</option>
+      <option value="disabled">Desactivada</option>
+    </select>
+
+    <button type="submit" class="boton boton-contorno">Buscar</button>
+    <button type="button" class="boton boton-fantasma" (click)="limpiarFiltros()">Limpiar</button>
+  </form>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <app-cargando *ngIf="cargando()"></app-cargando>
+
+  <div class="tarjeta" *ngIf="!cargando() && pagina() as p">
+
+    <app-estado-vacio *ngIf="!p.contenido.length"
+      titulo="Ningún usuario coincide"
+      descripcion="Prueba a quitar algún filtro, o da de alta una cuenta nueva."></app-estado-vacio>
+
+    <div class="tabla-envoltorio" *ngIf="p.contenido.length">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Persona</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Alta</th>
+            <th style="text-align:right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of p.contenido">
+            <td>
+              <div class="fila espaciado-sm">
+                <app-avatar [nombre]="usuario.name" [pequeno]="true"></app-avatar>
+                <div style="min-width:0">
+                  <p class="fuerte mb-0">{{ usuario.name }}</p>
+                  <p class="pequeno apagado mb-0 correo">{{ usuario.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td><app-pastilla-estado [valor]="usuario.role"></app-pastilla-estado></td>
+            <td><app-pastilla-estado [valor]="usuario.status"></app-pastilla-estado></td>
+            <td class="pequeno apagado">{{ usuario.createdAt | fecha : false }}</td>
+            <td>
+              <div class="acciones">
+                <button type="button" class="boton boton-suave boton-pequeno"
+                        *ngIf="usuario.status === 'pending'"
+                        [disabled]="trabajandoCon() === usuario.id"
+                        (click)="reenviarInvitacion(usuario)">Reenviar invitación</button>
+
+                <button type="button" class="boton boton-contorno boton-pequeno"
+                        *ngIf="usuario.status === 'active'"
+                        [disabled]="trabajandoCon() === usuario.id"
+                        (click)="cambiarEstado(usuario, 'disabled')">Desactivar</button>
+
+                <button type="button" class="boton boton-suave boton-pequeno"
+                        *ngIf="usuario.status === 'disabled'"
+                        [disabled]="trabajandoCon() === usuario.id"
+                        (click)="cambiarEstado(usuario, 'active')">Reactivar</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="paginacion" *ngIf="p.totalPaginas > 1">
+      <button type="button" class="boton boton-contorno boton-pequeno"
+              [disabled]="p.pagina === 0" (click)="cargar(p.pagina - 1)">Anterior</button>
+      <span class="pequeno apagado">
+        Página {{ p.pagina + 1 }} de {{ p.totalPaginas }} · {{ p.totalElementos }} usuario(s)
+      </span>
+      <button type="button" class="boton boton-contorno boton-pequeno"
+              [disabled]="p.ultima" (click)="cargar(p.pagina + 1)">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alta / invitación -->
+<app-dialogo [abierto]="dialogoAbierto()"
+             [titulo]="invitacionEmitida() ? 'Invitación lista' : 'Nuevo usuario'"
+             [cierraAlPulsarFuera]="false"
+             (cerrar)="dialogoAbierto.set(false)">
+
+  <!-- Paso 2: el enlace -->
+  <ng-container *ngIf="invitacionEmitida() as emitida">
+    <p class="mb-2">
+      La cuenta de <strong>{{ emitida.nombre }}</strong> ya está creada. Para activarla tiene que
+      abrir este enlace y elegir su contraseña.
+    </p>
+
+    <div class="aviso aviso-atencion mb-2" *ngIf="!emitida.invitacion.emailEnviado">
+      <span>No hay servidor de correo configurado, así que el enlace no se ha enviado. Cópialo y hazlo llegar tú.</span>
+    </div>
+
+    <div class="aviso aviso-exito mb-2" *ngIf="emitida.invitacion.emailEnviado">
+      <span>Se ha enviado por correo. Aquí lo tienes también por si acaso.</span>
+    </div>
+
+    <div class="enlace">
+      <code>{{ emitida.invitacion.link }}</code>
+      <button type="button" class="boton boton-contorno boton-pequeno"
+              (click)="copiarEnlace(emitida.invitacion.link)">
+        {{ enlaceCopiado() ? 'Copiado' : 'Copiar' }}
+      </button>
+    </div>
+
+    <p class="pequeno apagado mt-2 mb-0">
+      Sirve una sola vez y caduca el {{ emitida.invitacion.expiresAt | fecha }}.
+    </p>
+  </ng-container>
+
+  <!-- Paso 1: el formulario -->
+  <ng-container *ngIf="!invitacionEmitida()">
+    <app-aviso class="mb-2" tipo="error" [mensaje]="errorFormulario()"></app-aviso>
+
+    <form [formGroup]="formulario" (ngSubmit)="crear()" novalidate id="form-usuario">
+      <div class="campo">
+        <label class="etiqueta" for="nombre">Nombre y apellidos</label>
+        <input id="nombre" class="entrada" formControlName="name" placeholder="Marina Vázquez">
+      </div>
+
+      <div class="campo">
+        <label class="etiqueta" for="correo">Email</label>
+        <input id="correo" type="email" class="entrada" formControlName="email"
+               placeholder="marina.vazquez@centro.es">
+      </div>
+
+      <div class="campo mb-0">
+        <label class="etiqueta" for="rol">Rol</label>
+        <select id="rol" class="selector" formControlName="role">
+          <option value="student">Alumnado</option>
+          <option value="teacher">Profesorado</option>
+          <option value="admin">Administración</option>
+          <option value="guardian">Tutor legal</option>
+        </select>
+        <span class="ayuda-campo">La cuenta nace sin contraseña; la elige la propia persona.</span>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoAbierto.set(false)">
+      {{ invitacionEmitida() ? 'Cerrar' : 'Cancelar' }}
+    </button>
+    <button type="submit" form="form-usuario" class="boton boton-primario"
+            *ngIf="!invitacionEmitida()" [disabled]="creando()">
+      {{ creando() ? 'Creando…' : 'Crear e invitar' }}
+    </button>
+  </ng-container>
+</app-dialogo>

@@ -1,0 +1,65 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<div class="contenedor" *ngIf="!cargando() && error()">
+  <app-aviso tipo="error" [mensaje]="error()"></app-aviso>
+  <a routerLink="/clases" class="boton boton-contorno mt-2">Volver a mis clases</a>
+</div>
+
+<ng-container *ngIf="clase() as detalle">
+
+  <!-- Cabecera -->
+  <header class="cabecera" [style.--color-clase]="detalle.color || 'var(--verde-600)'">
+    <div class="contenedor">
+
+      <a routerLink="/clases" class="volver">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Mis clases
+      </a>
+
+      <div class="fila-entre envolver mt-2">
+        <div>
+          <p class="asignatura mb-0">{{ detalle.subject || 'Sin asignatura' }}</p>
+          <h1 class="mb-1">{{ detalle.name }}</h1>
+          <p class="pequeno apagado mb-0">
+            {{ detalle.profesores.length ? nombresProfesorado(detalle) : 'Sin profesorado' }}
+            · {{ detalle.numeroAlumnos }} alumno(s)
+          </p>
+        </div>
+
+        <span class="pastilla pastilla-verde" *ngIf="detalle.miRol === 'teacher'">Impartes esta clase</span>
+        <span class="pastilla pastilla-azul" *ngIf="detalle.miRol === 'admin'">Administración</span>
+      </div>
+
+      <!-- Pestañas -->
+      <nav class="pestanas mt-3">
+        <button type="button" class="pestana" [class.activa]="pestana() === 'trabajo'"
+                (click)="cambiarA('trabajo')">Trabajo de clase</button>
+
+        <button type="button" class="pestana" [class.activa]="pestana() === 'personas'"
+                (click)="cambiarA('personas')">Personas</button>
+
+        <button type="button" class="pestana" *ngIf="muestraCalificaciones()"
+                [class.activa]="pestana() === 'calificaciones'"
+                (click)="cambiarA('calificaciones')">Mis calificaciones</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido de la pestaña activa -->
+  <div class="contenedor mt-3">
+
+    <app-pestana-trabajo *ngIf="pestana() === 'trabajo'"
+      [claseId]="detalle.id"
+      [puedoEditar]="detalle.puedoEditar"
+      [temas]="detalle.temas"></app-pestana-trabajo>
+
+    <app-pestana-personas *ngIf="pestana() === 'personas'"
+      [claseId]="detalle.id"></app-pestana-personas>
+
+    <app-pestana-calificaciones *ngIf="pestana() === 'calificaciones'"
+      [claseId]="detalle.id"></app-pestana-calificaciones>
+  </div>
+</ng-container>

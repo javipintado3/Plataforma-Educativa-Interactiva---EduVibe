@@ -1,0 +1,26 @@
+.titulo-grupo {
+  font-size: .78rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gris);
+  margin-bottom: 9px;
+}
+
+.persona {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.persona:last-child { border-bottom: none; }
+
+.nombre { font-weight: 550; font-size: .93rem; }
+
+.correo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

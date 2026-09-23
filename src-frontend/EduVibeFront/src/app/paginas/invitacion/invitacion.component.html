@@ -1,0 +1,75 @@
+<div class="pagina">
+  <div class="caja">
+
+    <div class="centrado mb-3">
+      <app-logo [size]="36"></app-logo>
+    </div>
+
+    <app-cargando *ngIf="comprobando()" texto="Comprobando la invitación…"></app-cargando>
+
+    <!-- Enlace inservible -->
+    <div class="tarjeta" *ngIf="!comprobando() && errorEnlace()">
+      <div class="tarjeta-cuerpo centrado">
+        <div class="vacio-icono" style="background:var(--rojo-50);color:var(--rojo)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/>
+          </svg>
+        </div>
+        <h2 class="mb-1">Enlace no válido</h2>
+        <p class="apagado">{{ errorEnlace() }}</p>
+        <p class="pequeno apagado mb-0">
+          Pide a tu centro que te vuelva a enviar la invitación.
+        </p>
+      </div>
+    </div>
+
+    <!-- Enlace correcto -->
+    <div class="tarjeta" *ngIf="!comprobando() && datos() as info">
+      <div class="tarjeta-cuerpo">
+
+        <h2 class="mb-1">Activa tu cuenta</h2>
+        <p class="apagado mb-3">Elige una contraseña para entrar en Eduvibe.</p>
+
+        <div class="ficha mb-3">
+          <p class="pequeno apagado mb-0">Cuenta</p>
+          <p class="fuerte mb-0">{{ info.name }}</p>
+          <p class="pequeno mb-0" style="word-break:break-all">{{ info.email }}</p>
+          <p class="pequeno apagado mb-0 mt-1">{{ info.organizationName }}</p>
+        </div>
+
+        <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+        <form [formGroup]="formulario" (ngSubmit)="activar()" novalidate>
+
+          <div class="campo">
+            <label class="etiqueta" for="password">Contraseña</label>
+            <input id="password" type="password" class="entrada" formControlName="password"
+                   [class.invalida]="campoInvalido('password')"
+                   autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+            <span class="error-campo" *ngIf="campoInvalido('password')">
+              La contraseña debe tener al menos 8 caracteres
+            </span>
+          </div>
+
+          <div class="campo">
+            <label class="etiqueta" for="repetir">Repite la contraseña</label>
+            <input id="repetir" type="password" class="entrada" formControlName="repetir"
+                   [class.invalida]="noCoinciden" autocomplete="new-password">
+            <span class="error-campo" *ngIf="noCoinciden">
+              Las dos contraseñas no coinciden
+            </span>
+          </div>
+
+          <button type="submit" class="boton boton-primario boton-bloque mt-1" [disabled]="enviando()">
+            {{ enviando() ? 'Activando…' : 'Activar cuenta y entrar' }}
+          </button>
+        </form>
+
+        <p class="pequeno apagado centrado mt-2 mb-0">
+          El enlace caduca el {{ info.expiresAt | fecha }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

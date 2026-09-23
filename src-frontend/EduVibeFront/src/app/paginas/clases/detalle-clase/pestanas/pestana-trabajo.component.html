@@ -1,0 +1,112 @@
+<div class="fila-entre mb-2" *ngIf="puedoEditar">
+  <p class="pequeno apagado mb-0">Las tareas se agrupan por el tema al que pertenecen.</p>
+  <button type="button" class="boton boton-primario boton-pequeno" (click)="abrirDialogo()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Nueva tarea
+  </button>
+</div>
+
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<ng-container *ngIf="!cargando()">
+
+  <div class="tarjeta" *ngIf="!bloques().length">
+    <app-estado-vacio
+      titulo="Todavía no hay tareas"
+      [descripcion]="puedoEditar
+        ? 'Crea la primera tarea de la clase.'
+        : 'Cuando el profesorado publique una tarea, aparecerá aquí.'">
+      <button type="button" class="boton boton-suave mt-2" *ngIf="puedoEditar" (click)="abrirDialogo()">
+        Crear la primera tarea
+      </button>
+    </app-estado-vacio>
+  </div>
+
+  <section class="bloque" *ngFor="let bloque of bloques()">
+    <h3 class="titulo-bloque">{{ bloque.tema?.title || 'Sin tema' }}</h3>
+
+    <div class="tarjeta">
+      <a class="tarea" *ngFor="let tarea of bloque.tareas" [routerLink]="['/tareas', tarea.id]">
+
+        <span class="icono" [ngClass]="tarea.haVencido ? 'icono-gris' : 'icono-verde'">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </span>
+
+        <span class="crecer" style="min-width:0">
+          <span class="titulo">{{ tarea.title }}</span>
+          <span class="meta">
+            {{ tarea.dueDate ? (tarea.dueDate | plazo) : 'Sin fecha límite' }}
+            <span class="apagado" *ngIf="tarea.dueDate"> · {{ tarea.dueDate | fecha }}</span>
+            <span class="apagado"> · {{ tarea.points }} puntos</span>
+          </span>
+        </span>
+
+        <!-- Vista de alumnado -->
+        <span class="fila espaciado-sm" *ngIf="tarea.entregasRecibidas === null">
+          <span class="pastilla pastilla-roja" *ngIf="tarea.miEntregaTarde">Tarde</span>
+          <app-pastilla-estado [valor]="estadoDe(tarea)"></app-pastilla-estado>
+        </span>
+
+        <!-- Vista de profesorado -->
+        <span class="pastilla pastilla-gris" *ngIf="tarea.entregasRecibidas !== null">
+          {{ tarea.entregasRecibidas }} entrega(s)
+        </span>
+      </a>
+    </div>
+  </section>
+</ng-container>
+
+<!-- Alta de tarea -->
+<app-dialogo [abierto]="dialogoAbierto()" titulo="Nueva tarea"
+             [cierraAlPulsarFuera]="false" (cerrar)="dialogoAbierto.set(false)">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorFormulario()"></app-aviso>
+
+  <form [formGroup]="formulario" (ngSubmit)="crear()" novalidate id="form-tarea">
+
+    <div class="campo">
+      <label class="etiqueta" for="titulo-tarea">Título</label>
+      <input id="titulo-tarea" class="entrada" formControlName="title" placeholder="Sistemas de ecuaciones">
+    </div>
+
+    <div class="campo">
+      <label class="etiqueta" for="enunciado">Enunciado</label>
+      <textarea id="enunciado" class="area" formControlName="description"
+                placeholder="Qué hay que hacer y cómo se entrega."></textarea>
+    </div>
+
+    <div class="dos-columnas">
+      <div class="campo">
+        <label class="etiqueta" for="fecha">Fecha límite</label>
+        <input id="fecha" type="datetime-local" class="entrada" formControlName="dueDate">
+        <span class="ayuda-campo">Opcional</span>
+      </div>
+
+      <div class="campo">
+        <label class="etiqueta" for="puntos">Puntos</label>
+        <input id="puntos" type="number" min="1" max="1000" class="entrada" formControlName="points">
+      </div>
+    </div>
+
+    <div class="campo mb-0" *ngIf="temas.length">
+      <label class="etiqueta" for="tema">Tema</label>
+      <select id="tema" class="selector" formControlName="topicId">
+        <option value="">Sin tema</option>
+        <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
+      </select>
+    </div>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoAbierto.set(false)">Cancelar</button>
+    <button type="submit" form="form-tarea" class="boton boton-primario" [disabled]="creando()">
+      {{ creando() ? 'Creando…' : 'Crear tarea' }}
+    </button>
+  </ng-container>
+</app-dialogo>

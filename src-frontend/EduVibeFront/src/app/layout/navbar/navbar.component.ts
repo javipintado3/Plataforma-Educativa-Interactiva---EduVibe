@@ -1,39 +1,57 @@
-import { Component, OnInit } from '@angular/core';
-import { faBell, faMoon } from '@fortawesome/free-solid-svg-icons';
-import { AuthService } from '../../services/auth.service';
-import { UserResp } from '../../interfaces/userResp';
+import { Component, HostListener, inject, signal } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
+import { AuthService } from '../../core/services/auth.service';
+import { LogoComponent } from '../../shared/logo/logo.component';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
+
+/**
+ * Barra superior.
+ *
+ * Los enlaces que se muestran dependen del rol, y no solo por comodidad:
+ * enseñar "Usuarios" a un alumno para que después reciba un 403 es una forma
+ * de mentirle sobre lo que puede hacer.
+ */
 @Component({
   selector: 'app-navbar',
+  standalone: true,
+  imports: [NgIf, RouterLink, RouterLinkActive, LogoComponent, AvatarComponent, PastillaEstadoComponent],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'] // Corrige el nombre de la propiedad "styleUrl" a "styleUrls"
+  styleUrl: './navbar.component.css',
 })
-export class NavbarComponent implements OnInit {
-  userResp: UserResp | null = null; // Define la propiedad userResp como un objeto de tipo UserResp o nulo
+export class NavbarComponent {
 
-  constructor(public authService: AuthService) {} // Hacer que authService sea público
+  readonly auth = inject(AuthService);
 
-  ngOnInit(): void {
-    this.authService.getIsAuthenticated().subscribe(isAuthenticated => {
-      if (isAuthenticated) {
-        // Si el usuario está autenticado, obtén los datos del usuario actual
-        const userId = this.authService.getUserId();
-        if (userId) {
-          this.authService.getUserProfile(userId).subscribe(
-            (user: UserResp) => this.userResp = user,
-            error => console.error('Error fetching user data', error)
-          );
-        }
-      } else {
-        this.userResp = null; // Establece userResp en nulo si no hay usuario autenticado
-      }
-    });
+  readonly menuAbierto = signal(false);
+  readonly navegacionAbierta = signal(false);
+
+  alternarMenu(): void {
+    this.menuAbierto.update(abierto => !abierto);
   }
 
-  logout(): void {
-    this.authService.logout();
+  alternarNavegacion(): void {
+    this.navegacionAbierta.update(abierta => !abierta);
   }
 
-  
-  faBell = faBell;
+  cerrarTodo(): void {
+    this.menuAbierto.set(false);
+    this.navegacionAbierta.set(false);
+  }
+
+  salir(): void {
+    this.cerrarTodo();
+    this.auth.logout();
+  }
+
+  /** Cierra el menú al pulsar en cualquier otro sitio de la página. */
+  @HostListener('document:click', ['$event'])
+  alPulsarFuera(evento: MouseEvent): void {
+    const objetivo = evento.target as HTMLElement;
+    if (!objetivo.closest('[data-menu-usuario]')) {
+      this.menuAbierto.set(false);
+    }
+  }
 }
