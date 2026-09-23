@@ -2,85 +2,99 @@
   margin-top: 20px;
 }
 
-.card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+.page-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
 }
 
-.card:hover {
-  transform: translateY(-5px);
+.class-card {
+  height: 100%;
 }
 
-.card-img-top {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+.class-banner {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2952e3, #6366f1);
 }
-  
+
+.class-banner.banner-0 { background: linear-gradient(135deg, #2952e3, #6366f1); }
+.class-banner.banner-1 { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+.class-banner.banner-2 { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.class-banner.banner-3 { background: linear-gradient(135deg, #16a34a, #22c55e); }
+
+.class-initial {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
 .card-body {
   padding: 20px;
 }
 
+.card-text {
+  color: #6b7280;
+  min-height: 44px;
+}
+
 .card-buttons {
   display: flex;
-  justify-content: space-between;
+  gap: 0.6rem;
   margin-top: 15px;
 }
 
-.card-buttons a {
-  flex: 1;
-  margin: 0 5px;
-}
-
 .card-buttons .btn {
-  width: 45%;
-  border-color: #2D9596;
-  color: #2D9596;
-  font-weight: bold;
-  background-color: white;
+  flex: 1;
 }
 
-a {
+.editar-button,
+.eliminar-button {
+  border: none;
+  color: white;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
   text-decoration: none;
-  color: #2D9596;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.15s ease;
 }
 
 .editar-button {
-  background-color: #2D9596; /* Color de fondo del botón */
-  color: white; /* Color del texto del botón */
-  border: none; /* Sin borde */
-  padding: 0.5rem 1rem; /* Espaciado interno */
-  font-size: 1rem; /* Tamaño de fuente */
-  border-radius: 0.25rem; /* Borde redondeado */
-  cursor: pointer; /* Cambiar el cursor al pasar el ratón */
-  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+  background-color: #2952e3;
 }
 
 .editar-button:hover {
-  background-color: #267a79; /* Color de fondo del botón al pasar el ratón */
+  background-color: #2243ba;
+  color: white;
 }
 
 .eliminar-button {
-  background-color: #962d2d; /* Color de fondo del botón */
-  color: white; /* Color del texto del botón */
-  border: none; /* Sin borde */
-  padding: 0.5rem 1rem; /* Espaciado interno */
-  font-size: 1rem; /* Tamaño de fuente */
-  border-radius: 0.25rem; /* Borde redondeado */
-  cursor: pointer; /* Cambiar el cursor al pasar el ratón */
-  transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+  background-color: #dc2626;
 }
 
 .eliminar-button:hover {
-  background-color: #b33a3a; /* Color de fondo del botón al pasar el ratón */
+  background-color: #b91c1c;
+  color: white;
 }
 
 .tarea-buttons {
-  margin-top: 20px;
+  margin-top: 16px;
+  gap: 0.4rem;
 }
 
 .mx-2 {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 6px;
+  margin-right: 6px;
 }

@@ -1,52 +1,57 @@
-.card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+.page-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
 }
 
-.card:hover {
-  transform: translateY(-5px);
+.class-card {
+  height: 100%;
 }
 
-.card-img-top {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+.class-banner {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2952e3, #6366f1);
 }
-  
+
+.class-banner.banner-0 { background: linear-gradient(135deg, #2952e3, #6366f1); }
+.class-banner.banner-1 { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+.class-banner.banner-2 { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.class-banner.banner-3 { background: linear-gradient(135deg, #16a34a, #22c55e); }
+
+.class-initial {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
 .card-body {
   padding: 20px;
 }
 
+.card-text {
+  color: #6b7280;
+  min-height: 44px;
+}
+
 .card-buttons {
   display: flex;
-  justify-content: space-between;
+  gap: 0.6rem;
   margin-top: 15px;
 }
 
-
-  
-  .card-buttons .btn {
-    width: 45%;
-    border-color: #2D9596;
-    color: #2D9596;
-    font-weight: bold;
-    background-color: white;
-  }
-  
-  .pagination-controls {
-    margin-top: 20px;
-  }
-
-  a {
-    text-decoration: none;
-    color: #2D9596;
-  }
-  
-
-
-
-  .paginacion ::ng-deep .ngx-pagination .current {
-    background: #2D9596;
+.card-buttons .btn {
+  flex: 1;
 }
-  
+
+.pagination-controls {
+  margin-top: 20px;
+}

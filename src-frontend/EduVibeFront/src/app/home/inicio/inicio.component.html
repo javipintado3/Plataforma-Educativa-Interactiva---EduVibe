@@ -1,9 +1,12 @@
 <div class="container my-5">
-    <h2 class="mb-4">Inicio</h2>
+    <h2 class="mb-1">Inicio</h2>
+    <p class="page-subtitle mb-4">Un vistazo rápido a tus clases</p>
     <div class="row justify-content-center"> <!-- Centrar las tarjetas -->
-        <div class="col-md-5 mb-4" *ngFor="let clase of clases | paginate: { itemsPerPage: 2, currentPage: p }">
-            <div class="card">
-                <img src="../../../assets/Img/ImagenClase3.png" class="card-img-top" alt="{{ clase.nombre }}">
+        <div class="col-md-5 mb-4" *ngFor="let clase of clases | paginate: { itemsPerPage: 2, currentPage: p }; let i = index">
+            <div class="card class-card">
+                <div class="class-banner" [class]="'banner-' + (i % 4)">
+                    <span class="class-initial">{{ clase.nombre.charAt(0) }}</span>
+                </div>
                 <div class="card-body">
                     <h5 class="card-title"><a [routerLink]="['/clase', clase.idClase]">{{ clase.nombre }}</a></h5>
                     <p class="card-text">{{ clase.descripcion }}</p>
