@@ -8,12 +8,13 @@ import { LoginRequest } from '../request/loginRequest';
 import { UserResp } from '../interfaces/userResp';
 import { jwtDecode } from 'jwt-decode';
 import { useAnimation } from '@angular/animations';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:9090';
+  private apiUrl = environment.apiUrl;
   private isAuthenticated$: BehaviorSubject<boolean>;
   name = "";
   rol = ""; // Cambio 'role' por 'rol'

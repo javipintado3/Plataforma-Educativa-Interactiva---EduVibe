@@ -6,12 +6,13 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { ClaseDto } from '../interfaces/clase';
 import { UserResp } from '../interfaces/userResp';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClaseService {
-  private baseUrl = 'http://localhost:9090/clases'; // URL base de tu backend
+  private baseUrl = `${environment.apiUrl}/clases`;
 
   constructor(private http: HttpClient) { }
 

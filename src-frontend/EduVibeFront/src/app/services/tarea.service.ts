@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TareaDto } from '../interfaces/tarea';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TareaService {
-  private baseUrl = 'http://localhost:9090/tareas'; // URL base de tu backend
+  private baseUrl = `${environment.apiUrl}/tareas`;
 
   constructor(private http: HttpClient) { }
 
