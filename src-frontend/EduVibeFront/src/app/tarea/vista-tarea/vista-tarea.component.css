@@ -2,9 +2,6 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tarea-container {
@@ -15,52 +12,57 @@
 
 .tarea-item {
   background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
 }
 
 .tarea-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #dee2e6;
-  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
   margin-bottom: 1rem;
 }
 
 .tarea-title {
   margin: 0;
   font-size: 1.5rem;
-  font-weight: bold;
-  color: #2D9596;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .tarea-status {
-  font-weight: bold;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
   color: white;
 }
 
 .tarea-status.completed {
-  background-color: #28a745; /* Color verde para tarea completada */
+  background-color: #16a34a;
 }
 
 .tarea-status.pending {
-  background-color: #ffcc00; /* Color amarillo para tarea pendiente */
+  background-color: #f59e0b;
 }
 
 .tarea-enunciado {
-  font-size: 1.1rem;
-  color: #333;
+  font-size: 1.05rem;
+  color: #374151;
   margin-top: 1rem;
 }
 
 .tarea-date, .tarea-calificacion, .usuario-asignado {
   margin-top: 0.5rem;
-  color: #555;
+  color: #6b7280;
 }
 
 .archivo-subida {
@@ -76,7 +78,7 @@
 .archivo-lista h3 {
   margin-bottom: 0.5rem;
   font-size: 1.2rem;
-  color: #2D9596;
+  color: #2952e3;
 }
 
 .archivo-lista ul {
@@ -88,65 +90,58 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  border: 1px solid #dee2e6;
-  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   margin-bottom: 0.5rem;
-  background-color: #f1f1f1;
+  background-color: #f9fafb;
 }
 
 .archivo-lista button {
-  background-color: #2D9596;
+  background-color: #2952e3;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .archivo-lista button:hover {
-  background-color: #1b6d73;
+  background-color: #2243ba;
 }
 
 .editar-button {
-  background-color: #2D9596;
+  background-color: #2952e3;
   color: white;
-  width: 30%;
   border: none;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 0.25rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .editar-button:hover {
-  background-color: #1b6d73;
+  background-color: #2243ba;
 }
 
 .solucion-escrita-alumno {
   margin-top: 1.5rem;
 }
 
-.solucion-escrita-alumno .btn-primary {
-  background-color: #2D9596; /* Color verde */
-  border-color: #2D9596; /* Color verde */
-  display: block;
-  margin: 0 auto;
-}
-
 .solucion-escrita-profesor {
-  margin-top: 2rem; /* Aumentado para mejor separación */
+  margin-top: 2rem;
 }
 
 .solucion-escrita {
-  background-color: #eef5f9;
+  background-color: #f6f7fb;
   padding: 1rem;
-  border-radius: 0.25rem;
-  border: 1px solid #dee2e6;
-  font-size: 1.1rem;
-  color: #333;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 1rem;
+  color: #374151;
 }
 
 .calificacion-profesor {
@@ -154,4 +149,5 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  max-width: 240px;
 }
