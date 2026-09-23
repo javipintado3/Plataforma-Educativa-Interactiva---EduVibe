@@ -3,7 +3,6 @@ package com.example.EduvibeBackend.controller;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,22 +30,21 @@ import com.example.EduvibeBackend.service.impl.ClaseServiceImpl;
 import com.example.EduvibeBackend.service.impl.TareaServiceImpl;
 
 import io.jsonwebtoken.io.IOException;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Controlador REST para gestionar las tareas.
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/tareas")
 public class TareaController {
 
-    @Autowired
-    private TareaServiceImpl tareaService;
+    private final TareaServiceImpl tareaService;
     
-    @Autowired
-    private ClaseServiceImpl claseService;
+    private final ClaseServiceImpl claseService;
     
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     /**
      * Crear una nueva tarea.

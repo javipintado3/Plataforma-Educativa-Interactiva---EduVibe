@@ -7,10 +7,12 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { finalize } from 'rxjs';
 
 export const jwtInterceptorInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem("token") || "";
   const authService = inject(AuthService)
   const router = inject(Router)
   const loader = inject(NgxUiLoaderService)
+  // getToken() comprueba que localStorage exista: en SSR no está definido y
+  // acceder a él directamente rompía el renderizado en servidor.
+  const token = authService.getToken() || "";
 
   
   if(!req.url.includes("/user/existeEmail")

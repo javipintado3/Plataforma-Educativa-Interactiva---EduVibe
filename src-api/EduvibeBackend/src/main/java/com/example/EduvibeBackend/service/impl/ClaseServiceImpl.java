@@ -10,26 +10,25 @@ import com.example.EduvibeBackend.service.ClaseService;
 
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import java.util.stream.Collectors;
 
 /**
  * Implementación del servicio de gestión de clases.
  */
+@RequiredArgsConstructor
 @Service
 public class ClaseServiceImpl implements ClaseService {
 
-    @Autowired
-    private ClaseRepository claseRepository;
+    private final ClaseRepository claseRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ClaseDto crearClase(ClaseDto claseDto) {

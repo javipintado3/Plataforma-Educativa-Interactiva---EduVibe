@@ -1,13 +1,14 @@
 package com.example.EduvibeBackend.controller;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,16 +28,16 @@ import com.example.EduvibeBackend.utility.TokenUtils;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import lombok.RequiredArgsConstructor;
 import io.jsonwebtoken.MalformedJwtException;
 
+@RequiredArgsConstructor
 @RestController
 public class AuthController {
 
-	@Autowired
-	AuthenticationManager authenticationManager;
+	private final AuthenticationManager authenticationManager;
 
-	@Autowired
-	UserService userService;
+	private final UserService userService;
 
 	/**
 	 * Metodo para validar que el token no esta malformado, no ha expirado o no
@@ -178,10 +179,12 @@ public class AuthController {
 			token.setToken(jwt);
 			return ResponseEntity.ok(token);
 
-		} catch (Exception e) {
-			// Si ocurre un error durante la autenticación, lanzamos una excepción
-			// GlobalException
-			throw new GlobalException(e.getMessage());
+		} catch (AuthenticationException e) {
+			// Credenciales incorrectas o usuario inexistente: 401, no 404.
+			// No se detalla cuál de las dos cosas ha fallado para no revelar
+			// qué emails existen en la plataforma.
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(Map.of("message", "Usuario y/o contraseña incorrectos"));
 		}
 	}
 

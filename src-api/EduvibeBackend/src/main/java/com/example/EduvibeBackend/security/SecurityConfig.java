@@ -1,10 +1,15 @@
 package com.example.EduvibeBackend.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,6 +17,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.EduvibeBackend.service.impl.UserService;
 
@@ -23,20 +31,28 @@ import com.example.EduvibeBackend.service.impl.UserService;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    AuthEntryPoint authEntryPoint;
+    private static final String ADMIN = "admin";
+    private static final String PROFESOR = "profesor";
 
-    @Autowired
-    RequestFilter requestFilter;
+    private final AuthEntryPoint authEntryPoint;
+    private final RequestFilter requestFilter;
 
     /**
-     * Método para obtener el servicio de detalles de usuario.
-     *
-     * @return una instancia de {@link UserService}.
+     * Orígenes autorizados para CORS, separados por comas, configurables con la
+     * variable de entorno CORS_ALLOWED_ORIGINS para no tener que tocar el código
+     * al desplegar.
      */
-    @Bean
-    UserService userDetailsService() {
-        return new UserService();
+    private final String allowedOrigins;
+
+    /**
+     * Inyección por constructor: deja explícito de qué depende esta clase y
+     * permite declarar los campos como final.
+     */
+    public SecurityConfig(AuthEntryPoint authEntryPoint, RequestFilter requestFilter,
+            @Value("${app.cors.allowed-origins}") String allowedOrigins) {
+        this.authEntryPoint = authEntryPoint;
+        this.requestFilter = requestFilter;
+        this.allowedOrigins = allowedOrigins;
     }
 
     /**
@@ -55,10 +71,11 @@ public class SecurityConfig {
      * @return una instancia de {@link DaoAuthenticationProvider}.
      */
     @Bean
-    DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authenticationProvider(UserService userService,
+            BCryptPasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(userService);
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -75,8 +92,37 @@ public class SecurityConfig {
     }
 
     /**
+     * Configuración de CORS. Se registra aquí, y no como WebMvcConfigurer, para que
+     * la cadena de filtros de Spring Security la aplique también a las peticiones
+     * preflight (OPTIONS) de los endpoints protegidos.
+     *
+     * @return el origen de configuración CORS.
+     */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        List<String> origenes = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origen -> !origen.isEmpty())
+                .toList();
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(origenes);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    /**
      * Método para configurar la cadena de filtros de seguridad.
-     * Aquí se especifica qué solicitudes están permitidas y cuáles requieren autenticación.
+     *
+     * Las reglas se evalúan en orden y gana la primera que coincide, así que las
+     * rutas concretas van siempre antes que los comodines. La regla final es
+     * {@code authenticated()}: todo lo que no esté declarado como público exige
+     * sesión, para que añadir un endpoint nuevo no lo deje abierto por descuido.
      *
      * @param http el objeto {@link HttpSecurity}.
      * @return una instancia de {@link SecurityFilterChain}.
@@ -85,31 +131,39 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+            .cors(Customizer.withDefaults())
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
-            .authorizeHttpRequests((requests) -> {
-                requests
-                    .requestMatchers("/registeruser").permitAll()
-                    .requestMatchers("/user/changePassword").authenticated()
-                    .requestMatchers("/loginuser").permitAll()
-                    .requestMatchers("/validate").permitAll()
-                    .requestMatchers("/prueba").authenticated()
-                    .requestMatchers("usuarios").hasAnyAuthority("admin", "profesor")
-                    .requestMatchers("/clases/**").authenticated()
-                    .requestMatchers("/clases/editar/{id}").hasAnyAuthority("admin", "profesor")
-                    .requestMatchers("/clases/crear").hasAuthority("admin")
-                    .requestMatchers("/clases/eliminar/{id}").hasAuthority("admin")
-                    .requestMatchers("/clases/inscribir").hasAuthority("admin")
-                    .requestMatchers("/tareas/crear").hasAnyAuthority("admin", "profesor")
-                    .requestMatchers("/tareas/{id}").authenticated()
-                    .requestMatchers("/tareas/todos").authenticated()
-                    .requestMatchers("/tareas/eliminar/{id}").hasAnyAuthority("admin", "profesor")
-                    .requestMatchers("/tareas/editar/{id}").hasAnyAuthority("admin", "profesor")
-                    .requestMatchers("/tareas/clase/{idClase}").authenticated()
-                    .anyRequest().permitAll();
-            })
-            .formLogin((form) -> form.permitAll())
-            .logout((logout) -> logout.permitAll().logoutSuccessUrl("/"));
+            .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(authEntryPoint))
+            .authorizeHttpRequests(requests -> requests
+                // Spring reenvía los errores a /error. Si esa ruta exige autenticación,
+                // un 403 acaba devolviéndose al cliente como un 401 engañoso.
+                .requestMatchers("/error").permitAll()
+
+                // --- Público: alta de cuenta y autenticación ---
+                .requestMatchers(HttpMethod.POST, "/loginuser", "/registeruser").permitAll()
+                .requestMatchers(HttpMethod.GET, "/validate", "/user/existeEmail").permitAll()
+
+                // --- Clases ---
+                .requestMatchers(HttpMethod.POST, "/clases/crear", "/clases/inscribir").hasAuthority(ADMIN)
+                .requestMatchers(HttpMethod.DELETE, "/clases/eliminar/**", "/clases/*/eliminar-usuario").hasAuthority(ADMIN)
+                .requestMatchers(HttpMethod.PUT, "/clases/editar/**").hasAnyAuthority(ADMIN, PROFESOR)
+                .requestMatchers("/clases/**").authenticated()
+
+                // --- Tareas ---
+                .requestMatchers(HttpMethod.POST, "/tareas/crear", "/tareas/crear/**", "/tareas/asignar")
+                    .hasAnyAuthority(ADMIN, PROFESOR)
+                .requestMatchers(HttpMethod.PUT, "/tareas/editar/**", "/tareas/calificacion/**")
+                    .hasAnyAuthority(ADMIN, PROFESOR)
+                .requestMatchers(HttpMethod.DELETE, "/tareas/eliminar/**").hasAnyAuthority(ADMIN, PROFESOR)
+                .requestMatchers(HttpMethod.GET, "/tareas/mediaCalificaciones/**").hasAnyAuthority(ADMIN, PROFESOR)
+                .requestMatchers("/tareas/**").authenticated()
+
+                // --- Usuarios ---
+                .requestMatchers(HttpMethod.DELETE, "/user/**").hasAuthority(ADMIN)
+                .requestMatchers(HttpMethod.GET, "/usuarios").hasAnyAuthority(ADMIN, PROFESOR)
+
+                // --- Todo lo demás exige autenticación ---
+                .anyRequest().authenticated());
 
         http.addFilterBefore(requestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

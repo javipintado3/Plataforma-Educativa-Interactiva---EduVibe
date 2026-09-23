@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,22 +17,21 @@ import com.example.EduvibeBackend.entities.Clase;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.ClaseRepository;
+import lombok.RequiredArgsConstructor;
 import com.example.EduvibeBackend.repository.UserRepository;
 
 /**
  * Servicio para la gestión de usuarios.
  */
+@RequiredArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder encode;
+    private final PasswordEncoder encode;
     
-    @Autowired
-    private ClaseRepository claseRepository;
+    private final ClaseRepository claseRepository;
 
     /**
      * Obtiene un usuario por su email.

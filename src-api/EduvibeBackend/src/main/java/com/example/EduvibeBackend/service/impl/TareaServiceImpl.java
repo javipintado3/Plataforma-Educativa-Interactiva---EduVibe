@@ -3,7 +3,6 @@ package com.example.EduvibeBackend.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.EduvibeBackend.dto.ClaseDto;
@@ -16,22 +15,21 @@ import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
 import com.example.EduvibeBackend.repository.TareaRepository;
 import com.example.EduvibeBackend.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import com.example.EduvibeBackend.service.TareaService;
 
 /**
  * Implementación del servicio de gestión de tareas.
  */
+@RequiredArgsConstructor
 @Service
 public class TareaServiceImpl implements TareaService {
 
-    @Autowired
-    private TareaRepository tareaRepository;
+    private final TareaRepository tareaRepository;
 
-    @Autowired
-    private ClaseServiceImpl claseService;
+    private final ClaseServiceImpl claseService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public TareaDTO crearTarea(TareaDTO tareaDto) {

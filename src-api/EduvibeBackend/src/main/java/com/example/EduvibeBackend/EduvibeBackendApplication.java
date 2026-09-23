@@ -2,14 +2,13 @@ package com.example.EduvibeBackend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * La clase principal para la aplicación backend de EduVibe.
  * Esta clase contiene el método principal que ejecuta la aplicación Spring Boot.
+ *
+ * La configuración de CORS vive en {@link com.example.EduvibeBackend.security.SecurityConfig},
+ * para que la apliquen también los filtros de seguridad.
  */
 @SpringBootApplication
 public class EduvibeBackendApplication {
@@ -21,24 +20,5 @@ public class EduvibeBackendApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(EduvibeBackendApplication.class, args);
-    }
-
-    /**
-     * Configura los mapeos de CORS para la aplicación.
-     * 
-     * @return un configurador de WebMvc
-     */
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:4200", "http://localhost")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
-                    .allowCredentials(true)
-                    .allowedHeaders("*");
-            }
-        };
     }
 }

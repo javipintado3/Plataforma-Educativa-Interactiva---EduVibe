@@ -44,13 +44,9 @@ export class AuthService {
           // Mostrar alerta exitosa
         }),
         catchError(error => {
-          // Mostrar alerta de error
-          Swal.fire({
-            title: "Error",
-            text: error.message,
-            icon: "error"
-          });
-          return throwError(error);
+          // El mensaje al usuario lo muestra quien llama (LoginComponent);
+          // aquí solo se propaga el error.
+          return throwError(() => error);
         })
       );
   }
@@ -114,7 +110,10 @@ export class AuthService {
 
   getUserData() {
 
-    let token: string = localStorage.getItem("token") as any;
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
     const { name, rol, id } = jwtDecode(token) as any;
     return {
       nombre: name,
@@ -129,9 +128,9 @@ export class AuthService {
     //creamos la variable
     let minutosRestantes = -1
     //si hay token en el localstorage entocnes entra
-    if (localStorage.getItem("token")) {
+    if (this.getToken()) {
       //sacamos los milisegundos del token
-      let expiracion: number = jwtDecode((localStorage.getItem("token") || "")).exp as any
+      let expiracion: number = jwtDecode(this.getToken() || "").exp as any
       //lo seteamos en una nueva fecha
       let dateExp = new Date(expiracion * 1000)
       //creamos una fecha de hoy
@@ -152,7 +151,7 @@ export class AuthService {
 
   // Método para obtener el ID del usuario del token decodificado
   getUserId(): number | null {
-    const token: string = localStorage.getItem("token")!; // Usamos el operador de aserción no nulo aquí también
+    const token = this.getToken();
     if (token) {
       const decodedToken: any = jwtDecode(token);
       return decodedToken.id; // Cambia 'id' por el nombre correcto del campo en el token

@@ -3,7 +3,6 @@ package com.example.EduvibeBackend.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +16,17 @@ import com.example.EduvibeBackend.dto.PostRegistroDto;
 import com.example.EduvibeBackend.dto.UsuarioDto;
 import com.example.EduvibeBackend.entities.User;
 import com.example.EduvibeBackend.exception.GlobalException;
+import lombok.RequiredArgsConstructor;
 import com.example.EduvibeBackend.service.impl.UserService;
 
 /**
  * Controlador REST para gestionar los usuarios.
  */
+@RequiredArgsConstructor
 @RestController
 public class UserController {
     
-    @Autowired
-    UserService userService;
+    private final UserService userService;
     
     /**
      * Obtener los usuarios de una clase específica.
