@@ -17,6 +17,7 @@ import com.eduvibe.exception.BadRequestException;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Assignment;
 import com.eduvibe.model.Grade;
+import com.eduvibe.model.Notification;
 import com.eduvibe.model.Submission;
 import com.eduvibe.model.User;
 import com.eduvibe.repository.AssignmentRepository;
@@ -44,6 +45,7 @@ public class SubmissionService {
     private final UserRepository userRepository;
     private final ClassAccessService acceso;
     private final AuthService authService;
+    private final NotificationService notificationService;
 
     /**
      * Crea o actualiza la entrega de quien está autenticado.
@@ -147,6 +149,9 @@ public class SubmissionService {
 
         entrega.marcarComoCalificada();
         submissionRepository.save(entrega);
+
+        notificationService.emitir(entrega.getStudent(), Notification.NOTA_PUBLICADA,
+                Map.of("title", tarea.getTitle(), "className", tarea.getSchoolClass().getName()));
 
         return SubmissionResponse.de(entrega, GradeResponse.de(nota));
     }

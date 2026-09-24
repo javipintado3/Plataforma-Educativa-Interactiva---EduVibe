@@ -19,12 +19,12 @@ class SubmissionTest {
     private final User alumno = new User(centro, "ana@centro.es", "Ana", UserRole.STUDENT);
 
     private Assignment tareaConPlazo(Duration desdeAhora) {
-        SchoolClass clase = new SchoolClass(centro, "1º A", "Matemáticas", "#2563eb");
+        SchoolClass clase = new SchoolClass(centro, "1º A", "Matemáticas", "#2563eb", null);
         return new Assignment(clase, "Ejercicios", null, Instant.now().plus(desdeAhora), 100, profesor);
     }
 
     private Assignment tareaSinPlazo() {
-        SchoolClass clase = new SchoolClass(centro, "1º A", "Matemáticas", "#2563eb");
+        SchoolClass clase = new SchoolClass(centro, "1º A", "Matemáticas", "#2563eb", null);
         return new Assignment(clase, "Ejercicios", null, null, 100, profesor);
     }
 

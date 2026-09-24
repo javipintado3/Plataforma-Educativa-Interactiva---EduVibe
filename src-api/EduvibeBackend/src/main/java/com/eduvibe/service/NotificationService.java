@@ -1,6 +1,7 @@
 package com.eduvibe.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eduvibe.dto.notification.NotificationResponse;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Notification;
+import com.eduvibe.model.User;
 import com.eduvibe.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,9 @@ import lombok.RequiredArgsConstructor;
  * {@link ClassAccessService}: basta con comprobar que la notificación es de
  * quien pregunta.
  *
- * Quién las emite (una tarea nueva, una nota publicada) queda para cuando esos
- * flujos lo necesiten: este servicio es, por ahora, solo el lado de lectura.
+ * La emiten AssignmentService (tarea nueva), AnnouncementService (aviso
+ * nuevo) y SubmissionService (nota publicada), cada uno con el payload que
+ * {@link NotificationResponse} necesita para redactar el texto.
  */
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,25 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final AuthService authService;
+
+    /** Una notificación para una sola persona (por ejemplo, la nota de su propia entrega). */
+    @Transactional
+    public void emitir(User destinatario, String tipo, Map<String, Object> payload) {
+        notificationRepository.save(new Notification(destinatario, tipo, payload));
+    }
+
+    /**
+     * La misma notificación para varias personas (por ejemplo, todo el
+     * alumnado de una clase). El payload se comparte entre todas las filas
+     * porque no se modifica después de crearlas.
+     */
+    @Transactional
+    public void emitirParaVarios(List<User> destinatarios, String tipo, Map<String, Object> payload) {
+        List<Notification> notificaciones = destinatarios.stream()
+                .map(destinatario -> new Notification(destinatario, tipo, payload))
+                .toList();
+        notificationRepository.saveAll(notificaciones);
+    }
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> misNotificaciones() {

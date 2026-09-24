@@ -14,11 +14,15 @@ import com.eduvibe.dto.assignment.SaveAssignmentRequest;
 import com.eduvibe.exception.BadRequestException;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Assignment;
+import com.eduvibe.model.Enrollment;
+import com.eduvibe.model.Notification;
 import com.eduvibe.model.SchoolClass;
 import com.eduvibe.model.Submission;
 import com.eduvibe.model.Topic;
 import com.eduvibe.model.User;
+import com.eduvibe.model.enums.EnrollmentRole;
 import com.eduvibe.repository.AssignmentRepository;
+import com.eduvibe.repository.EnrollmentRepository;
 import com.eduvibe.repository.SubmissionRepository;
 import com.eduvibe.repository.TopicRepository;
 import com.eduvibe.repository.UserRepository;
@@ -41,9 +45,11 @@ public class AssignmentService {
     private final SubmissionRepository submissionRepository;
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final ClassAccessService acceso;
     private final AuthService authService;
     private final SubmissionService submissionService;
+    private final NotificationService notificationService;
 
     @Transactional
     public AssignmentDetailResponse crear(UUID classId, SaveAssignmentRequest peticion) {
@@ -58,8 +64,18 @@ public class AssignmentService {
         tarea.setTopic(temaDeLaClase(peticion.topicId(), classId));
 
         assignmentRepository.saveAndFlush(tarea);
+        notificarAlumnado(classId, clase, Notification.TAREA_NUEVA, tarea.getTitle());
 
         return AssignmentDetailResponse.de(tarea, true, null);
+    }
+
+    /** Avisa a todo el alumnado matriculado de que hay una novedad con este título. */
+    private void notificarAlumnado(UUID classId, SchoolClass clase, String tipo, String titulo) {
+        List<User> alumnado = enrollmentRepository
+                .findBySchoolClassIdAndRoleInClassOrderByUserNameAsc(classId, EnrollmentRole.STUDENT)
+                .stream().map(Enrollment::getUser).toList();
+
+        notificationService.emitirParaVarios(alumnado, tipo, Map.of("className", clase.getName(), "title", titulo));
     }
 
     /**

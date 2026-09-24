@@ -1,6 +1,7 @@
 package com.eduvibe.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -10,9 +11,13 @@ import com.eduvibe.dto.announcement.AnnouncementResponse;
 import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Announcement;
+import com.eduvibe.model.Enrollment;
+import com.eduvibe.model.Notification;
 import com.eduvibe.model.SchoolClass;
 import com.eduvibe.model.User;
+import com.eduvibe.model.enums.EnrollmentRole;
 import com.eduvibe.repository.AnnouncementRepository;
+import com.eduvibe.repository.EnrollmentRepository;
 import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
 
@@ -31,8 +36,10 @@ public class AnnouncementService {
 
     private final AnnouncementRepository announcementRepository;
     private final UserRepository userRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final ClassAccessService acceso;
     private final AuthService authService;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<AnnouncementResponse> listar(UUID classId) {
@@ -55,6 +62,11 @@ public class AnnouncementService {
 
         Announcement aviso = new Announcement(clase, autor, peticion.content().trim(), peticion.estaFijado());
         announcementRepository.saveAndFlush(aviso);
+
+        List<User> alumnado = enrollmentRepository
+                .findBySchoolClassIdAndRoleInClassOrderByUserNameAsc(classId, EnrollmentRole.STUDENT)
+                .stream().map(Enrollment::getUser).toList();
+        notificationService.emitirParaVarios(alumnado, Notification.AVISO_NUEVO, Map.of("className", clase.getName()));
 
         return AnnouncementResponse.de(aviso, true);
     }
