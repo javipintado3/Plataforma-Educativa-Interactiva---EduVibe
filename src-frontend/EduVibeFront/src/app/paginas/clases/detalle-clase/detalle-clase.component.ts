@@ -7,12 +7,14 @@ import { ClasesService } from '../../../core/services/clases.service';
 import { DetalleClase } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
+import { PestanaAvisosComponent } from './pestanas/pestana-avisos.component';
 import { PestanaCalificacionesComponent } from './pestanas/pestana-calificaciones.component';
+import { PestanaMaterialesComponent } from './pestanas/pestana-materiales.component';
 import { PestanaPersonasComponent } from './pestanas/pestana-personas.component';
 import { PestanaTrabajoComponent } from './pestanas/pestana-trabajo.component';
 import { PortadaClaseComponent } from '../../../shared/portada-clase/portada-clase.component';
 
-type Pestana = 'trabajo' | 'personas' | 'calificaciones';
+type Pestana = 'avisos' | 'trabajo' | 'materiales' | 'personas' | 'calificaciones';
 
 /**
  * Pantalla de una clase.
@@ -27,7 +29,8 @@ type Pestana = 'trabajo' | 'personas' | 'calificaciones';
   standalone: true,
   imports: [
     NgIf, RouterLink, CargandoComponent, AvisoComponent, PortadaClaseComponent,
-    PestanaTrabajoComponent, PestanaPersonasComponent, PestanaCalificacionesComponent,
+    PestanaAvisosComponent, PestanaTrabajoComponent, PestanaMaterialesComponent,
+    PestanaPersonasComponent, PestanaCalificacionesComponent,
   ],
   templateUrl: './detalle-clase.component.html',
   styleUrl: './detalle-clase.component.css',

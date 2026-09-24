@@ -43,8 +43,14 @@
 
       <!-- Pestañas -->
       <nav class="pestanas mt-3">
+        <button type="button" class="pestana" [class.activa]="pestana() === 'avisos'"
+                (click)="cambiarA('avisos')">Avisos</button>
+
         <button type="button" class="pestana" [class.activa]="pestana() === 'trabajo'"
                 (click)="cambiarA('trabajo')">Trabajo de clase</button>
+
+        <button type="button" class="pestana" [class.activa]="pestana() === 'materiales'"
+                (click)="cambiarA('materiales')">Materiales</button>
 
         <button type="button" class="pestana" [class.activa]="pestana() === 'personas'"
                 (click)="cambiarA('personas')">Personas</button>
@@ -59,10 +65,19 @@
   <!-- Contenido de la pestaña activa -->
   <div class="contenedor mt-3">
 
+    <app-pestana-avisos *ngIf="pestana() === 'avisos'"
+      [claseId]="detalle.id"
+      [puedoEditar]="detalle.puedoEditar"></app-pestana-avisos>
+
     <app-pestana-trabajo *ngIf="pestana() === 'trabajo'"
       [claseId]="detalle.id"
       [puedoEditar]="detalle.puedoEditar"
       [temas]="detalle.temas"></app-pestana-trabajo>
+
+    <app-pestana-materiales *ngIf="pestana() === 'materiales'"
+      [claseId]="detalle.id"
+      [puedoEditar]="detalle.puedoEditar"
+      [temas]="detalle.temas"></app-pestana-materiales>
 
     <app-pestana-personas *ngIf="pestana() === 'personas'"
       [claseId]="detalle.id"></app-pestana-personas>

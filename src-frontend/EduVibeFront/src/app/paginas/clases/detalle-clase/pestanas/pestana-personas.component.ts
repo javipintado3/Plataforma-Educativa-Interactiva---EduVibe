@@ -2,6 +2,7 @@ import { Component, Input, OnInit, computed, inject, signal } from '@angular/cor
 import { NgFor, NgIf } from '@angular/common';
 
 import { ClasesService } from '../../../../core/services/clases.service';
+import { ConfirmacionService } from '../../../../core/services/confirmacion.service';
 import { Miembro } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AvatarComponent } from '../../../../shared/avatar/avatar.component';
@@ -26,6 +27,7 @@ import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vac
 export class PestanaPersonasComponent implements OnInit {
 
   private readonly clasesService = inject(ClasesService);
+  private readonly confirmacion = inject(ConfirmacionService);
   readonly auth = inject(AuthService);
 
   @Input({ required: true }) claseId!: string;
@@ -58,8 +60,11 @@ export class PestanaPersonasComponent implements OnInit {
     });
   }
 
-  quitar(miembro: Miembro): void {
-    if (!confirm(`¿Quitar a ${miembro.name} de esta clase?`)) {
+  async quitar(miembro: Miembro): Promise<void> {
+    const confirmado = await this.confirmacion.preguntar(`¿Quitar a ${miembro.name} de esta clase?`, {
+      titulo: 'Quitar de la clase', textoConfirmar: 'Quitar',
+    });
+    if (!confirmado) {
       return;
     }
 

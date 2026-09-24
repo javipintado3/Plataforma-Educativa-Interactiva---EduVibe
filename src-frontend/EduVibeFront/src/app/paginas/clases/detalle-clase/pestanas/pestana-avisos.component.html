@@ -1,0 +1,77 @@
+<div class="fila-entre mb-2" *ngIf="puedoEditar">
+  <p class="pequeno apagado mb-0">Los avisos fijados aparecen arriba del muro.</p>
+  <button type="button" class="boton boton-primario boton-pequeno" (click)="abrirDialogo()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Nuevo aviso
+  </button>
+</div>
+
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<ng-container *ngIf="!cargando()">
+
+  <div class="tarjeta" *ngIf="!avisos().length">
+    <app-estado-vacio
+      titulo="Todavía no hay avisos"
+      [descripcion]="puedoEditar
+        ? 'Publica el primer aviso del muro de la clase.'
+        : 'Cuando el profesorado publique un aviso, aparecerá aquí.'">
+      <button type="button" class="boton boton-suave mt-2" *ngIf="puedoEditar" (click)="abrirDialogo()">
+        Publicar el primer aviso
+      </button>
+    </app-estado-vacio>
+  </div>
+
+  <div class="tarjeta" *ngIf="avisos().length">
+    <article class="aviso-muro" *ngFor="let aviso of avisos()" [class.fijado]="aviso.pinned">
+
+      <span class="icono-fijado" *ngIf="aviso.pinned" title="Aviso fijado">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a1 1 0 0 1 1 1v6.5l3.4 3.4a1 1 0 0 1-.7 1.7H13v6a1 1 0 1 1-2 0v-6H8.3a1 1 0 0 1-.7-1.7L11 9.5V3a1 1 0 0 1 1-1Z"/></svg>
+      </span>
+
+      <div class="crecer" style="min-width:0">
+        <p class="contenido mb-1">{{ aviso.content }}</p>
+        <p class="pequeno apagado mb-0">{{ aviso.authorName }} · {{ aviso.createdAt | fecha }}</p>
+      </div>
+
+      <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="aviso.puedoBorrar"
+              [disabled]="borrando() === aviso.id" (click)="borrar(aviso)" aria-label="Retirar aviso">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+        </svg>
+      </button>
+    </article>
+  </div>
+</ng-container>
+
+<!-- Alta de aviso -->
+<app-dialogo [abierto]="dialogoAbierto()" titulo="Nuevo aviso"
+             [cierraAlPulsarFuera]="false" (cerrar)="dialogoAbierto.set(false)">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorFormulario()"></app-aviso>
+
+  <form [formGroup]="formulario" (ngSubmit)="publicar()" novalidate id="form-aviso">
+
+    <div class="campo mb-0">
+      <label class="etiqueta" for="contenido-aviso">Aviso</label>
+      <textarea id="contenido-aviso" class="area" formControlName="content"
+                placeholder="Un cambio de fecha, un recordatorio, una aclaración…"></textarea>
+    </div>
+
+    <label class="campo-fijar">
+      <input type="checkbox" formControlName="pinned">
+      Fijar arriba del muro
+    </label>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoAbierto.set(false)">Cancelar</button>
+    <button type="submit" form="form-aviso" class="boton boton-primario" [disabled]="publicando()">
+      {{ publicando() ? 'Publicando…' : 'Publicar' }}
+    </button>
+  </ng-container>
+</app-dialogo>

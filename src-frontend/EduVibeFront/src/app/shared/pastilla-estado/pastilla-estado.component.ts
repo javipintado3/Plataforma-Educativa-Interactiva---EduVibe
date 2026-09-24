@@ -1,8 +1,8 @@
 import { Component, Input, computed, signal } from '@angular/core';
 
-import { EstadoCuenta, EstadoEntrega, Rol } from '../../core/models';
+import { EstadoCuenta, EstadoEntrega, Rol, TipoEventoAgenda, TipoMaterial } from '../../core/models';
 
-type Clave = EstadoCuenta | EstadoEntrega | Rol | 'sin-empezar' | 'tarde';
+type Clave = EstadoCuenta | EstadoEntrega | Rol | 'sin-empezar' | 'tarde' | TipoMaterial | TipoEventoAgenda | 'assignment_due';
 
 interface Aspecto {
   texto: string;
@@ -42,13 +42,31 @@ export class PastillaEstadoComponent {
     graded:       { texto: 'Calificada',  clase: 'pastilla-verde' },
     'sin-empezar':{ texto: 'Sin empezar', clase: 'pastilla-gris' },
     tarde:        { texto: 'Fuera de plazo', clase: 'pastilla-roja' },
+
+    // Materiales
+    pdf:   { texto: 'PDF',    clase: 'pastilla-roja' },
+    link:  { texto: 'Enlace', clase: 'pastilla-azul' },
+    video: { texto: 'Vídeo',  clase: 'pastilla-ambar' },
+    doc:   { texto: 'Documento', clase: 'pastilla-azul' },
+    other: { texto: 'Otro',   clase: 'pastilla-gris' },
+
+    // Agenda
+    exam:            { texto: 'Examen',        clase: 'pastilla-roja' },
+    holiday:         { texto: 'Festivo',       clase: 'pastilla-verde' },
+    assignment_due:  { texto: 'Entrega',       clase: 'pastilla-azul' },
   };
 
   private readonly _valor = signal<Clave | null>(null);
 
+  /**
+   * Acepta cualquier string, no solo `Clave`: algunas fuentes (la agenda,
+   * que mezcla eventos y tareas) devuelven su tipo como texto sin tipar en
+   * el backend. Un valor que no está en ASPECTOS cae al guion por defecto en
+   * lugar de romper la plantilla.
+   */
   @Input({ required: true })
-  set valor(v: Clave | null | undefined) {
-    this._valor.set(v ?? null);
+  set valor(v: string | null | undefined) {
+    this._valor.set((v as Clave) ?? null);
   }
 
   readonly aspecto = computed<Aspecto>(() => {

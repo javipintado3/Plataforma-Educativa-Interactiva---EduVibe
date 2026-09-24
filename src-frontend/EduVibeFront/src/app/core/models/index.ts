@@ -144,6 +144,48 @@ export interface Entrega {
   grade: Calificacion | null;
 }
 
+export interface Anuncio {
+  id: string;
+  content: string;
+  pinned: boolean;
+  authorName: string;
+  createdAt: string;
+  /** Lo decide el servicio, no el cliente: solo aparece a quien puede borrarlo. */
+  puedoBorrar: boolean;
+}
+
+export type TipoMaterial = 'pdf' | 'link' | 'video' | 'doc' | 'other';
+
+export interface Material {
+  id: string;
+  topicId: string | null;
+  title: string;
+  fileUrl: string | null;
+  type: TipoMaterial | null;
+  sortOrder: number;
+  createdAt: string | null;
+}
+
+export type TipoEventoAgenda = 'exam' | 'holiday' | 'other';
+export type OrigenEntradaAgenda = 'event' | 'assignment';
+
+/**
+ * Una entrada de la agenda: un evento a mano o una fecha de entrega derivada.
+ * `tipo` puede ser un TipoEventoAgenda o 'assignment_due' cuando el origen es
+ * una tarea.
+ */
+export interface EntradaAgenda {
+  referencia: string;
+  origen: OrigenEntradaAgenda;
+  title: string;
+  fecha: string;
+  tipo: string;
+  classId: string | null;
+  className: string | null;
+  classSubject: string | null;
+  classColor: string | null;
+}
+
 /** Forma de los errores que devuelve la API. */
 export interface ErrorApi {
   status: number;

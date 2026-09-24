@@ -175,8 +175,7 @@ public class AssignmentService {
         if (topicId == null) {
             return null;
         }
-        return topicRepository.findById(topicId)
-                .filter(t -> t.getSchoolClass().getId().equals(classId))
+        return topicRepository.findByIdAndSchoolClassId(topicId, classId)
                 .orElseThrow(() -> new BadRequestException("El tema indicado no es de esta clase"));
     }
 }

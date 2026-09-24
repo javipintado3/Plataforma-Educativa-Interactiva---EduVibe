@@ -1,0 +1,52 @@
+.entrada-agenda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.entrada-agenda:last-child { border-bottom: none; }
+
+.fecha-chip {
+  flex-shrink: 0;
+  width: 64px;
+  text-align: center;
+  border-radius: var(--radio);
+  background: var(--fondo);
+  padding: 6px 4px;
+}
+
+.fecha-chip .dia {
+  display: block;
+  font-weight: 600;
+  font-size: .82rem;
+  text-transform: capitalize;
+}
+
+.fecha-chip .hora {
+  display: block;
+  font-size: .74rem;
+  color: var(--tinta-70);
+}
+
+.titulo {
+  display: block;
+  font-weight: 550;
+  font-size: .93rem;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .8rem;
+  margin-top: 3px;
+}
+
+.dos-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+@media (max-width: 560px) {
+  .dos-columnas { grid-template-columns: 1fr; }
+  .entrada-agenda { flex-wrap: wrap; }
+}

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduvibe.dto.announcement.AnnouncementResponse;
+import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
 import com.eduvibe.dto.assignment.AssignmentResponse;
 import com.eduvibe.dto.assignment.SaveAssignmentRequest;
@@ -24,9 +26,13 @@ import com.eduvibe.dto.schoolclass.CreateClassRequest;
 import com.eduvibe.dto.schoolclass.CreateTopicRequest;
 import com.eduvibe.dto.schoolclass.EnrollRequest;
 import com.eduvibe.dto.schoolclass.MemberResponse;
+import com.eduvibe.dto.resource.ResourceResponse;
+import com.eduvibe.dto.resource.SaveResourceRequest;
 import com.eduvibe.dto.schoolclass.TopicResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
+import com.eduvibe.service.AnnouncementService;
 import com.eduvibe.service.AssignmentService;
+import com.eduvibe.service.ResourceService;
 import com.eduvibe.service.SchoolClassService;
 import com.eduvibe.service.SubmissionService;
 
@@ -50,6 +56,8 @@ public class SchoolClassController {
     private final SchoolClassService schoolClassService;
     private final AssignmentService assignmentService;
     private final SubmissionService submissionService;
+    private final AnnouncementService announcementService;
+    private final ResourceService resourceService;
 
     // ---------------------------------------------------------------- clases
 
@@ -131,5 +139,34 @@ public class SchoolClassController {
     @GetMapping("/{classId}/my-submissions")
     public ResponseEntity<List<SubmissionResponse>> misEntregas(@PathVariable UUID classId) {
         return ResponseEntity.ok(submissionService.misEntregasDeClase(classId));
+    }
+
+    // ---------------------------------------------------------------- avisos
+
+    /** Muro de la clase: fijados primero, luego lo más reciente. */
+    @GetMapping("/{classId}/announcements")
+    public ResponseEntity<List<AnnouncementResponse>> avisos(@PathVariable UUID classId) {
+        return ResponseEntity.ok(announcementService.listar(classId));
+    }
+
+    @PostMapping("/{classId}/announcements")
+    public ResponseEntity<AnnouncementResponse> publicarAviso(@PathVariable UUID classId,
+                                                               @Valid @RequestBody SaveAnnouncementRequest peticion) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(announcementService.crear(classId, peticion));
+    }
+
+    // ------------------------------------------------------------ materiales
+
+    @GetMapping("/{classId}/resources")
+    public ResponseEntity<List<ResourceResponse>> materiales(@PathVariable UUID classId) {
+        return ResponseEntity.ok(resourceService.listar(classId));
+    }
+
+    @PostMapping("/{classId}/resources")
+    public ResponseEntity<ResourceResponse> anadirMaterial(@PathVariable UUID classId,
+                                                            @Valid @RequestBody SaveResourceRequest peticion) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(resourceService.crear(classId, peticion));
     }
 }

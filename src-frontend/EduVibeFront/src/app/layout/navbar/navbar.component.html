@@ -10,6 +10,9 @@
       <a routerLink="/clases" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
         Mis clases
       </a>
+      <a routerLink="/calendario" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
+        Calendario
+      </a>
       <a routerLink="/admin/usuarios" routerLinkActive="activo" class="enlace"
          *ngIf="auth.esAdmin()" (click)="cerrarTodo()">
         Usuarios

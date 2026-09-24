@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Clase, DetalleClase, DetalleTarea, Entrega, Miembro, Tarea, Tema } from '../models';
+import { Anuncio, Clase, DetalleClase, DetalleTarea, Entrega, Material, Miembro, Tarea, Tema, TipoMaterial } from '../models';
 
 /**
  * Clases y todo lo que cuelga de una.
@@ -68,5 +68,29 @@ export class ClasesService {
   /** Las entregas propias en esta clase: la pestaña de calificaciones. */
   misEntregas(claseId: string): Observable<Entrega[]> {
     return this.http.get<Entrega[]>(`${this.api}/${claseId}/my-submissions`);
+  }
+
+  /** Muro de la clase: fijados primero, luego lo más reciente. */
+  avisos(claseId: string): Observable<Anuncio[]> {
+    return this.http.get<Anuncio[]>(`${this.api}/${claseId}/announcements`);
+  }
+
+  crearAviso(claseId: string, datos: { content: string; pinned?: boolean }): Observable<Anuncio> {
+    return this.http.post<Anuncio>(`${this.api}/${claseId}/announcements`, datos);
+  }
+
+  /** El aviso ya tiene identidad propia, por eso cuelga de /announcements y no de su clase. */
+  borrarAviso(avisoId: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/announcements/${avisoId}`);
+  }
+
+  materiales(claseId: string): Observable<Material[]> {
+    return this.http.get<Material[]>(`${this.api}/${claseId}/resources`);
+  }
+
+  crearMaterial(claseId: string, datos: {
+    title: string; fileUrl?: string; type?: TipoMaterial | ''; topicId?: string | null;
+  }): Observable<Material> {
+    return this.http.post<Material>(`${this.api}/${claseId}/resources`, datos);
   }
 }

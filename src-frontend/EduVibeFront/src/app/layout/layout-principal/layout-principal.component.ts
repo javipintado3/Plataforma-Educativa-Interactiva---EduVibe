@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
+import { ConfirmarComponent } from '../../shared/confirmar/confirmar.component';
 
 /**
  * Armazón de las pantallas con sesión iniciada: barra superior, contenido y
@@ -19,7 +20,7 @@ import { FooterComponent } from '../footer/footer.component';
 @Component({
   selector: 'app-layout-principal',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, ConfirmarComponent],
   template: `
     <div class="armazon">
       <app-navbar></app-navbar>
@@ -30,6 +31,8 @@ import { FooterComponent } from '../footer/footer.component';
 
       <app-footer></app-footer>
     </div>
+
+    <app-confirmar></app-confirmar>
   `,
   styles: [`
     .armazon {

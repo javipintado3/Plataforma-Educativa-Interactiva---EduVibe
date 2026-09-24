@@ -1,0 +1,31 @@
+.aviso-muro {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.aviso-muro:last-child { border-bottom: none; }
+.aviso-muro.fijado { background: var(--verde-50); }
+
+.contenido {
+  font-size: .93rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.icono-fijado {
+  flex-shrink: 0;
+  color: var(--verde-600);
+  margin-top: 2px;
+}
+
+.campo-fijar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .88rem;
+  color: var(--tinta-70);
+  cursor: pointer;
+}

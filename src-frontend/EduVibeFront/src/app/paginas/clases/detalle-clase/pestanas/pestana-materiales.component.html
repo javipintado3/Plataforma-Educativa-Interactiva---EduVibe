@@ -1,0 +1,112 @@
+<div class="fila-entre mb-2" *ngIf="puedoEditar">
+  <p class="pequeno apagado mb-0">Apuntes, enlaces y vídeos de la clase.</p>
+  <button type="button" class="boton boton-primario boton-pequeno" (click)="abrirCrear()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    Nuevo material
+  </button>
+</div>
+
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<ng-container *ngIf="!cargando()">
+
+  <div class="tarjeta" *ngIf="!materiales().length">
+    <app-estado-vacio
+      titulo="Todavía no hay materiales"
+      [descripcion]="puedoEditar
+        ? 'Sube el primer apunte, enlace o vídeo de la clase.'
+        : 'Cuando el profesorado suba materiales, aparecerán aquí.'">
+      <button type="button" class="boton boton-suave mt-2" *ngIf="puedoEditar" (click)="abrirCrear()">
+        Añadir el primer material
+      </button>
+    </app-estado-vacio>
+  </div>
+
+  <div class="tarjeta" *ngIf="materiales().length">
+    <article class="material" *ngFor="let material of materiales()">
+
+      <span class="crecer" style="min-width:0">
+        <a class="titulo" *ngIf="material.fileUrl" [href]="material.fileUrl" target="_blank" rel="noopener">
+          {{ material.title }}
+        </a>
+        <span class="titulo" *ngIf="!material.fileUrl">{{ material.title }}</span>
+
+        <span class="meta">
+          <app-pastilla-estado *ngIf="material.type" [valor]="material.type"></app-pastilla-estado>
+          <span class="apagado"> · {{ tituloDelTema(material.topicId) }}</span>
+        </span>
+      </span>
+
+      <span class="fila espaciado-sm" *ngIf="puedoEditar">
+        <button type="button" class="boton boton-fantasma boton-pequeno"
+                (click)="abrirEditar(material)" aria-label="Editar material">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/>
+            <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+          </svg>
+        </button>
+        <button type="button" class="boton boton-fantasma boton-pequeno"
+                [disabled]="borrando() === material.id" (click)="borrar(material)" aria-label="Retirar material">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+          </svg>
+        </button>
+      </span>
+    </article>
+  </div>
+</ng-container>
+
+<!-- Alta / edición de material -->
+<app-dialogo [abierto]="dialogoAbierto()" [titulo]="editando() ? 'Editar material' : 'Nuevo material'"
+             [cierraAlPulsarFuera]="false" (cerrar)="dialogoAbierto.set(false)">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorFormulario()"></app-aviso>
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate id="form-material">
+
+    <div class="campo">
+      <label class="etiqueta" for="titulo-material">Título</label>
+      <input id="titulo-material" class="entrada" formControlName="title" placeholder="Apuntes del tema 1">
+    </div>
+
+    <div class="campo">
+      <label class="etiqueta" for="url-material">Enlace</label>
+      <input id="url-material" class="entrada" formControlName="fileUrl" placeholder="https://…">
+      <span class="ayuda-campo">Opcional</span>
+    </div>
+
+    <div class="dos-columnas">
+      <div class="campo">
+        <label class="etiqueta" for="tipo-material">Tipo</label>
+        <select id="tipo-material" class="selector" formControlName="type">
+          <option value="">Sin especificar</option>
+          <option value="pdf">PDF</option>
+          <option value="link">Enlace</option>
+          <option value="video">Vídeo</option>
+          <option value="doc">Documento</option>
+          <option value="other">Otro</option>
+        </select>
+      </div>
+
+      <div class="campo mb-0" *ngIf="temas.length">
+        <label class="etiqueta" for="tema-material">Tema</label>
+        <select id="tema-material" class="selector" formControlName="topicId">
+          <option value="">Sin tema</option>
+          <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoAbierto.set(false)">Cancelar</button>
+    <button type="submit" form="form-material" class="boton boton-primario" [disabled]="guardando()">
+      {{ guardando() ? 'Guardando…' : (editando() ? 'Guardar cambios' : 'Añadir material') }}
+    </button>
+  </ng-container>
+</app-dialogo>
