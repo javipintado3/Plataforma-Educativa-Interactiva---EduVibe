@@ -88,6 +88,9 @@
 
 .opcion:hover { background: var(--fondo); color: var(--rojo); }
 
+/* "Cerrar sesión" es la única opción destructiva; el resto no se pone en rojo al pasar el ratón. */
+.opcion-neutra:hover { color: var(--tinta); }
+
 /* -------------------------------------------------------------------- móvil */
 
 .hamburguesa { display: none; }

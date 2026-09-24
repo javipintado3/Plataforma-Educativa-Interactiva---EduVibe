@@ -150,8 +150,9 @@ public class SubmissionService {
         entrega.marcarComoCalificada();
         submissionRepository.save(entrega);
 
-        notificationService.emitir(entrega.getStudent(), Notification.NOTA_PUBLICADA,
-                Map.of("title", tarea.getTitle(), "className", tarea.getSchoolClass().getName()));
+        notificationService.emitir(entrega.getStudent(), Notification.NOTA_PUBLICADA, Map.of(
+                "title", tarea.getTitle(), "className", tarea.getSchoolClass().getName(),
+                "assignmentId", tarea.getId().toString()));
 
         return SubmissionResponse.de(entrega, GradeResponse.de(nota));
     }

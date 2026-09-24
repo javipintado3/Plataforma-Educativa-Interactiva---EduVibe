@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.eduvibe.model.Enrollment;
 import com.eduvibe.model.enums.EnrollmentRole;
@@ -30,6 +32,23 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     List<Enrollment> findBySchoolClassIdAndRoleInClassOrderByUserNameAsc(UUID classId, EnrollmentRole rol);
 
     long countBySchoolClassIdAndRoleInClass(UUID classId, EnrollmentRole rol);
+
+    /** Para el resumen de perfil: en cuántas clases participa, como profesor o como alumno. */
+    long countByUserIdAndRoleInClass(UUID userId, EnrollmentRole rol);
+
+    /**
+     * Alumnado distinto en las clases que imparte un profesor. DISTINCT porque
+     * un mismo alumno puede estar en varias de sus clases y no debe contar dos veces.
+     */
+    @Query("""
+            SELECT COUNT(DISTINCT alumno.user.id) FROM Enrollment alumno
+            WHERE alumno.roleInClass = com.eduvibe.model.enums.EnrollmentRole.STUDENT
+              AND alumno.schoolClass.id IN (
+                  SELECT profesor.schoolClass.id FROM Enrollment profesor
+                  WHERE profesor.user.id = :teacherId
+                    AND profesor.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
+            """)
+    long countAlumnadoDeProfesor(@Param("teacherId") UUID teacherId);
 
     /**
      * Matriculaciones de varias clases en una sola consulta. Es lo que permite

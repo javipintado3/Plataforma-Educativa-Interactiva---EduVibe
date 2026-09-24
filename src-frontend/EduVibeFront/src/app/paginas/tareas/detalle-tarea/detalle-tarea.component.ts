@@ -12,6 +12,8 @@ import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe, PlazoPipe } from '../../../shared/pipes/fecha.pipe';
+import { RutaArchivoPipe } from '../../../shared/pipes/ruta-archivo.pipe';
+import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 
 /**
  * Pantalla de una tarea. Es dos pantallas en una, según quién la abra:
@@ -29,7 +31,7 @@ import { FechaPipe, PlazoPipe } from '../../../shared/pipes/fecha.pipe';
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, AvatarComponent,
-    DialogoComponent, AvisoComponent, FechaPipe, PlazoPipe,
+    DialogoComponent, AvisoComponent, SubidaArchivoComponent, FechaPipe, PlazoPipe, RutaArchivoPipe,
   ],
   templateUrl: './detalle-tarea.component.html',
   styleUrl: './detalle-tarea.component.css',

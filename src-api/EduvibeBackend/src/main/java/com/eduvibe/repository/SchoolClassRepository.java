@@ -15,6 +15,9 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, UUID> 
     /** Todas las clases del centro: es la vista de un administrador. */
     List<SchoolClass> findByOrganizationIdOrderByNameAscSubjectAsc(UUID organizationId);
 
+    /** Para el resumen de perfil de administración. */
+    long countByOrganizationId(UUID organizationId);
+
     /** Las clases en las que participa una persona, sea profesor o alumno. */
     @Query("""
             SELECT e.schoolClass FROM Enrollment e

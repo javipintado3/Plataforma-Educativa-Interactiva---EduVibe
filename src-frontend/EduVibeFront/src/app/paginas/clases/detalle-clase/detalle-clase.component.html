@@ -10,12 +10,25 @@
   <!-- Cabecera -->
   <header class="cabecera" [style.--color-clase]="detalle.color || '#059669'">
 
-    <app-portada-clase
-      [semilla]="detalle.id"
-      [imageUrl]="detalle.imageUrl"
-      [color]="detalle.color"
-      [titulo]="detalle.name"
-      [alto]="120"></app-portada-clase>
+    <div class="envoltura-portada">
+      <app-portada-clase
+        [semilla]="detalle.id"
+        [imageUrl]="detalle.imageUrl"
+        [color]="detalle.color"
+        [titulo]="detalle.name"
+        [alto]="120"></app-portada-clase>
+
+      <label class="cambiar-portada" *ngIf="detalle.puedoEditar" [class.subiendo]="subiendoPortada()">
+        <input type="file" class="entrada-oculta" accept="image/*"
+               [disabled]="subiendoPortada()" (change)="cambiarPortadaDirecta($event)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"/>
+          <circle cx="12" cy="13" r="3.5"/>
+        </svg>
+        {{ subiendoPortada() ? 'Subiendo…' : 'Cambiar portada' }}
+      </label>
+    </div>
 
     <div class="contenedor">
 
@@ -37,8 +50,20 @@
           </p>
         </div>
 
-        <span class="pastilla pastilla-verde" *ngIf="detalle.miRol === 'teacher'">Impartes esta clase</span>
-        <span class="pastilla pastilla-azul" *ngIf="detalle.miRol === 'admin'">Administración</span>
+        <span class="fila espaciado-sm">
+          <span class="pastilla pastilla-verde" *ngIf="detalle.miRol === 'teacher'">Impartes esta clase</span>
+          <span class="pastilla pastilla-azul" *ngIf="detalle.miRol === 'admin'">Administración</span>
+
+          <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="detalle.puedoEditar"
+                  (click)="abrirEditar()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/>
+              <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+            </svg>
+            Editar clase
+          </button>
+        </span>
       </div>
 
       <!-- Pestañas -->
@@ -86,3 +111,46 @@
       [claseId]="detalle.id"></app-pestana-calificaciones>
   </div>
 </ng-container>
+
+<!-- Editar clase -->
+<app-dialogo [abierto]="dialogoEditarAbierto()" titulo="Editar clase"
+             [cierraAlPulsarFuera]="false" (cerrar)="dialogoEditarAbierto.set(false)">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorEdicion()"></app-aviso>
+
+  <form [formGroup]="formularioClase" (ngSubmit)="guardarClase()" novalidate id="form-editar-clase">
+
+    <div class="campo">
+      <label class="etiqueta" for="nombre-clase-editar">Grupo</label>
+      <input id="nombre-clase-editar" class="entrada" formControlName="name">
+    </div>
+
+    <div class="campo">
+      <label class="etiqueta" for="asignatura-editar">Asignatura</label>
+      <input id="asignatura-editar" class="entrada" formControlName="subject">
+    </div>
+
+    <div class="campo mb-0">
+      <label class="etiqueta">Color</label>
+      <div class="colores">
+        <button type="button" class="color" *ngFor="let c of paleta"
+                [style.background]="c.valor"
+                [class.elegido]="formularioClase.controls.color.value === c.valor"
+                [attr.aria-label]="c.nombre"
+                (click)="formularioClase.controls.color.setValue(c.valor)"></button>
+      </div>
+    </div>
+
+    <div class="campo mt-2 mb-0">
+      <label class="etiqueta">Portada</label>
+      <app-subida-archivo formControlName="imageUrl" tipo="imagen" placeholder="https://… o sube una foto"></app-subida-archivo>
+    </div>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoEditarAbierto.set(false)">Cancelar</button>
+    <button type="submit" form="form-editar-clase" class="boton boton-primario" [disabled]="guardandoClase()">
+      {{ guardandoClase() ? 'Guardando…' : 'Guardar cambios' }}
+    </button>
+  </ng-container>
+</app-dialogo>

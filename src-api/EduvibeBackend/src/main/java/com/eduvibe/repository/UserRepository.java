@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.eduvibe.model.User;
+import com.eduvibe.model.enums.UserRole;
+import com.eduvibe.model.enums.UserStatus;
 
 /**
  * El listado con filtros opcionales del panel de administración se resuelve con
@@ -22,4 +24,10 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
     Optional<User> findByEmail(String email);
 
     boolean existsByEmail(String email);
+
+    /** Para el resumen de perfil de administración: usuarios por rol. */
+    long countByOrganizationIdAndRole(UUID organizationId, UserRole role);
+
+    /** Cuentas todavía sin aceptar su invitación. */
+    long countByOrganizationIdAndStatus(UUID organizationId, UserStatus status);
 }

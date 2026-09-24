@@ -25,7 +25,7 @@
       <div class="menu-usuario" data-menu-usuario>
         <button type="button" class="disparador" (click)="alternarMenu()"
                 [attr.aria-expanded]="menuAbierto()" aria-haspopup="true">
-          <app-avatar [nombre]="auth.usuario()?.name || ''" [pequeno]="true"></app-avatar>
+          <app-avatar [nombre]="auth.usuario()?.name || ''" [avatarUrl]="auth.usuario()?.avatarUrl || null" [pequeno]="true"></app-avatar>
           <span class="nombre">{{ auth.usuario()?.name }}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
@@ -40,6 +40,13 @@
             <p class="pequeno apagado mb-1" style="word-break:break-all">{{ auth.usuario()?.email }}</p>
             <app-pastilla-estado [valor]="auth.usuario()?.role"></app-pastilla-estado>
           </div>
+          <a routerLink="/perfil" class="opcion opcion-neutra" (click)="cerrarTodo()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/>
+            </svg>
+            Mi perfil
+          </a>
           <button type="button" class="opcion" (click)="salir()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

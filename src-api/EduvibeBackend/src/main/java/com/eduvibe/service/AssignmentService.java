@@ -64,18 +64,19 @@ public class AssignmentService {
         tarea.setTopic(temaDeLaClase(peticion.topicId(), classId));
 
         assignmentRepository.saveAndFlush(tarea);
-        notificarAlumnado(classId, clase, Notification.TAREA_NUEVA, tarea.getTitle());
+        notificarAlumnado(classId, clase, tarea);
 
         return AssignmentDetailResponse.de(tarea, true, null);
     }
 
     /** Avisa a todo el alumnado matriculado de que hay una novedad con este título. */
-    private void notificarAlumnado(UUID classId, SchoolClass clase, String tipo, String titulo) {
+    private void notificarAlumnado(UUID classId, SchoolClass clase, Assignment tarea) {
         List<User> alumnado = enrollmentRepository
                 .findBySchoolClassIdAndRoleInClassOrderByUserNameAsc(classId, EnrollmentRole.STUDENT)
                 .stream().map(Enrollment::getUser).toList();
 
-        notificationService.emitirParaVarios(alumnado, tipo, Map.of("className", clase.getName(), "title", titulo));
+        notificationService.emitirParaVarios(alumnado, Notification.TAREA_NUEVA, Map.of(
+                "className", clase.getName(), "title", tarea.getTitle(), "assignmentId", tarea.getId().toString()));
     }
 
     /**

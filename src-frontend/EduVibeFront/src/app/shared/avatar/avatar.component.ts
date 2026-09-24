@@ -1,16 +1,35 @@
 import { Component, Input, computed, signal } from '@angular/core';
+import { NgIf } from '@angular/common';
+
+import { RutaArchivoPipe } from '../pipes/ruta-archivo.pipe';
 
 /**
- * Avatar con las iniciales de la persona.
+ * Avatar de la persona: su foto si tiene una subida, si no sus iniciales.
  *
- * Se prefiere a una foto genérica porque no hay fotos que mostrar y un icono
- * repetido veinte veces en una lista no aporta nada; las iniciales, en cambio,
- * hacen reconocible cada fila de un vistazo.
+ * Sin foto se prefieren las iniciales a un icono genérico, porque un icono
+ * repetido veinte veces en una lista no aporta nada; las iniciales, en
+ * cambio, hacen reconocible cada fila de un vistazo.
  */
 @Component({
   selector: 'app-avatar',
   standalone: true,
-  template: `<span class="iniciales" [class.iniciales-sm]="pequeno" [title]="nombre">{{ iniciales() }}</span>`,
+  imports: [NgIf, RutaArchivoPipe],
+  template: `
+    <img *ngIf="avatarUrl" class="foto-avatar" [class.foto-avatar-sm]="pequeno"
+         [src]="avatarUrl | rutaArchivo" [alt]="nombre">
+    <span *ngIf="!avatarUrl" class="iniciales" [class.iniciales-sm]="pequeno" [title]="nombre">{{ iniciales() }}</span>
+  `,
+  styles: [`
+    .foto-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      object-fit: cover;
+      display: block;
+      flex-shrink: 0;
+    }
+    .foto-avatar-sm { width: 30px; height: 30px; }
+  `],
 })
 export class AvatarComponent {
 
@@ -25,6 +44,7 @@ export class AvatarComponent {
   }
 
   @Input() pequeno = false;
+  @Input() avatarUrl: string | null = null;
 
   readonly iniciales = computed(() =>
     this._nombre()

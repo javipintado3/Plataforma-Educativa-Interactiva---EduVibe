@@ -76,11 +76,10 @@
             </div>
 
             <div class="campo">
-              <label class="etiqueta" for="archivo">Enlace al archivo</label>
-              <input id="archivo" class="entrada" formControlName="fileUrl"
-                     [attr.disabled]="bloqueada ? '' : null"
-                     placeholder="https://…">
-              <span class="ayuda-campo">Si lo has subido a otro sitio, pega aquí el enlace.</span>
+              <label class="etiqueta">Archivo</label>
+              <app-subida-archivo formControlName="fileUrl" tipo="documento" [bloqueado]="bloqueada"
+                                   placeholder="https://… o sube tu archivo"></app-subida-archivo>
+              <span class="ayuda-campo" *ngIf="!bloqueada">Sube tu trabajo o pega el enlace si ya lo tienes en otro sitio.</span>
             </div>
           </form>
 
@@ -148,7 +147,7 @@
       <p class="pequeno apagado mb-1">Lo entregado</p>
       <p class="mb-1" *ngIf="entrega.content" style="white-space:pre-wrap">{{ entrega.content }}</p>
       <p class="apagado mb-1" *ngIf="!entrega.content">Sin respuesta escrita.</p>
-      <a *ngIf="entrega.fileUrl" [href]="entrega.fileUrl" target="_blank" rel="noopener"
+      <a *ngIf="entrega.fileUrl" [href]="entrega.fileUrl | rutaArchivo" target="_blank" rel="noopener"
          class="pequeno">Ver archivo entregado</a>
     </div>
 

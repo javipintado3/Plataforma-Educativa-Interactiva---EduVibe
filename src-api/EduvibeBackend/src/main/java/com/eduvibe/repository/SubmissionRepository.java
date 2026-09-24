@@ -35,4 +35,15 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
                                           @Param("assignmentIds") List<UUID> assignmentIds);
 
     long countByAssignmentId(UUID assignmentId);
+
+    /** Para el resumen de perfil del profesorado: cuánto trabajo tiene por corregir. */
+    @Query("""
+            SELECT COUNT(s) FROM Submission s
+            WHERE s.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
+              AND s.assignment.schoolClass.id IN (
+                  SELECT e.schoolClass.id FROM Enrollment e
+                  WHERE e.user.id = :teacherId
+                    AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
+            """)
+    long countPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
 }

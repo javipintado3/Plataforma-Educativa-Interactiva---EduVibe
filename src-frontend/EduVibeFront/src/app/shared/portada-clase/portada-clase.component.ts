@@ -1,6 +1,8 @@
 import { Component, Input, computed, signal } from '@angular/core';
 import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 
+import { RutaArchivoPipe } from '../pipes/ruta-archivo.pipe';
+
 /**
  * Portada de una clase.
  *
@@ -23,12 +25,12 @@ import { NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 @Component({
   selector: 'app-portada-clase',
   standalone: true,
-  imports: [NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault],
+  imports: [NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault, RutaArchivoPipe],
   template: `
     <div class="portada" [style.--tono]="color || '#059669'" [style.height.px]="alto">
 
       <!-- Portada propia de la clase -->
-      <img *ngIf="imageUrl" class="foto" [src]="imageUrl" [alt]="'Portada de ' + titulo" loading="lazy">
+      <img *ngIf="imageUrl" class="foto" [src]="imageUrl | rutaArchivo" [alt]="'Portada de ' + titulo" loading="lazy">
 
       <!-- Portada compuesta -->
       <svg *ngIf="!imageUrl" class="motivo" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice"

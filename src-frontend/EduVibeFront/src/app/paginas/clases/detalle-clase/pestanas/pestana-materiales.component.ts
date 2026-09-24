@@ -11,6 +11,8 @@ import { CargandoComponent } from '../../../../shared/cargando/cargando.componen
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
+import { RutaArchivoPipe } from '../../../../shared/pipes/ruta-archivo.pipe';
+import { SubidaArchivoComponent } from '../../../../shared/subida-archivo/subida-archivo.component';
 
 /**
  * Pestaña "Materiales": apuntes, enlaces y vídeos de la clase.
@@ -25,6 +27,7 @@ import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/past
   imports: [
     NgIf, NgFor, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent,
+    SubidaArchivoComponent, RutaArchivoPipe,
   ],
   templateUrl: './pestana-materiales.component.html',
   styleUrl: './pestana-materiales.component.css',

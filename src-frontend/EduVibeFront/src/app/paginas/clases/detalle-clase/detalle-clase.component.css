@@ -37,3 +37,34 @@
 }
 
 .pestanas { border-bottom: none; margin-bottom: -1px; }
+
+.envoltura-portada { position: relative; }
+
+.cambiar-portada {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .55);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 550;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+  transition: background .12s ease;
+}
+
+.cambiar-portada:hover { background: rgba(15, 23, 42, .72); }
+.cambiar-portada.subiendo { opacity: .75; pointer-events: none; }
+
+.entrada-oculta {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}

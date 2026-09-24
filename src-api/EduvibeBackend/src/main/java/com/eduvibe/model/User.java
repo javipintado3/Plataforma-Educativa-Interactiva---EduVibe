@@ -61,6 +61,10 @@ public class User {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    /** Null hasta que la persona sube una foto: mientras tanto se ven sus iniciales. */
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", insertable = false, updatable = false)
     private Instant createdAt;

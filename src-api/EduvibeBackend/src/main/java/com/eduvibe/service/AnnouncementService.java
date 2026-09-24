@@ -66,7 +66,8 @@ public class AnnouncementService {
         List<User> alumnado = enrollmentRepository
                 .findBySchoolClassIdAndRoleInClassOrderByUserNameAsc(classId, EnrollmentRole.STUDENT)
                 .stream().map(Enrollment::getUser).toList();
-        notificationService.emitirParaVarios(alumnado, Notification.AVISO_NUEVO, Map.of("className", clase.getName()));
+        notificationService.emitirParaVarios(alumnado, Notification.AVISO_NUEVO, Map.of(
+                "className", clase.getName(), "classId", classId.toString()));
 
         return AnnouncementResponse.de(aviso, true);
     }

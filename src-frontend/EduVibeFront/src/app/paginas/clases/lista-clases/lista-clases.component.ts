@@ -9,17 +9,9 @@ import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.component';
+import { PALETA_CLASE } from '../../../shared/paleta-clase';
+import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-clase.component';
-
-/** Colores de asignatura que se ofrecen al crear una clase. */
-const PALETA = [
-  { nombre: 'Verde',    valor: '#059669' },
-  { nombre: 'Azul',     valor: '#2563eb' },
-  { nombre: 'Violeta',  valor: '#7c3aed' },
-  { nombre: 'Rosa',     valor: '#db2777' },
-  { nombre: 'Naranja',  valor: '#ea580c' },
-  { nombre: 'Turquesa', valor: '#0891b2' },
-];
 
 /**
  * Panel principal: las clases de quien entra.
@@ -34,7 +26,7 @@ const PALETA = [
   imports: [
     NgIf, NgFor, ReactiveFormsModule,
     TarjetaClaseComponent, EstadoVacioComponent, CargandoComponent,
-    DialogoComponent, AvisoComponent,
+    DialogoComponent, AvisoComponent, SubidaArchivoComponent,
   ],
   templateUrl: './lista-clases.component.html',
   styleUrl: './lista-clases.component.css',
@@ -45,7 +37,7 @@ export class ListaClasesComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
 
-  readonly paleta = PALETA;
+  readonly paleta = PALETA_CLASE;
 
   readonly clases = signal<Clase[]>([]);
   readonly cargando = signal(true);
@@ -58,7 +50,7 @@ export class ListaClasesComponent implements OnInit {
   readonly formulario = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
     subject: [''],
-    color: [PALETA[0].valor],
+    color: [PALETA_CLASE[0].valor],
     imageUrl: [''],
   });
 
@@ -83,7 +75,7 @@ export class ListaClasesComponent implements OnInit {
   }
 
   abrirDialogo(): void {
-    this.formulario.reset({ name: '', subject: '', color: PALETA[0].valor, imageUrl: '' });
+    this.formulario.reset({ name: '', subject: '', color: PALETA_CLASE[0].valor, imageUrl: '' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }

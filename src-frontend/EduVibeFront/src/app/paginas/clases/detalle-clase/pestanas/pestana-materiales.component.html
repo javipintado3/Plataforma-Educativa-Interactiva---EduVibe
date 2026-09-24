@@ -29,7 +29,7 @@
     <article class="material" *ngFor="let material of materiales()">
 
       <span class="crecer" style="min-width:0">
-        <a class="titulo" *ngIf="material.fileUrl" [href]="material.fileUrl" target="_blank" rel="noopener">
+        <a class="titulo" *ngIf="material.fileUrl" [href]="material.fileUrl | rutaArchivo" target="_blank" rel="noopener">
           {{ material.title }}
         </a>
         <span class="titulo" *ngIf="!material.fileUrl">{{ material.title }}</span>
@@ -75,8 +75,8 @@
     </div>
 
     <div class="campo">
-      <label class="etiqueta" for="url-material">Enlace</label>
-      <input id="url-material" class="entrada" formControlName="fileUrl" placeholder="https://…">
+      <label class="etiqueta">Archivo o enlace</label>
+      <app-subida-archivo formControlName="fileUrl" tipo="documento"></app-subida-archivo>
       <span class="ayuda-campo">Opcional</span>
     </div>
 

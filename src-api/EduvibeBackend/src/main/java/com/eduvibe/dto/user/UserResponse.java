@@ -18,6 +18,7 @@ public record UserResponse(
         String name,
         String role,
         String status,
+        String avatarUrl,
         UUID organizationId,
         Instant createdAt) {
 
@@ -28,6 +29,7 @@ public record UserResponse(
                 usuario.getName(),
                 usuario.getRole().getValor(),
                 usuario.getStatus().getValor(),
+                usuario.getAvatarUrl(),
                 usuario.getOrganization().getId(),
                 usuario.getCreatedAt());
     }

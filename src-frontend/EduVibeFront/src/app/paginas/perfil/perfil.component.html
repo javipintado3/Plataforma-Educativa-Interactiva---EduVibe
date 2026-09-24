@@ -1,0 +1,169 @@
+<div class="contenedor">
+
+  <app-cargando *ngIf="cargando()"></app-cargando>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <ng-container *ngIf="!cargando() && auth.usuario() as usuario">
+
+    <!-- Cabecera -->
+    <div class="tarjeta cabecera-perfil mb-3">
+      <app-avatar [nombre]="usuario.name" [avatarUrl]="usuario.avatarUrl"></app-avatar>
+      <div class="crecer" style="min-width:0">
+        <h1 class="mb-0">{{ usuario.name }}</h1>
+        <p class="apagado mb-1" style="word-break:break-all">{{ usuario.email }}</p>
+        <span class="fila espaciado-sm envolver">
+          <app-pastilla-estado [valor]="usuario.role"></app-pastilla-estado>
+          <span class="pequeno apagado" *ngIf="usuario.createdAt">
+            En la plataforma desde {{ usuario.createdAt | fecha:false }}
+          </span>
+        </span>
+      </div>
+
+      <div class="cambiar-foto">
+        <app-subida-archivo tipo="imagen" [bloqueado]="guardandoAvatar()"
+                             [ngModel]="usuario.avatarUrl" [ngModelOptions]="{standalone: true}"
+                             (ngModelChange)="cambiarAvatar($event)"></app-subida-archivo>
+      </div>
+    </div>
+
+    <!-- Resumen por rol -->
+    <div class="rejilla-resumen mb-3" *ngIf="resumen() as r">
+
+      <ng-container *ngIf="auth.esAlumno()">
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.numeroClases }}</span>
+          <span class="stat-etiqueta">Clases</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.notaMedia !== null ? (r.notaMedia | number:'1.0-1') : '—' }}</span>
+          <span class="stat-etiqueta">Nota media</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.tareasPendientes }}</span>
+          <span class="stat-etiqueta">Tareas pendientes</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.notificacionesNoLeidas }}</span>
+          <span class="stat-etiqueta">Sin leer</span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="auth.esProfesor()">
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.numeroClases }}</span>
+          <span class="stat-etiqueta">Clases que impartes</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.numeroAlumnos }}</span>
+          <span class="stat-etiqueta">Alumnado</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.entregasPorCorregir }}</span>
+          <span class="stat-etiqueta">Por corregir</span>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="auth.esAdmin()">
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.numeroClases }}</span>
+          <span class="stat-etiqueta">Clases del centro</span>
+        </div>
+        <div class="tarjeta stat">
+          <span class="stat-numero">{{ r.invitacionesPendientes }}</span>
+          <span class="stat-etiqueta">Invitaciones pendientes</span>
+        </div>
+        <div class="tarjeta stat" *ngFor="let entrada of usuariosPorRol()">
+          <span class="stat-numero">{{ entrada[1] }}</span>
+          <span class="stat-etiqueta">{{ etiquetaRol(entrada[0]) }}</span>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="tarjeta acciones-rapidas mb-3">
+      <a routerLink="/calendario" class="accion-rapida">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+        Calendario
+      </a>
+
+      <a routerLink="/clases" class="accion-rapida">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+        </svg>
+        {{ auth.esAdmin() ? 'Todas las clases' : 'Mis clases' }}
+      </a>
+
+      <a routerLink="/admin/usuarios" class="accion-rapida" *ngIf="auth.esAdmin()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Usuarios
+      </a>
+    </div>
+
+    <div class="disposicion-perfil">
+
+      <!-- Mis clases (alumnado y profesorado) -->
+      <section *ngIf="!auth.esAdmin()">
+        <div class="fila-entre mb-2">
+          <h3 class="mb-0">Mis clases</h3>
+          <a routerLink="/clases" class="pequeno">Ver todas</a>
+        </div>
+
+        <div class="rejilla" *ngIf="clases().length">
+          <app-tarjeta-clase *ngFor="let clase of clases().slice(0, 4)" [clase]="clase"></app-tarjeta-clase>
+        </div>
+
+        <div class="tarjeta" *ngIf="!clases().length">
+          <app-estado-vacio titulo="Todavía sin clases"></app-estado-vacio>
+        </div>
+      </section>
+
+      <!-- Gestión (solo administración) -->
+      <section *ngIf="auth.esAdmin()">
+        <h3 class="mb-2">Gestión del centro</h3>
+        <div class="tarjeta">
+          <div class="tarjeta-cuerpo">
+            <p class="apagado mb-2">Usuarios, altas por invitación y clases del centro.</p>
+            <a routerLink="/admin/usuarios" class="boton boton-primario">Ir a Usuarios</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Notificaciones -->
+      <section>
+        <div class="fila-entre mb-2">
+          <h3 class="mb-0">Notificaciones</h3>
+          <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="hayNoLeidas()"
+                  [disabled]="marcandoTodas()" (click)="marcarTodasLeidas()">
+            {{ marcandoTodas() ? 'Marcando…' : 'Marcar todo leído' }}
+          </button>
+        </div>
+
+        <div class="tarjeta" *ngIf="!notificaciones().length">
+          <app-estado-vacio titulo="Sin notificaciones"
+            descripcion="Aquí aparecerán las novedades de tus clases."></app-estado-vacio>
+        </div>
+
+        <div class="tarjeta" *ngIf="notificaciones().length">
+          <button type="button" class="notificacion" *ngFor="let n of notificaciones()"
+                  [class.no-leida]="!n.leida" (click)="irA(n)">
+            <span class="punto" *ngIf="!n.leida" aria-hidden="true"></span>
+            <span class="crecer" style="min-width:0">
+              <span class="texto-notificacion">{{ n.texto }}</span>
+              <span class="pequeno apagado bloque">{{ n.createdAt | fecha }}</span>
+            </span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+</div>

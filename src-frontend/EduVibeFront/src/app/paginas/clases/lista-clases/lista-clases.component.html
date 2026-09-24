@@ -70,8 +70,8 @@
     </div>
 
     <div class="campo mt-2 mb-0">
-      <label class="etiqueta" for="portada">Portada</label>
-      <input id="portada" class="entrada" formControlName="imageUrl" placeholder="https://… (opcional)">
+      <label class="etiqueta">Portada</label>
+      <app-subida-archivo formControlName="imageUrl" tipo="imagen" placeholder="https://… o sube una foto"></app-subida-archivo>
       <span class="ayuda-campo">
         Si la dejas vacía se compone una portada con el color de la clase.
       </span>

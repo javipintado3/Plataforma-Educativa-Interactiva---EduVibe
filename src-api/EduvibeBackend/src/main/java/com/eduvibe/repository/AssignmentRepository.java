@@ -57,4 +57,23 @@ public interface AssignmentRepository extends JpaRepository<Assignment, UUID> {
     List<Assignment> findConEntregaDeOrganizacion(@Param("orgId") UUID orgId,
                                                   @Param("desde") Instant desde,
                                                   @Param("hasta") Instant hasta);
+
+    /**
+     * Tareas todavía por hacer, para el resumen de perfil del alumnado: sin
+     * vencer (o sin plazo) y sin una entrega que no sea un borrador. Un
+     * borrador no cuenta como hecho: todavía no se ha entregado nada.
+     */
+    @Query("""
+            SELECT COUNT(a) FROM Assignment a
+            WHERE (a.dueDate IS NULL OR a.dueDate > CURRENT_TIMESTAMP)
+              AND a.schoolClass.id IN (
+                  SELECT e.schoolClass.id FROM Enrollment e
+                  WHERE e.user.id = :studentId
+                    AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.STUDENT)
+              AND a.id NOT IN (
+                  SELECT s.assignment.id FROM Submission s
+                  WHERE s.student.id = :studentId
+                    AND s.status <> com.eduvibe.model.enums.SubmissionStatus.DRAFT)
+            """)
+    long countPendientesDeAlumno(@Param("studentId") UUID studentId);
 }

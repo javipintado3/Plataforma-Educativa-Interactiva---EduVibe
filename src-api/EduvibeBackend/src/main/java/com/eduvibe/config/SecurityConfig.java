@@ -94,6 +94,10 @@ public class SecurityConfig {
                     // Comprobación de estado, para el despliegue
                     .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
 
+                    // Archivos subidos (portadas, materiales, entregas): de lectura pública,
+                    // ver WebConfig. Subirlos (POST /api/uploads) sigue exigiendo sesión.
+                    .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+
                     // La gestión de usuarios es cosa de la administración
                     .requestMatchers("/api/users/**").hasRole("ADMIN")
 

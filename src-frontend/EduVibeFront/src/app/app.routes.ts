@@ -68,6 +68,12 @@ export const routes: Routes = [
           .then(m => m.CalendarioComponent),
       },
       {
+        path: 'perfil',
+        title: 'Mi perfil · Eduvibe',
+        loadComponent: () => import('./paginas/perfil/perfil.component')
+          .then(m => m.PerfilComponent),
+      },
+      {
         path: 'admin/usuarios',
         canActivate: [adminGuard],
         title: 'Usuarios · Eduvibe',

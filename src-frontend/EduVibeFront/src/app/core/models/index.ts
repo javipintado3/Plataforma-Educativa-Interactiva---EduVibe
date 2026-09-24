@@ -17,6 +17,7 @@ export interface Usuario {
   name: string;
   role: Rol;
   status: EstadoCuenta;
+  avatarUrl: string | null;
   organizationId: string;
   createdAt: string | null;
 }
@@ -184,6 +185,33 @@ export interface EntradaAgenda {
   className: string | null;
   classSubject: string | null;
   classColor: string | null;
+}
+
+export interface Notificacion {
+  id: string;
+  type: string;
+  texto: string;
+  payload: Record<string, unknown> | null;
+  leida: boolean;
+  createdAt: string;
+}
+
+/**
+ * Resumen de la pantalla de perfil.
+ *
+ * Un único tipo para los tres roles: cada uno rellena solo los campos que le
+ * corresponden, el resto llega a null. Así lo devuelve la API.
+ */
+export interface ResumenPerfil {
+  role: Rol;
+  numeroClases: number | null;
+  numeroAlumnos: number | null;
+  entregasPorCorregir: number | null;
+  notaMedia: number | null;
+  tareasPendientes: number | null;
+  notificacionesNoLeidas: number | null;
+  usuariosPorRol: Record<string, number> | null;
+  invitacionesPendientes: number | null;
 }
 
 /** Forma de los errores que devuelve la API. */
