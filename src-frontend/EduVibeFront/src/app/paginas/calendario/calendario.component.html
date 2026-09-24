@@ -6,11 +6,7 @@
       <p class="apagado mb-0">Eventos y fechas de entrega{{ auth.esAdmin() ? ' de todo el centro' : '' }}.</p>
     </div>
 
-    <button type="button" class="boton boton-primario" *ngIf="puedeCrear()" (click)="abrirDialogo()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      Nuevo evento
-    </button>
+    <button type="button" class="boton boton-contorno" (click)="hoy()">Hoy</button>
   </div>
 
   <div class="fila-entre mb-3">
@@ -33,18 +29,50 @@
 
   <ng-container *ngIf="!cargando()">
 
-    <div class="tarjeta" *ngIf="!entradas().length">
-      <app-estado-vacio titulo="Nada en la agenda este mes"
-        descripcion="Ni eventos ni fechas de entrega en este rango."></app-estado-vacio>
+    <!-- Cabecera de días de la semana -->
+    <div class="rejilla-cabecera">
+      <span *ngFor="let dia of diasSemana">{{ dia }}</span>
     </div>
 
-    <div class="tarjeta" *ngIf="entradas().length">
-      <article class="entrada-agenda" *ngFor="let entrada of entradas()">
+    <!-- Rejilla del mes -->
+    <div class="rejilla-mes mb-3">
+      <button type="button" class="celda" *ngFor="let celda of celdas()"
+              [class.fuera-de-mes]="!celda.enMes"
+              [class.es-hoy]="celda.hoy"
+              [class.seleccionada]="celda.clave === diaSeleccionado()"
+              (click)="seleccionar(celda)">
 
-        <div class="fecha-chip">
-          <span class="dia">{{ entrada.fecha | fecha:false }}</span>
-          <span class="hora">{{ horaDe(entrada.fecha) }}</span>
-        </div>
+        <span class="numero-dia">{{ celda.fecha.getDate() }}</span>
+
+        <span class="puntos" *ngIf="celda.entradas.length">
+          <span class="punto-entrada" *ngFor="let entrada of entradasVisiblesDe(celda)"
+                [style.background]="colorDe(entrada)" [title]="entrada.title">
+            <span class="punto-texto">{{ entrada.title }}</span>
+          </span>
+          <span class="punto-mas" *ngIf="masOcultosDe(celda) > 0">+{{ masOcultosDe(celda) }} más</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Detalle del día elegido -->
+    <div class="tarjeta">
+      <div class="fila-entre panel-dia">
+        <h3 class="mb-0">{{ tituloDia() }}</h3>
+
+        <button type="button" class="boton boton-primario boton-pequeno" *ngIf="puedeCrear()" (click)="abrirDialogo()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Nuevo evento
+        </button>
+      </div>
+
+      <app-estado-vacio *ngIf="!entradasDelDia().length"
+        titulo="Nada este día" descripcion="Ni eventos ni fechas de entrega."></app-estado-vacio>
+
+      <article class="entrada-agenda" *ngFor="let entrada of entradasDelDia()">
+        <span class="franja-color" [style.background]="colorDe(entrada)"></span>
+
+        <span class="hora-entrada">{{ horaDe(entrada.fecha) }}</span>
 
         <span class="crecer" style="min-width:0">
           <span class="titulo">{{ entrada.title }}</span>

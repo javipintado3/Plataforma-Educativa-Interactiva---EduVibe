@@ -1,32 +1,135 @@
+/* ---------------------------------------------------------------- rejilla */
+
+.rejilla-cabecera {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: .78rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--gris);
+}
+
+.rejilla-mes {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.celda {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-height: 92px;
+  padding: 6px 6px 8px;
+  background: var(--blanco);
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: border-color .12s ease, background .12s ease;
+}
+
+.celda:hover { border-color: var(--gris-claro); }
+
+.celda.fuera-de-mes { background: var(--fondo); color: var(--gris-claro); }
+.celda.fuera-de-mes .numero-dia { color: var(--gris-claro); }
+
+.celda.es-hoy .numero-dia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--verde-600);
+  color: #fff;
+}
+
+.celda.seleccionada {
+  border-color: var(--verde-600);
+  box-shadow: 0 0 0 1px var(--verde-600);
+}
+
+.numero-dia { font-size: .85rem; font-weight: 600; }
+
+.puntos {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+
+.punto-entrada {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.punto-entrada::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #fff;
+  opacity: .9;
+  flex-shrink: 0;
+}
+
+.punto-texto {
+  font-size: .72rem;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.punto-mas {
+  font-size: .72rem;
+  color: var(--tinta-70);
+  padding: 0 2px;
+}
+
+@media (max-width: 700px) {
+  .celda { min-height: 64px; }
+  .punto-texto { display: none; }
+  .punto-entrada { width: 6px; height: 6px; padding: 0; }
+  .punto-entrada::before { margin: 0 auto; }
+}
+
+/* ------------------------------------------------------------- panel del día */
+
+.panel-dia { padding: 18px 18px 12px; }
+
 .entrada-agenda {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
   padding: 13px 18px;
-  border-bottom: 1px solid var(--borde-sutil);
+  border-top: 1px solid var(--borde-sutil);
 }
 
-.entrada-agenda:last-child { border-bottom: none; }
-
-.fecha-chip {
+.franja-color {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 999px;
   flex-shrink: 0;
-  width: 64px;
-  text-align: center;
-  border-radius: var(--radio);
-  background: var(--fondo);
-  padding: 6px 4px;
 }
 
-.fecha-chip .dia {
-  display: block;
-  font-weight: 600;
+.hora-entrada {
+  flex-shrink: 0;
+  width: 44px;
   font-size: .82rem;
-  text-transform: capitalize;
-}
-
-.fecha-chip .hora {
-  display: block;
-  font-size: .74rem;
+  font-weight: 600;
   color: var(--tinta-70);
 }
 
@@ -48,5 +151,5 @@
 
 @media (max-width: 560px) {
   .dos-columnas { grid-template-columns: 1fr; }
-  .entrada-agenda { flex-wrap: wrap; }
+  .panel-dia { flex-wrap: wrap; gap: 10px; }
 }
