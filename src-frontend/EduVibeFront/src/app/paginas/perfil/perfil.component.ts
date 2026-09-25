@@ -1,20 +1,19 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe, NgFor, NgIf } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, switchMap } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { ClasesService } from '../../core/services/clases.service';
 import { NotificacionesService } from '../../core/services/notificaciones.service';
 import { PerfilService } from '../../core/services/perfil.service';
+import { SubidasService } from '../../core/services/subidas.service';
 import { Clase, Notificacion, ResumenPerfil } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { AvisoComponent } from '../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../shared/cargando/cargando.component';
 import { EstadoVacioComponent } from '../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
-import { SubidaArchivoComponent } from '../../shared/subida-archivo/subida-archivo.component';
 import { TarjetaClaseComponent } from '../../shared/tarjeta-clase/tarjeta-clase.component';
 import { FechaPipe } from '../../shared/pipes/fecha.pipe';
 
@@ -48,9 +47,9 @@ const ETIQUETAS_ROL: Record<string, string> = {
   selector: 'app-perfil',
   standalone: true,
   imports: [
-    NgIf, NgFor, FormsModule, RouterLink, DecimalPipe,
+    NgIf, NgFor, RouterLink, DecimalPipe,
     AvatarComponent, AvisoComponent, CargandoComponent, EstadoVacioComponent,
-    PastillaEstadoComponent, SubidaArchivoComponent, TarjetaClaseComponent, FechaPipe,
+    PastillaEstadoComponent, TarjetaClaseComponent, FechaPipe,
   ],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css',
@@ -59,6 +58,7 @@ export class PerfilComponent implements OnInit {
 
   private readonly clasesService = inject(ClasesService);
   private readonly perfilService = inject(PerfilService);
+  private readonly subidasService = inject(SubidasService);
   private readonly notificacionesService = inject(NotificacionesService);
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
@@ -108,14 +108,25 @@ export class PerfilComponent implements OnInit {
     return ETIQUETAS_ROL[rol] ?? rol;
   }
 
-  /** Se sube al elegir el archivo (lo hace app-subida-archivo); aquí solo queda guardarla en el perfil. */
-  cambiarAvatar(url: string): void {
-    if (this.guardandoAvatar()) {
+  /**
+   * Cambia la foto pinchando directamente en el círculo del avatar, sin pasar
+   * por una zona de subida aparte: se elige el archivo, se sube, y en cuanto
+   * hay URL se guarda en el perfil, igual que el acceso rápido de la portada
+   * de una clase.
+   */
+  cambiarFotoDirecta(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    if (!archivo || this.guardandoAvatar()) {
       return;
     }
-    this.guardandoAvatar.set(true);
 
-    this.perfilService.actualizarAvatar(url).subscribe({
+    this.guardandoAvatar.set(true);
+    this.error.set(null);
+
+    this.subidasService.subir(archivo, 'imagen').pipe(
+      switchMap(url => this.perfilService.actualizarAvatar(url)),
+    ).subscribe({
       next: () => {
         this.guardandoAvatar.set(false);
         this.auth.refrescarUsuario().subscribe();
@@ -125,6 +136,7 @@ export class PerfilComponent implements OnInit {
         this.error.set(AvisoComponent.mensajeDe(err, 'No se ha podido actualizar la foto'));
       },
     });
+    input.value = '';
   }
 
   marcarLeida(notificacion: Notificacion): void {

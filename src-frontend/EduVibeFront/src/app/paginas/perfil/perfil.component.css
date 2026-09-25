@@ -6,11 +6,41 @@
   flex-wrap: wrap;
 }
 
-.cambiar-foto { width: 100%; max-width: 260px; }
-
-@media (min-width: 640px) {
-  .cambiar-foto { width: auto; margin-left: auto; }
+.avatar-editable {
+  position: relative;
+  display: inline-block;
+  border-radius: 999px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
+
+.avatar-editable.subiendo { opacity: .6; pointer-events: none; }
+
+.avatar-editable .entrada-oculta {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.boton-camara {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--verde-600);
+  color: #fff;
+  border: 2px solid var(--blanco);
+  transition: background .12s ease;
+}
+
+.avatar-editable:hover .boton-camara { background: var(--verde-700); }
 
 .acciones-rapidas {
   display: flex;

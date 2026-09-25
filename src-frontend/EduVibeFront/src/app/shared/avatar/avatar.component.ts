@@ -15,9 +15,10 @@ import { RutaArchivoPipe } from '../pipes/ruta-archivo.pipe';
   standalone: true,
   imports: [NgIf, RutaArchivoPipe],
   template: `
-    <img *ngIf="avatarUrl" class="foto-avatar" [class.foto-avatar-sm]="pequeno"
+    <img *ngIf="avatarUrl" class="foto-avatar" [class.foto-avatar-sm]="pequeno" [class.foto-avatar-lg]="grande"
          [src]="avatarUrl | rutaArchivo" [alt]="nombre">
-    <span *ngIf="!avatarUrl" class="iniciales" [class.iniciales-sm]="pequeno" [title]="nombre">{{ iniciales() }}</span>
+    <span *ngIf="!avatarUrl" class="iniciales" [class.iniciales-sm]="pequeno" [class.iniciales-lg]="grande"
+          [title]="nombre">{{ iniciales() }}</span>
   `,
   styles: [`
     .foto-avatar {
@@ -29,6 +30,8 @@ import { RutaArchivoPipe } from '../pipes/ruta-archivo.pipe';
       flex-shrink: 0;
     }
     .foto-avatar-sm { width: 30px; height: 30px; }
+    .foto-avatar-lg { width: 84px; height: 84px; }
+    .iniciales-lg { width: 84px; height: 84px; font-size: 1.6rem; }
   `],
 })
 export class AvatarComponent {
@@ -44,6 +47,7 @@ export class AvatarComponent {
   }
 
   @Input() pequeno = false;
+  @Input() grande = false;
   @Input() avatarUrl: string | null = null;
 
   readonly iniciales = computed(() =>
