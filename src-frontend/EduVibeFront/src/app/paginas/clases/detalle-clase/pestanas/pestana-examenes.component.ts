@@ -4,7 +4,7 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 
 import { ClasesService } from '../../../../core/services/clases.service';
-import { Examen, Tema } from '../../../../core/models';
+import { Examen, PreguntaBanco, Tema } from '../../../../core/models';
 import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
@@ -54,6 +54,11 @@ export class PestanaExamenesComponent implements OnInit {
   readonly dialogoAbierto = signal(false);
   readonly creando = signal(false);
   readonly errorFormulario = signal<string | null>(null);
+
+  // --- banco de preguntas ---
+  readonly banco = signal<PreguntaBanco[]>([]);
+  /** questionId -> puntos que tendrá en este examen. Solo están aquí las marcadas. */
+  readonly seleccionBanco = signal<Map<string, number>>(new Map());
 
   readonly formulario = this.fb.nonNullable.group({
     title: ['', [Validators.required]],
@@ -143,10 +148,13 @@ export class PestanaExamenesComponent implements OnInit {
     this.preguntas.push(this.nuevaPregunta());
   }
 
+  /**
+   * A diferencia de una pregunta de tarea (que siempre necesita al menos
+   * una), aquí sí se puede quitar la última: el examen puede armarse entero
+   * reutilizando preguntas del banco, sin escribir ninguna nueva.
+   */
   quitarPregunta(indice: number): void {
-    if (this.preguntas.length > 1) {
-      this.preguntas.removeAt(indice);
-    }
+    this.preguntas.removeAt(indice);
   }
 
   anadirOpcion(indicePregunta: number): void {
@@ -177,8 +185,37 @@ export class PestanaExamenesComponent implements OnInit {
       this.preguntas.removeAt(0);
     }
     this.preguntas.push(this.nuevaPregunta());
+    this.seleccionBanco.set(new Map());
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
+
+    this.clasesService.bancoDePreguntas(this.claseId).subscribe({
+      next: (banco) => this.banco.set(banco),
+      error: () => this.banco.set([]), // sin banco previo no es un error que deba bloquear el alta
+    });
+  }
+
+  /** Si la pregunta ya está elegida del banco, o no. */
+  estaEnBanco(preguntaId: string): boolean {
+    return this.seleccionBanco().has(preguntaId);
+  }
+
+  alternarDelBanco(pregunta: PreguntaBanco, marcado: boolean): void {
+    this.seleccionBanco.update(mapa => {
+      const nuevo = new Map(mapa);
+      if (marcado) {
+        nuevo.set(pregunta.id, pregunta.points);
+      } else {
+        nuevo.delete(pregunta.id);
+      }
+      return nuevo;
+    });
+  }
+
+  actualizarPuntosDelBanco(preguntaId: string, points: number): void {
+    if (this.seleccionBanco().has(preguntaId)) {
+      this.seleccionBanco.update(mapa => new Map(mapa).set(preguntaId, points));
+    }
   }
 
   /** Cada pregunta necesita texto, al menos dos opciones con texto, y exactamente una correcta. */
@@ -208,6 +245,14 @@ export class PestanaExamenesComponent implements OnInit {
       return;
     }
 
+    const reuseQuestions = Array.from(this.seleccionBanco().entries())
+      .map(([questionId, points]) => ({ questionId, points }));
+
+    if (this.preguntas.length === 0 && reuseQuestions.length === 0) {
+      this.errorFormulario.set('El examen necesita al menos una pregunta, nueva o del banco');
+      return;
+    }
+
     const errorPreguntas = this.validarPreguntas();
     if (errorPreguntas) {
       this.errorFormulario.set(errorPreguntas);
@@ -232,6 +277,7 @@ export class PestanaExamenesComponent implements OnInit {
         points: p.points,
         options: p.options.filter(o => o.text.trim()).map(o => ({ text: o.text, correct: o.correct })),
       })),
+      reuseQuestions,
     }).subscribe({
       next: () => {
         this.creando.set(false);

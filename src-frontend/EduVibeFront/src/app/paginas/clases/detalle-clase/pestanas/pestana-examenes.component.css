@@ -98,6 +98,19 @@
 
 .boton-quitar:hover { color: var(--rojo); background: var(--borde-sutil); }
 
+/* ---------------------------------------------------- banco de preguntas */
+
+.pregunta-banco {
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio-sm);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.pregunta-banco label { cursor: pointer; }
+
+.texto-pregunta-banco { display: block; font-size: .9rem; font-weight: 550; }
+
 @media (max-width: 560px) {
   .dos-columnas { grid-template-columns: 1fr; }
   .meta { white-space: normal; }

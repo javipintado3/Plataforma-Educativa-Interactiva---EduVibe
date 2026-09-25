@@ -268,6 +268,15 @@ export interface PreguntaExamen {
   options: OpcionExamen[];
 }
 
+/** Una pregunta ya usada en algún examen de la clase, para reutilizarla en uno nuevo. */
+export interface PreguntaBanco {
+  id: string;
+  text: string;
+  points: number;
+  examTitle: string;
+  options: OpcionExamen[];
+}
+
 /** Una opción tal y como la ve el alumnado mientras hace el examen: sin marcar cuál es correcta. */
 export interface OpcionIntentoExamen {
   id: string;

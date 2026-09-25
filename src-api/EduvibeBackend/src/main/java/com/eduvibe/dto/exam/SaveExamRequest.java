@@ -16,6 +16,11 @@ import jakarta.validation.constraints.Size;
  * Un examen completo, con sus preguntas y opciones, tal y como se crea o se
  * edita de una sola vez: no tiene sentido dar de alta un examen sin
  * preguntas y añadírselas después una a una.
+ *
+ * Las preguntas pueden venir de dos sitios —nuevas ({@code questions}) o
+ * reutilizadas del banco de la clase ({@code reuseQuestions})—, y hace falta
+ * al menos una entre las dos; por eso ninguna de las dos lleva
+ * {@code @NotEmpty} y la comprobación vive en {@link com.eduvibe.service.ExamService}.
  */
 public record SaveExamRequest(
 
@@ -35,9 +40,21 @@ public record SaveExamRequest(
 
         UUID topicId,
 
-        @NotEmpty(message = "El examen necesita al menos una pregunta")
         @Valid
-        List<QuestionInput> questions) {
+        List<QuestionInput> questions,
+
+        @Valid
+        List<ReuseQuestionInput> reuseQuestions) {
+
+    /** Sin preguntas nuevas, cuando el examen se arma solo con el banco. */
+    public List<QuestionInput> questionsOSinNinguna() {
+        return questions == null ? List.of() : questions;
+    }
+
+    /** Sin reutilizar nada, cuando todas las preguntas son nuevas. */
+    public List<ReuseQuestionInput> reuseQuestionsOSinNinguna() {
+        return reuseQuestions == null ? List.of() : reuseQuestions;
+    }
 
     public record QuestionInput(
 
@@ -65,5 +82,19 @@ public record SaveExamRequest(
             String text,
 
             boolean correct) {
+    }
+
+    /** Una pregunta ya existente del banco de la clase, con sus propios puntos para este examen. */
+    public record ReuseQuestionInput(
+
+            @NotNull(message = "Falta el identificador de la pregunta")
+            UUID questionId,
+
+            @Positive(message = "Los puntos deben ser mayores que cero")
+            Integer points) {
+
+        public int puntosODelOriginal(int puntosOriginales) {
+            return points == null ? puntosOriginales : points;
+        }
     }
 }

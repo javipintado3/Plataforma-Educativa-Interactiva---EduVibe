@@ -104,21 +104,46 @@
       </select>
     </div>
 
+    <ng-container *ngIf="banco().length">
+      <hr class="separador">
+
+      <label class="etiqueta">Reutilizar del banco de preguntas</label>
+      <p class="pequeno apagado mb-2">Preguntas ya usadas en otros exámenes de esta clase. Se copian, así que retocarlas aquí no afecta al examen original.</p>
+
+      <div class="pregunta-banco" *ngFor="let pregunta of banco()">
+        <label class="fila espaciado-sm">
+          <input type="checkbox" [checked]="estaEnBanco(pregunta.id)"
+                 (change)="alternarDelBanco(pregunta, $any($event.target).checked)">
+          <span class="crecer" style="min-width:0">
+            <span class="texto-pregunta-banco">{{ pregunta.text }}</span>
+            <span class="pequeno apagado bloque">De "{{ pregunta.examTitle }}" · {{ pregunta.options.length }} opciones</span>
+          </span>
+          <input type="number" min="1" class="entrada entrada-corta" *ngIf="estaEnBanco(pregunta.id)"
+                 [value]="seleccionBanco().get(pregunta.id)"
+                 (input)="actualizarPuntosDelBanco(pregunta.id, +$any($event.target).value)">
+        </label>
+      </div>
+    </ng-container>
+
     <hr class="separador">
 
     <div class="fila-entre mb-2">
-      <label class="etiqueta mb-0">Preguntas</label>
+      <label class="etiqueta mb-0">Preguntas nuevas</label>
       <button type="button" class="boton boton-contorno boton-pequeno" (click)="anadirPregunta()">
         Añadir pregunta
       </button>
     </div>
+
+    <p class="pequeno apagado mb-2" *ngIf="!preguntas.length">
+      Este examen usará solo preguntas del banco, sin ninguna nueva.
+    </p>
 
     <div formArrayName="questions">
       <div class="pregunta" *ngFor="let pregunta of preguntas.controls; let i = index" [formGroupName]="i">
 
         <div class="fila-entre mb-2">
           <span class="numero-pregunta">Pregunta {{ i + 1 }}</span>
-          <button type="button" class="boton-quitar" *ngIf="preguntas.length > 1"
+          <button type="button" class="boton-quitar"
                   (click)="quitarPregunta(i)" aria-label="Quitar pregunta">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>

@@ -20,6 +20,7 @@ import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
 import com.eduvibe.dto.assignment.AssignmentResponse;
 import com.eduvibe.dto.assignment.SaveAssignmentRequest;
+import com.eduvibe.dto.exam.BankQuestionResponse;
 import com.eduvibe.dto.exam.ExamDetailResponse;
 import com.eduvibe.dto.exam.ExamResponse;
 import com.eduvibe.dto.exam.SaveExamRequest;
@@ -188,5 +189,11 @@ public class SchoolClassController {
                                                           @Valid @RequestBody SaveExamRequest peticion) {
         ExamDetailResponse creado = examService.crear(classId, peticion);
         return ResponseEntity.created(URI.create("/api/exams/" + creado.id())).body(creado);
+    }
+
+    /** Preguntas ya usadas en algún examen de la clase, para reutilizarlas en uno nuevo. Solo profesorado. */
+    @GetMapping("/{classId}/exams/question-bank")
+    public ResponseEntity<List<BankQuestionResponse>> bancoDePreguntas(@PathVariable UUID classId) {
+        return ResponseEntity.ok(examService.listarBanco(classId));
     }
 }

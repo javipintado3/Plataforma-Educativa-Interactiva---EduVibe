@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
-  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleTarea, Entrega, Examen, Material, Miembro, Tarea, Tema,
-  TipoMaterial,
+  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleTarea, Entrega, Examen, Material, Miembro, PreguntaBanco,
+  Tarea, Tema, TipoMaterial,
 } from '../models';
 
 /**
@@ -108,7 +108,13 @@ export class ClasesService {
     dueDate?: string | null;
     topicId?: string | null;
     questions: { text: string; points?: number; options: { text: string; correct: boolean }[] }[];
+    reuseQuestions: { questionId: string; points?: number }[];
   }): Observable<DetalleExamen> {
     return this.http.post<DetalleExamen>(`${this.api}/${claseId}/exams`, datos);
+  }
+
+  /** Preguntas ya usadas en algún examen de la clase, para reutilizarlas en uno nuevo. */
+  bancoDePreguntas(claseId: string): Observable<PreguntaBanco[]> {
+    return this.http.get<PreguntaBanco[]>(`${this.api}/${claseId}/exams/question-bank`);
   }
 }
