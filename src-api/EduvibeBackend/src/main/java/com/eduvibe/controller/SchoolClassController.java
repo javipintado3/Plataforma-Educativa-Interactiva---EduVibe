@@ -20,6 +20,9 @@ import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
 import com.eduvibe.dto.assignment.AssignmentResponse;
 import com.eduvibe.dto.assignment.SaveAssignmentRequest;
+import com.eduvibe.dto.exam.ExamDetailResponse;
+import com.eduvibe.dto.exam.ExamResponse;
+import com.eduvibe.dto.exam.SaveExamRequest;
 import com.eduvibe.dto.schoolclass.ClassDetailResponse;
 import com.eduvibe.dto.schoolclass.ClassResponse;
 import com.eduvibe.dto.schoolclass.CreateClassRequest;
@@ -32,6 +35,7 @@ import com.eduvibe.dto.schoolclass.TopicResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.service.AnnouncementService;
 import com.eduvibe.service.AssignmentService;
+import com.eduvibe.service.ExamService;
 import com.eduvibe.service.ResourceService;
 import com.eduvibe.service.SchoolClassService;
 import com.eduvibe.service.SubmissionService;
@@ -58,6 +62,7 @@ public class SchoolClassController {
     private final SubmissionService submissionService;
     private final AnnouncementService announcementService;
     private final ResourceService resourceService;
+    private final ExamService examService;
 
     // ---------------------------------------------------------------- clases
 
@@ -168,5 +173,20 @@ public class SchoolClassController {
                                                             @Valid @RequestBody SaveResourceRequest peticion) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resourceService.crear(classId, peticion));
+    }
+
+    // -------------------------------------------------------------- exámenes
+
+    /** Exámenes de la clase. Lo que se devuelve depende de quién pregunte. */
+    @GetMapping("/{classId}/exams")
+    public ResponseEntity<List<ExamResponse>> examenes(@PathVariable UUID classId) {
+        return ResponseEntity.ok(examService.listar(classId));
+    }
+
+    @PostMapping("/{classId}/exams")
+    public ResponseEntity<ExamDetailResponse> crearExamen(@PathVariable UUID classId,
+                                                          @Valid @RequestBody SaveExamRequest peticion) {
+        ExamDetailResponse creado = examService.crear(classId, peticion);
+        return ResponseEntity.created(URI.create("/api/exams/" + creado.id())).body(creado);
     }
 }

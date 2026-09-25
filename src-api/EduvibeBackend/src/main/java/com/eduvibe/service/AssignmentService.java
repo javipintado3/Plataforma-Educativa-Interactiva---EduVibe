@@ -18,13 +18,11 @@ import com.eduvibe.model.Enrollment;
 import com.eduvibe.model.Notification;
 import com.eduvibe.model.SchoolClass;
 import com.eduvibe.model.Submission;
-import com.eduvibe.model.Topic;
 import com.eduvibe.model.User;
 import com.eduvibe.model.enums.EnrollmentRole;
 import com.eduvibe.repository.AssignmentRepository;
 import com.eduvibe.repository.EnrollmentRepository;
 import com.eduvibe.repository.SubmissionRepository;
-import com.eduvibe.repository.TopicRepository;
 import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
 
@@ -43,13 +41,13 @@ public class AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final SubmissionRepository submissionRepository;
-    private final TopicRepository topicRepository;
     private final UserRepository userRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final ClassAccessService acceso;
     private final AuthService authService;
     private final SubmissionService submissionService;
     private final NotificationService notificationService;
+    private final TopicService topicService;
 
     @Transactional
     public AssignmentDetailResponse crear(UUID classId, SaveAssignmentRequest peticion) {
@@ -61,7 +59,7 @@ public class AssignmentService {
 
         Assignment tarea = new Assignment(clase, peticion.title().trim(), peticion.description(),
                 peticion.dueDate(), peticion.puntosOPorDefecto(), autor);
-        tarea.setTopic(temaDeLaClase(peticion.topicId(), classId));
+        tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
 
         assignmentRepository.saveAndFlush(tarea);
         notificarAlumnado(classId, clase, tarea);
@@ -144,7 +142,7 @@ public class AssignmentService {
         tarea.setDescription(peticion.description());
         tarea.setDueDate(peticion.dueDate());
         tarea.setPoints(peticion.puntosOPorDefecto());
-        tarea.setTopic(temaDeLaClase(peticion.topicId(), classId));
+        tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
 
         assignmentRepository.save(tarea);
 
@@ -180,19 +178,5 @@ public class AssignmentService {
 
         acceso.exigirVisible(tarea.getSchoolClass().getId());
         return tarea;
-    }
-
-    /**
-     * Comprueba que el tema indicado pertenece a esta clase.
-     *
-     * Sin esta comprobación se podría colgar una tarea de un tema de otra clase
-     * sin más que conocer su identificador.
-     */
-    private Topic temaDeLaClase(UUID topicId, UUID classId) {
-        if (topicId == null) {
-            return null;
-        }
-        return topicRepository.findByIdAndSchoolClassId(topicId, classId)
-                .orElseThrow(() -> new BadRequestException("El tema indicado no es de esta clase"));
     }
 }

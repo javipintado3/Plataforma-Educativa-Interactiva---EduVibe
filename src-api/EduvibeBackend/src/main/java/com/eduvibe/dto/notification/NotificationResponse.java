@@ -41,6 +41,7 @@ public record NotificationResponse(
             case Notification.TAREA_NUEVA -> "Nueva tarea en " + clase + ": " + titulo;
             case Notification.NOTA_PUBLICADA -> "Ya tienes nota en " + titulo + " (" + clase + ")";
             case Notification.AVISO_NUEVO -> "Nuevo aviso en " + clase;
+            case Notification.EXAMEN_NUEVO -> "Nuevo examen en " + clase + ": " + titulo;
             default -> "Tienes una novedad";
         };
     }
