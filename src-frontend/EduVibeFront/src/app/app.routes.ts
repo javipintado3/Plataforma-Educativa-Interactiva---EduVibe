@@ -62,6 +62,18 @@ export const routes: Routes = [
           .then(m => m.DetalleTareaComponent),
       },
       {
+        path: 'examenes/:id',
+        title: 'Examen · Eduvibe',
+        loadComponent: () => import('./paginas/examenes/detalle-examen/detalle-examen.component')
+          .then(m => m.DetalleExamenComponent),
+      },
+      {
+        path: 'examenes/:id/hacer',
+        title: 'Haciendo el examen · Eduvibe',
+        loadComponent: () => import('./paginas/examenes/hacer-examen/hacer-examen.component')
+          .then(m => m.HacerExamenComponent),
+      },
+      {
         path: 'calendario',
         title: 'Calendario · Eduvibe',
         loadComponent: () => import('./paginas/calendario/calendario.component')

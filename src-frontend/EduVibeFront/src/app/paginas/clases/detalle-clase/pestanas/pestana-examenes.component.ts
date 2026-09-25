@@ -1,0 +1,247 @@
+import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { NgClass, NgFor, NgIf } from '@angular/common';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+import { ClasesService } from '../../../../core/services/clases.service';
+import { Examen, Tema } from '../../../../core/models';
+import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
+import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
+import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
+import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
+import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
+import { FechaPipe, PlazoPipe } from '../../../../shared/pipes/fecha.pipe';
+
+/** Un examen ya emparejado con el tema al que pertenece. */
+interface Bloque {
+  tema: Tema | null;
+  examenes: Examen[];
+}
+
+/**
+ * Pestaña "Exámenes": los exámenes tipo test de la clase, agrupados por tema.
+ *
+ * El alta es la parte más grande: un examen se crea completo con sus
+ * preguntas y opciones de una sola vez, así que el formulario es un FormArray
+ * de preguntas, cada una con su propio FormArray de opciones. La validación
+ * de que cada pregunta tenga exactamente una opción correcta se comprueba
+ * aquí para el mensaje inmediato, aunque el backend la exige igual.
+ */
+@Component({
+  selector: 'app-pestana-examenes',
+  standalone: true,
+  imports: [
+    NgIf, NgFor, NgClass, RouterLink, ReactiveFormsModule,
+    CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent,
+    DialogoComponent, AvisoComponent, FechaPipe, PlazoPipe,
+  ],
+  templateUrl: './pestana-examenes.component.html',
+  styleUrl: './pestana-examenes.component.css',
+})
+export class PestanaExamenesComponent implements OnInit {
+
+  private readonly clasesService = inject(ClasesService);
+  private readonly fb = inject(FormBuilder);
+
+  @Input({ required: true }) claseId!: string;
+  @Input() puedoEditar = false;
+  @Input() temas: Tema[] = [];
+
+  readonly bloques = signal<Bloque[]>([]);
+  readonly cargando = signal(true);
+  readonly error = signal<string | null>(null);
+
+  readonly dialogoAbierto = signal(false);
+  readonly creando = signal(false);
+  readonly errorFormulario = signal<string | null>(null);
+
+  readonly formulario = this.fb.nonNullable.group({
+    title: ['', [Validators.required]],
+    description: [''],
+    durationMinutes: [30, [Validators.required, Validators.min(1), Validators.max(480)]],
+    dueDate: [''],
+    topicId: [''],
+    questions: this.fb.array([this.nuevaPregunta()]),
+  });
+
+  get preguntas(): FormArray {
+    return this.formulario.controls.questions;
+  }
+
+  opcionesDe(indicePregunta: number): FormArray {
+    return this.preguntas.at(indicePregunta).get('options') as FormArray;
+  }
+
+  ngOnInit(): void {
+    this.cargar();
+  }
+
+  cargar(): void {
+    this.cargando.set(true);
+    this.error.set(null);
+
+    this.clasesService.examenes(this.claseId).subscribe({
+      next: (examenes) => {
+        this.bloques.set(this.agrupar(examenes));
+        this.cargando.set(false);
+      },
+      error: (err) => {
+        this.error.set(AvisoComponent.mensajeDe(err, 'No se han podido cargar los exámenes'));
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  /** Igual que en la pestaña de trabajo: por tema, y lo suelto al final. */
+  private agrupar(examenes: Examen[]): Bloque[] {
+    const porTema = new Map<string, Examen[]>();
+    const sueltos: Examen[] = [];
+
+    for (const examen of examenes) {
+      if (!examen.topicId) {
+        sueltos.push(examen);
+        continue;
+      }
+      const lista = porTema.get(examen.topicId) ?? [];
+      lista.push(examen);
+      porTema.set(examen.topicId, lista);
+    }
+
+    const bloques: Bloque[] = this.temas
+      .filter(tema => porTema.has(tema.id))
+      .map(tema => ({ tema, examenes: porTema.get(tema.id)! }));
+
+    if (sueltos.length) {
+      bloques.push({ tema: null, examenes: sueltos });
+    }
+    return bloques;
+  }
+
+  /** Estado que se muestra al alumnado: sin intento todavía cuenta como "no_empezado". */
+  estadoDe(examen: Examen): 'no_empezado' | 'en_curso' | 'entregado' {
+    return examen.miEstado ?? 'no_empezado';
+  }
+
+  // ------------------------------------------------------------------ alta
+
+  private nuevaPregunta() {
+    return this.fb.nonNullable.group({
+      text: ['', [Validators.required]],
+      points: [1, [Validators.required, Validators.min(1)]],
+      options: this.fb.array([this.nuevaOpcion(), this.nuevaOpcion()]),
+    });
+  }
+
+  private nuevaOpcion() {
+    return this.fb.nonNullable.group({
+      text: ['', [Validators.required]],
+      correct: [false],
+    });
+  }
+
+  anadirPregunta(): void {
+    this.preguntas.push(this.nuevaPregunta());
+  }
+
+  quitarPregunta(indice: number): void {
+    if (this.preguntas.length > 1) {
+      this.preguntas.removeAt(indice);
+    }
+  }
+
+  anadirOpcion(indicePregunta: number): void {
+    this.opcionesDe(indicePregunta).push(this.nuevaOpcion());
+  }
+
+  quitarOpcion(indicePregunta: number, indiceOpcion: number): void {
+    const opciones = this.opcionesDe(indicePregunta);
+    if (opciones.length > 2) {
+      opciones.removeAt(indiceOpcion);
+    }
+  }
+
+  /**
+   * Deja marcada como correcta solo la opción elegida dentro de su pregunta:
+   * son radios, no checkboxes, así que no puede haber dos correctas a la vez.
+   */
+  marcarCorrecta(indicePregunta: number, indiceOpcion: number): void {
+    const opciones = this.opcionesDe(indicePregunta);
+    opciones.controls.forEach((opcion, i) => opcion.get('correct')!.setValue(i === indiceOpcion));
+  }
+
+  abrirDialogo(): void {
+    this.formulario.reset({
+      title: '', description: '', durationMinutes: 30, dueDate: '', topicId: '',
+    });
+    while (this.preguntas.length) {
+      this.preguntas.removeAt(0);
+    }
+    this.preguntas.push(this.nuevaPregunta());
+    this.errorFormulario.set(null);
+    this.dialogoAbierto.set(true);
+  }
+
+  /** Cada pregunta necesita texto, al menos dos opciones con texto, y exactamente una correcta. */
+  private validarPreguntas(): string | null {
+    const valores = this.preguntas.getRawValue() as {
+      text: string; options: { text: string; correct: boolean }[];
+    }[];
+
+    for (let i = 0; i < valores.length; i++) {
+      const pregunta = valores[i];
+      const conTexto = pregunta.options.filter(o => o.text.trim());
+      if (conTexto.length < 2) {
+        return `La pregunta ${i + 1} necesita al menos dos opciones con texto`;
+      }
+      const correctas = pregunta.options.filter(o => o.correct).length;
+      if (correctas !== 1) {
+        return `La pregunta ${i + 1} necesita exactamente una opción correcta`;
+      }
+    }
+    return null;
+  }
+
+  crear(): void {
+    this.formulario.markAllAsTouched();
+
+    if (this.formulario.invalid || this.creando()) {
+      return;
+    }
+
+    const errorPreguntas = this.validarPreguntas();
+    if (errorPreguntas) {
+      this.errorFormulario.set(errorPreguntas);
+      return;
+    }
+
+    this.creando.set(true);
+    this.errorFormulario.set(null);
+
+    const { title, description, durationMinutes, dueDate, topicId, questions } = this.formulario.getRawValue();
+
+    this.clasesService.crearExamen(this.claseId, {
+      title,
+      description: description || undefined,
+      durationMinutes,
+      // El input datetime-local da "2026-10-02T18:30"; la API espera un
+      // instante en UTC, y eso es justo lo que hace toISOString()
+      dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      topicId: topicId || null,
+      questions: questions.map(p => ({
+        text: p.text,
+        points: p.points,
+        options: p.options.filter(o => o.text.trim()).map(o => ({ text: o.text, correct: o.correct })),
+      })),
+    }).subscribe({
+      next: () => {
+        this.creando.set(false);
+        this.dialogoAbierto.set(false);
+        this.cargar();
+      },
+      error: (err) => {
+        this.creando.set(false);
+        this.errorFormulario.set(AvisoComponent.mensajeDe(err));
+      },
+    });
+  }
+}

@@ -15,12 +15,13 @@ import { PALETA_CLASE } from '../../../shared/paleta-clase';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { PestanaAvisosComponent } from './pestanas/pestana-avisos.component';
 import { PestanaCalificacionesComponent } from './pestanas/pestana-calificaciones.component';
+import { PestanaExamenesComponent } from './pestanas/pestana-examenes.component';
 import { PestanaMaterialesComponent } from './pestanas/pestana-materiales.component';
 import { PestanaPersonasComponent } from './pestanas/pestana-personas.component';
 import { PestanaTrabajoComponent } from './pestanas/pestana-trabajo.component';
 import { PortadaClaseComponent } from '../../../shared/portada-clase/portada-clase.component';
 
-type Pestana = 'avisos' | 'trabajo' | 'materiales' | 'personas' | 'calificaciones';
+type Pestana = 'avisos' | 'trabajo' | 'examenes' | 'materiales' | 'personas' | 'calificaciones';
 
 /**
  * Pantalla de una clase.
@@ -36,7 +37,7 @@ type Pestana = 'avisos' | 'trabajo' | 'materiales' | 'personas' | 'calificacione
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, AvisoComponent, DialogoComponent, PortadaClaseComponent, SubidaArchivoComponent,
-    PestanaAvisosComponent, PestanaTrabajoComponent, PestanaMaterialesComponent,
+    PestanaAvisosComponent, PestanaTrabajoComponent, PestanaExamenesComponent, PestanaMaterialesComponent,
     PestanaPersonasComponent, PestanaCalificacionesComponent,
   ],
   templateUrl: './detalle-clase.component.html',

@@ -1,8 +1,9 @@
 import { Component, Input, computed, signal } from '@angular/core';
 
-import { EstadoCuenta, EstadoEntrega, Rol, TipoEventoAgenda, TipoMaterial } from '../../core/models';
+import { EstadoCuenta, EstadoEntrega, EstadoIntentoExamen, Rol, TipoEventoAgenda, TipoMaterial } from '../../core/models';
 
-type Clave = EstadoCuenta | EstadoEntrega | Rol | 'sin-empezar' | 'tarde' | TipoMaterial | TipoEventoAgenda | 'assignment_due';
+type Clave = EstadoCuenta | EstadoEntrega | EstadoIntentoExamen | Rol | 'sin-empezar' | 'tarde' | TipoMaterial
+  | TipoEventoAgenda | 'assignment_due';
 
 interface Aspecto {
   texto: string;
@@ -42,6 +43,11 @@ export class PastillaEstadoComponent {
     graded:       { texto: 'Calificada',  clase: 'pastilla-verde' },
     'sin-empezar':{ texto: 'Sin empezar', clase: 'pastilla-gris' },
     tarde:        { texto: 'Fuera de plazo', clase: 'pastilla-roja' },
+
+    // Intentos de examen
+    no_empezado: { texto: 'Sin empezar', clase: 'pastilla-gris' },
+    en_curso:    { texto: 'En curso',    clase: 'pastilla-ambar' },
+    entregado:   { texto: 'Entregado',   clase: 'pastilla-verde' },
 
     // Materiales
     pdf:   { texto: 'PDF',    clase: 'pastilla-roja' },

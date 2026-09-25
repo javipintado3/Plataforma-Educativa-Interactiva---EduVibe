@@ -1,0 +1,45 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<div class="contenedor" *ngIf="!cargando() && !intento()">
+  <app-aviso tipo="error" [mensaje]="error()"></app-aviso>
+  <a [routerLink]="['/examenes', id]" class="boton boton-contorno mt-2">Volver al examen</a>
+</div>
+
+<div class="contenedor-estrecho" *ngIf="intento() as i">
+
+  <!-- Cabecera fija con el cronómetro -->
+  <div class="barra-tiempo" [class.critica]="pocoTiempo()">
+    <span class="titulo-examen">{{ i.examTitle }}</span>
+    <span class="cronometro">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+      </svg>
+      {{ tiempoFormateado() }}
+    </span>
+  </div>
+
+  <app-aviso class="mb-2 mt-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <div class="tarjeta pregunta-examen" *ngFor="let p of i.questions; let idx = index">
+    <p class="texto-pregunta">{{ idx + 1 }}. {{ p.text }} <span class="apagado">({{ p.points }} pts)</span></p>
+
+    <label class="opcion-examen" *ngFor="let o of p.options" [class.elegida]="p.miRespuesta === o.id">
+      <input type="radio" [name]="'pregunta-' + p.id" [checked]="p.miRespuesta === o.id"
+             [disabled]="entregando()" (change)="elegir(p.id, o.id)">
+      {{ o.text }}
+    </label>
+  </div>
+
+  <div class="tarjeta">
+    <div class="tarjeta-cuerpo fila-entre">
+      <p class="pequeno apagado mb-0">
+        {{ sinResponder ? sinResponder + ' pregunta(s) sin responder' : 'Todo respondido' }}
+      </p>
+      <button type="button" class="boton boton-primario" [disabled]="entregando()"
+              (click)="entregarConConfirmacion()">
+        {{ entregando() ? 'Entregando…' : 'Entregar examen' }}
+      </button>
+    </div>
+  </div>
+</div>

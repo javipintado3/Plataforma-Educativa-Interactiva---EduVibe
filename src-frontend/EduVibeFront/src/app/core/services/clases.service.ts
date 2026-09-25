@@ -3,7 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Anuncio, Clase, DetalleClase, DetalleTarea, Entrega, Material, Miembro, Tarea, Tema, TipoMaterial } from '../models';
+import {
+  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleTarea, Entrega, Examen, Material, Miembro, Tarea, Tema,
+  TipoMaterial,
+} from '../models';
 
 /**
  * Clases y todo lo que cuelga de una.
@@ -92,5 +95,20 @@ export class ClasesService {
     title: string; fileUrl?: string; type?: TipoMaterial | ''; topicId?: string | null;
   }): Observable<Material> {
     return this.http.post<Material>(`${this.api}/${claseId}/resources`, datos);
+  }
+
+  examenes(claseId: string): Observable<Examen[]> {
+    return this.http.get<Examen[]>(`${this.api}/${claseId}/exams`);
+  }
+
+  crearExamen(claseId: string, datos: {
+    title: string;
+    description?: string;
+    durationMinutes: number;
+    dueDate?: string | null;
+    topicId?: string | null;
+    questions: { text: string; points?: number; options: { text: string; correct: boolean }[] }[];
+  }): Observable<DetalleExamen> {
+    return this.http.post<DetalleExamen>(`${this.api}/${claseId}/exams`, datos);
   }
 }

@@ -1,0 +1,134 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<div class="contenedor" *ngIf="!cargando() && !examen()">
+  <app-aviso tipo="error" [mensaje]="error()"></app-aviso>
+  <a routerLink="/clases" class="boton boton-contorno mt-2">Volver a mis clases</a>
+</div>
+
+<div class="contenedor" *ngIf="examen() as e">
+
+  <a [routerLink]="['/clases', e.classId]" class="volver mb-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    {{ e.className }}{{ e.classSubject ? ' · ' + e.classSubject : '' }}
+  </a>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <div class="disposicion">
+
+    <!-- Enunciado -->
+    <article class="tarjeta">
+      <div class="tarjeta-cuerpo">
+        <div class="fila-entre envolver mb-2">
+          <h1 class="mb-0">{{ e.title }}</h1>
+          <span class="pastilla" [class.pastilla-ambar]="!e.haVencido" [class.pastilla-gris]="e.haVencido">
+            {{ e.dueDate ? (e.dueDate | plazo) : 'Sin fecha límite' }}
+          </span>
+        </div>
+
+        <p class="pequeno apagado mb-3">
+          {{ e.durationMinutes }} minutos · {{ e.numeroPreguntas }} pregunta(s) · {{ e.totalPuntos }} puntos
+          <span *ngIf="e.dueDate"> · Hasta el {{ e.dueDate | fecha }}</span>
+        </p>
+
+        <div class="enunciado" *ngIf="e.description">{{ e.description }}</div>
+        <p class="apagado" *ngIf="!e.description">Este examen no tiene descripción.</p>
+
+        <!-- Repaso de preguntas: solo profesorado -->
+        <ng-container *ngIf="e.puedoEditar">
+          <button type="button" class="boton boton-contorno boton-pequeno mt-3" (click)="verPreguntas()">
+            {{ mostrarPreguntas() ? 'Ocultar preguntas' : 'Ver preguntas y respuestas' }}
+          </button>
+
+          <div class="repaso mt-3" *ngIf="mostrarPreguntas()">
+            <div class="pregunta-repaso" *ngFor="let p of preguntas(); let i = index">
+              <p class="texto-pregunta">{{ i + 1 }}. {{ p.text }} <span class="apagado">({{ p.points }} pts)</span></p>
+              <ul class="lista-opciones">
+                <li *ngFor="let o of p.options" [class.correcta]="o.correct">
+                  {{ o.text }} <span class="marca-correcta" *ngIf="o.correct">✓ correcta</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </article>
+
+    <!-- Columna derecha -->
+    <aside>
+
+      <!-- ============ Alumnado ============ -->
+      <div class="tarjeta" *ngIf="!e.puedoEditar">
+        <div class="tarjeta-cabecera fila-entre">
+          <h3 class="mb-0">Tu examen</h3>
+          <app-pastilla-estado [valor]="e.miEstado || 'no_empezado'"></app-pastilla-estado>
+        </div>
+
+        <div class="tarjeta-cuerpo">
+
+          <div class="nota-caja mb-3" *ngIf="e.miEstado === 'entregado'">
+            <div class="fila-entre">
+              <span class="pequeno apagado">Tu nota</span>
+              <span class="nota">{{ e.miNota }} <span class="sobre">/ {{ e.totalPuntos }}</span></span>
+            </div>
+          </div>
+
+          <p class="pequeno apagado mb-3" *ngIf="e.miEstado !== 'entregado'">
+            Cuando lo empieces, el tiempo corre sin parar: {{ e.durationMinutes }} minutos desde ese momento.
+          </p>
+
+          <button type="button" class="boton boton-primario crecer" *ngIf="e.miEstado === 'no_empezado' && !e.haVencido"
+                  [disabled]="empezando()" (click)="empezar()">
+            {{ empezando() ? 'Empezando…' : 'Empezar examen' }}
+          </button>
+
+          <p class="pequeno apagado mb-0" *ngIf="e.miEstado === 'no_empezado' && e.haVencido">
+            Ya no se puede empezar: pasó la fecha límite.
+          </p>
+
+          <button type="button" class="boton boton-primario crecer" *ngIf="e.miEstado === 'en_curso'"
+                  [disabled]="empezando()" (click)="empezar()">
+            {{ empezando() ? 'Cargando…' : 'Continuar examen' }}
+          </button>
+
+          <p class="pequeno apagado mb-0" *ngIf="e.miEstado === 'entregado'">
+            Ya has entregado este examen. Aquí queda tu nota.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============ Profesorado ============ -->
+      <div class="tarjeta" *ngIf="e.puedoEditar">
+        <div class="tarjeta-cabecera fila-entre">
+          <h3 class="mb-0">Intentos</h3>
+          <span class="pastilla pastilla-gris">{{ intentos().length }}</span>
+        </div>
+
+        <app-estado-vacio *ngIf="!intentos().length"
+          titulo="Todavía no hay intentos"
+          descripcion="Aquí aparecerá el alumnado según vaya haciendo el examen."></app-estado-vacio>
+
+        <div class="intento" *ngFor="let intento of intentos()">
+          <app-avatar [nombre]="intento.studentName" [pequeno]="true"></app-avatar>
+
+          <span class="crecer" style="min-width:0;text-align:left">
+            <span class="alumno">{{ intento.studentName }}</span>
+            <span class="pequeno apagado bloque">
+              {{ intento.submittedAt ? ('Entregado ' + (intento.submittedAt | fecha)) : 'Sin entregar' }}
+            </span>
+          </span>
+
+          <span class="nota-lista" *ngIf="intento.entregado">{{ intento.score }}</span>
+          <app-pastilla-estado *ngIf="!intento.entregado" [valor]="'en_curso'"></app-pastilla-estado>
+        </div>
+
+        <div class="tarjeta-cuerpo">
+          <button type="button" class="boton boton-peligro crecer" [disabled]="borrando()" (click)="eliminar()">
+            {{ borrando() ? 'Borrando…' : 'Borrar examen' }}
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

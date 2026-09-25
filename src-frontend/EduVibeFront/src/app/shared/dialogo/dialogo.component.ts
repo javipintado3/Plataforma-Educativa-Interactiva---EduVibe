@@ -14,7 +14,8 @@ import { NgIf } from '@angular/common';
   imports: [NgIf],
   template: `
     <div class="velo" *ngIf="abierto" (click)="cerrarDesdeElVelo($event)">
-      <div class="dialogo" role="dialog" aria-modal="true" [attr.aria-label]="titulo">
+      <div class="dialogo" [class.dialogo-grande]="ancho === 'grande'"
+           role="dialog" aria-modal="true" [attr.aria-label]="titulo">
         <header class="cabecera">
           <h3>{{ titulo }}</h3>
           <button type="button" class="boton boton-fantasma" (click)="cerrar.emit()" aria-label="Cerrar">
@@ -59,6 +60,10 @@ import { NgIf } from '@angular/common';
       animation: subir .16s ease;
     }
 
+    /* Para formularios con más contenido (por ejemplo, un examen con sus
+       preguntas y opciones): el ancho fijo de 480px los deja apretados. */
+    .dialogo-grande { max-width: 760px; }
+
     .cabecera {
       display: flex;
       align-items: center;
@@ -93,6 +98,9 @@ export class DialogoComponent {
 
   /** Si pulsar fuera del recuadro cierra. Se desactiva en formularios largos. */
   @Input() cierraAlPulsarFuera = true;
+
+  /** 'grande' da más ancho para formularios con más contenido, como el de un examen. */
+  @Input() ancho: 'normal' | 'grande' = 'normal';
 
   @Output() cerrar = new EventEmitter<void>();
 
