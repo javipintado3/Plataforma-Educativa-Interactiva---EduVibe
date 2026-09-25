@@ -1,7 +1,11 @@
 package com.eduvibe.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,20 @@ public class AuthService {
      */
     private static final String CREDENCIALES_INVALIDAS = "Usuario y/o contraseña incorrectos";
 
+    /**
+     * Hash bcrypt válido de una contraseña que no existe.
+     *
+     * Se usa como sustituto cuando el email no está dado de alta, para que
+     * {@code passwordEncoder.matches(...)} se ejecute igual en ese caso que
+     * cuando sí hay usuario: es la operación lenta a propósito, y saltársela
+     * dejaría una petición con email inexistente respondiendo más rápido que
+     * una con email real y contraseña incorrecta. Esa diferencia de tiempo
+     * delataría qué direcciones están registradas, aunque el mensaje de error
+     * sea idéntico en los dos casos.
+     */
+    private static final String HASH_FICTICIO =
+            new BCryptPasswordEncoder().encode(UUID.randomUUID().toString());
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -39,19 +57,23 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest peticion) {
-        User usuario = userRepository.findByEmail(User.normalizarEmail(peticion.email()))
-                .orElseThrow(() -> new BadCredentialsException(CREDENCIALES_INVALIDAS));
+        Optional<User> usuario = userRepository.findByEmail(User.normalizarEmail(peticion.email()));
 
-        // Una cuenta pendiente de aceptar invitación, o desactivada, no entra
-        if (!usuario.puedeIniciarSesion()) {
+        String hash = usuario.map(User::getPasswordHash).orElse(HASH_FICTICIO);
+        boolean contrasenaCorrecta = passwordEncoder.matches(peticion.password(), hash);
+
+        // Email inexistente, cuenta pendiente o desactivada, y contraseña
+        // incorrecta se tratan igual a propósito: el mismo mensaje de error y,
+        // gracias a la comprobación de arriba, el mismo tiempo de respuesta.
+        boolean credencialesValidas = usuario.isPresent()
+                && usuario.get().puedeIniciarSesion()
+                && contrasenaCorrecta;
+
+        if (!credencialesValidas) {
             throw new BadCredentialsException(CREDENCIALES_INVALIDAS);
         }
 
-        if (!passwordEncoder.matches(peticion.password(), usuario.getPasswordHash())) {
-            throw new BadCredentialsException(CREDENCIALES_INVALIDAS);
-        }
-
-        return construirRespuesta(usuario);
+        return construirRespuesta(usuario.get());
     }
 
     /**
