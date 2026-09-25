@@ -68,3 +68,21 @@
   opacity: 0;
   overflow: hidden;
 }
+
+.lista-temas {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio-sm);
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.lista-temas li {
+  padding: 8px 12px;
+  font-size: .9rem;
+  border-bottom: 1px solid var(--borde-sutil);
+}
+
+.lista-temas li:last-child { border-bottom: none; }

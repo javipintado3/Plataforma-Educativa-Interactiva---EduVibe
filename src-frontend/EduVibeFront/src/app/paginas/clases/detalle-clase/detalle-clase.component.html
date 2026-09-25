@@ -55,6 +55,16 @@
           <span class="pastilla pastilla-azul" *ngIf="detalle.miRol === 'admin'">Administración</span>
 
           <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="detalle.puedoEditar"
+                  (click)="abrirTemas()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+            </svg>
+            Temas
+          </button>
+
+          <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="detalle.puedoEditar"
                   (click)="abrirEditar()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -159,6 +169,36 @@
     <button type="button" class="boton boton-contorno" (click)="dialogoEditarAbierto.set(false)">Cancelar</button>
     <button type="submit" form="form-editar-clase" class="boton boton-primario" [disabled]="guardandoClase()">
       {{ guardandoClase() ? 'Guardando…' : 'Guardar cambios' }}
+    </button>
+  </ng-container>
+</app-dialogo>
+
+<!-- Temas -->
+<app-dialogo [abierto]="dialogoTemasAbierto()" titulo="Temas de la clase"
+             (cerrar)="dialogoTemasAbierto.set(false)">
+
+  <p class="pequeno apagado mb-2" *ngIf="clase() as detalle">
+    Trabajo, materiales y exámenes se pueden agrupar por tema al crearlos.
+  </p>
+
+  <ul class="lista-temas mb-3" *ngIf="clase() as detalle">
+    <li *ngFor="let tema of detalle.temas">{{ tema.title }}</li>
+    <li class="apagado" *ngIf="!detalle.temas.length">Todavía no hay ningún tema.</li>
+  </ul>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorTema()"></app-aviso>
+
+  <form [formGroup]="formularioTema" (ngSubmit)="crearTema()" novalidate id="form-tema">
+    <div class="campo mb-0">
+      <label class="etiqueta" for="nuevo-tema">Nuevo tema</label>
+      <input id="nuevo-tema" class="entrada" formControlName="title" placeholder="Bloque 3 — Geometría">
+    </div>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoTemasAbierto.set(false)">Cerrar</button>
+    <button type="submit" form="form-tema" class="boton boton-primario" [disabled]="creandoTema()">
+      {{ creandoTema() ? 'Añadiendo…' : 'Añadir tema' }}
     </button>
   </ng-container>
 </app-dialogo>

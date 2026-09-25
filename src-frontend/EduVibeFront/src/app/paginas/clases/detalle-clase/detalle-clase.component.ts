@@ -7,7 +7,7 @@ import { switchMap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
 import { SubidasService } from '../../../core/services/subidas.service';
-import { DetalleClase } from '../../../core/models';
+import { DetalleClase, Tema } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
@@ -69,6 +69,14 @@ export class DetalleClaseComponent implements OnInit {
     subject: [''],
     color: [PALETA_CLASE[0].valor],
     imageUrl: [''],
+  });
+
+  readonly dialogoTemasAbierto = signal(false);
+  readonly creandoTema = signal(false);
+  readonly errorTema = signal<string | null>(null);
+
+  readonly formularioTema = this.fb.nonNullable.group({
+    title: ['', [Validators.required]],
   });
 
   /**
@@ -173,6 +181,42 @@ export class DetalleClaseComponent implements OnInit {
       error: (err) => {
         this.guardandoClase.set(false);
         this.errorEdicion.set(AvisoComponent.mensajeDe(err));
+      },
+    });
+  }
+
+  // ------------------------------------------------------------------ temas
+
+  abrirTemas(): void {
+    this.formularioTema.reset({ title: '' });
+    this.errorTema.set(null);
+    this.dialogoTemasAbierto.set(true);
+  }
+
+  /**
+   * Solo da de alta: el backend no tiene forma de renombrar ni borrar un tema
+   * todavía, así que el frontend no finge que se puede.
+   */
+  crearTema(): void {
+    this.formularioTema.markAllAsTouched();
+
+    if (this.formularioTema.invalid || this.creandoTema()) {
+      return;
+    }
+
+    this.creandoTema.set(true);
+    this.errorTema.set(null);
+
+    this.clasesService.crearTema(this.id, this.formularioTema.getRawValue().title).subscribe({
+      next: (tema: Tema) => {
+        this.creandoTema.set(false);
+        this.formularioTema.reset({ title: '' });
+        // Se añade a la clase en memoria: las pestañas ya abiertas lo ven sin recargar
+        this.clase.update(detalle => detalle ? { ...detalle, temas: [...detalle.temas, tema] } : detalle);
+      },
+      error: (err) => {
+        this.creandoTema.set(false);
+        this.errorTema.set(AvisoComponent.mensajeDe(err));
       },
     });
   }
