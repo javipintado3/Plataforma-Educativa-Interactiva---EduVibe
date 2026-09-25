@@ -46,4 +46,9 @@ export class TareasService {
   calificar(entregaId: string, score: number, feedback?: string): Observable<Entrega> {
     return this.http.put<Entrega>(`${this.api}/submissions/${entregaId}/grade`, { score, feedback });
   }
+
+  /** Nota rápida sobre la entrega, sin calificarla: p.ej. "revisa este apartado". */
+  comentar(entregaId: string, teacherNote: string): Observable<Entrega> {
+    return this.http.put<Entrega>(`${this.api}/submissions/${entregaId}/comment`, { teacherNote });
+  }
 }

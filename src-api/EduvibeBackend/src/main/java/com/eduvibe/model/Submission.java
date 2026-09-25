@@ -56,6 +56,10 @@ public class Submission {
     @Column(name = "status", nullable = false, length = 20)
     private SubmissionStatus status;
 
+    /** Nota rápida del profesorado, independiente de la calificación: no hace falta poner nota para dejarla. */
+    @Column(name = "teacher_note")
+    private String teacherNote;
+
     /** Momento del envío. Null mientras siga siendo un borrador. */
     @Column(name = "submitted_at")
     private Instant submittedAt;

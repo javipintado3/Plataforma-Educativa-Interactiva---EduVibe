@@ -143,6 +143,8 @@ export interface Entrega {
   submittedAt: string | null;
   entregadaTarde: boolean;
   grade: Calificacion | null;
+  /** Nota rápida del profesorado, independiente de la calificación. */
+  teacherNote: string | null;
 }
 
 export interface Anuncio {

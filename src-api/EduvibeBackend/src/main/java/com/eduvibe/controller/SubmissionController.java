@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eduvibe.dto.submission.GradeRequest;
 import com.eduvibe.dto.submission.SubmissionResponse;
+import com.eduvibe.dto.submission.TeacherNoteRequest;
 import com.eduvibe.service.SubmissionService;
 
 import jakarta.validation.Valid;
@@ -34,5 +35,12 @@ public class SubmissionController {
     public ResponseEntity<SubmissionResponse> calificar(@PathVariable UUID submissionId,
                                                         @Valid @RequestBody GradeRequest peticion) {
         return ResponseEntity.ok(submissionService.calificar(submissionId, peticion));
+    }
+
+    /** Nota rápida sobre la entrega, sin calificarla. Igual que la nota, sustituye a la anterior si ya había una. */
+    @PutMapping("/{submissionId}/comment")
+    public ResponseEntity<SubmissionResponse> comentar(@PathVariable UUID submissionId,
+                                                       @Valid @RequestBody TeacherNoteRequest peticion) {
+        return ResponseEntity.ok(submissionService.comentar(submissionId, peticion));
     }
 }

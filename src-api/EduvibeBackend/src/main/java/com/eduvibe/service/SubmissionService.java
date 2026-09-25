@@ -13,6 +13,7 @@ import com.eduvibe.dto.submission.GradeRequest;
 import com.eduvibe.dto.submission.GradeResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.dto.submission.SubmitRequest;
+import com.eduvibe.dto.submission.TeacherNoteRequest;
 import com.eduvibe.exception.BadRequestException;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Assignment;
@@ -155,6 +156,24 @@ public class SubmissionService {
                 "assignmentId", tarea.getId().toString()));
 
         return SubmissionResponse.de(entrega, GradeResponse.de(nota));
+    }
+
+    /**
+     * Deja o cambia la nota rápida del profesorado, independiente de la
+     * calificación: no exige que la entrega ya esté enviada ni calificada,
+     * porque su gracia es poder avisar de algo antes de llegar a ese punto.
+     */
+    @Transactional
+    public SubmissionResponse comentar(UUID submissionId, TeacherNoteRequest peticion) {
+        Submission entrega = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> NotFoundException.de("Entrega", submissionId));
+
+        acceso.exigirEditable(entrega.getAssignment().getSchoolClass().getId());
+
+        entrega.setTeacherNote(peticion.teacherNote());
+        submissionRepository.save(entrega);
+
+        return SubmissionResponse.de(entrega, notaDe(entrega));
     }
 
     /** Las entregas de quien consulta en una clase: su pestaña de calificaciones. */

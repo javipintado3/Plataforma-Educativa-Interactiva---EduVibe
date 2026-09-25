@@ -61,6 +61,12 @@
             </p>
           </div>
 
+          <!-- Nota rápida del profesorado, aunque todavía no haya calificación -->
+          <div class="nota-profesor mb-2" *ngIf="t.miEntrega?.teacherNote as notaRapida">
+            <span class="pequeno apagado">Nota del profesorado</span>
+            <p class="pequeno mb-0 mt-1" style="white-space:pre-wrap">{{ notaRapida }}</p>
+          </div>
+
           <div class="aviso aviso-atencion mb-2" *ngIf="t.miEntrega?.entregadaTarde">
             <span>Esta entrega llegó fuera de plazo.</span>
           </div>
@@ -138,7 +144,7 @@
 <!-- Corrección de una entrega -->
 <app-dialogo [abierto]="entregaElegida() !== null"
              [titulo]="'Corregir · ' + (entregaElegida()?.studentName || '')"
-             [cierraAlPulsarFuera]="false"
+             [ancho]="'grande'" [cierraAlPulsarFuera]="false"
              (cerrar)="entregaElegida.set(null)">
 
   <ng-container *ngIf="entregaElegida() as entrega">
@@ -147,8 +153,27 @@
       <p class="pequeno apagado mb-1">Lo entregado</p>
       <p class="mb-1" *ngIf="entrega.content" style="white-space:pre-wrap">{{ entrega.content }}</p>
       <p class="apagado mb-1" *ngIf="!entrega.content">Sin respuesta escrita.</p>
-      <a *ngIf="entrega.fileUrl" [href]="entrega.fileUrl | rutaArchivo" target="_blank" rel="noopener"
-         class="pequeno">Ver archivo entregado</a>
+
+      <ng-container *ngIf="entrega.fileUrl">
+        <img *ngIf="tipoArchivoDe(entrega.fileUrl) === 'imagen'" class="previsualizacion-imagen"
+             [src]="entrega.fileUrl | rutaArchivo" alt="Archivo entregado">
+        <iframe *ngIf="tipoArchivoDe(entrega.fileUrl) === 'pdf'" class="previsualizacion-pdf"
+                [src]="urlSegura(entrega.fileUrl | rutaArchivo)" title="Archivo entregado"></iframe>
+        <a [href]="entrega.fileUrl | rutaArchivo" target="_blank" rel="noopener" class="pequeno bloque mt-1">
+          {{ tipoArchivoDe(entrega.fileUrl) === 'otro' ? 'Ver archivo entregado' : 'Abrir en una pestaña aparte' }}
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="nota-profesor mb-3">
+      <label class="etiqueta" for="nota-rapida">Nota rápida (no hace falta calificar para dejarla)</label>
+      <form [formGroup]="formNotaProfesor" (ngSubmit)="guardarNotaProfesor()" class="fila espaciado-sm">
+        <textarea id="nota-rapida" class="area crecer" rows="2" formControlName="teacherNote"
+                  placeholder="Revisa el segundo apartado antes de que te lo corrija."></textarea>
+        <button type="submit" class="boton boton-contorno boton-pequeno" [disabled]="guardandoNotaProfesor()">
+          {{ guardandoNotaProfesor() ? 'Guardando…' : 'Guardar nota' }}
+        </button>
+      </form>
     </div>
 
     <app-aviso class="mb-2" tipo="error" [mensaje]="errorNota()"></app-aviso>

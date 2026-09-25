@@ -24,7 +24,8 @@ public record SubmissionResponse(
         String status,
         Instant submittedAt,
         boolean entregadaTarde,
-        GradeResponse grade) {
+        GradeResponse grade,
+        String teacherNote) {
 
     public static SubmissionResponse de(Submission entrega, GradeResponse nota) {
         return new SubmissionResponse(
@@ -38,6 +39,7 @@ public record SubmissionResponse(
                 entrega.getStatus().getValor(),
                 entrega.getSubmittedAt(),
                 entrega.entregadaTarde(),
-                nota);
+                nota,
+                entrega.getTeacherNote());
     }
 }

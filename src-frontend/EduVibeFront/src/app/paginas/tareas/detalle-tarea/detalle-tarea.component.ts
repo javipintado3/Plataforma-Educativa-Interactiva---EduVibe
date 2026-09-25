@@ -2,6 +2,7 @@ import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { TareasService } from '../../../core/services/tareas.service';
 import { DetalleTarea, Entrega } from '../../../core/models';
@@ -40,6 +41,7 @@ export class DetalleTareaComponent implements OnInit {
 
   private readonly tareasService = inject(TareasService);
   private readonly fb = inject(FormBuilder);
+  private readonly sanitizador = inject(DomSanitizer);
 
   @Input() id = '';
 
@@ -65,6 +67,13 @@ export class DetalleTareaComponent implements OnInit {
   readonly formNota = this.fb.nonNullable.group({
     score: [0, [Validators.required, Validators.min(0)]],
     feedback: [''],
+  });
+
+  // --- nota rápida, sin calificar ---
+  readonly guardandoNotaProfesor = signal(false);
+
+  readonly formNotaProfesor = this.fb.nonNullable.group({
+    teacherNote: [''],
   });
 
   ngOnInit(): void {
@@ -144,6 +153,58 @@ export class DetalleTareaComponent implements OnInit {
       score: entrega.grade ? Number(entrega.grade.score) : 0,
       feedback: entrega.grade?.feedback ?? '',
     });
+    this.formNotaProfesor.setValue({ teacherNote: entrega.teacherNote ?? '' });
+  }
+
+  /**
+   * Guarda la nota rápida, independiente de la calificación: no exige haber
+   * puesto nota antes, porque su gracia es poder avisar de algo mientras el
+   * alumno todavía puede corregirlo.
+   */
+  guardarNotaProfesor(): void {
+    const entrega = this.entregaElegida();
+    if (!entrega || this.guardandoNotaProfesor()) {
+      return;
+    }
+
+    this.guardandoNotaProfesor.set(true);
+    this.errorNota.set(null);
+
+    const { teacherNote } = this.formNotaProfesor.getRawValue();
+
+    this.tareasService.comentar(entrega.id, teacherNote).subscribe({
+      next: (actualizada) => {
+        this.guardandoNotaProfesor.set(false);
+        this.entregaElegida.set(actualizada);
+        this.entregas.update(lista => lista.map(e => e.id === actualizada.id ? actualizada : e));
+      },
+      error: (err) => {
+        this.guardandoNotaProfesor.set(false);
+        this.errorNota.set(AvisoComponent.mensajeDe(err));
+      },
+    });
+  }
+
+  /** Para previsualizar sin descargar: imagen o PDF se muestran en la propia pantalla. */
+  tipoArchivoDe(url: string | null): 'imagen' | 'pdf' | 'otro' {
+    if (!url) {
+      return 'otro';
+    }
+    const limpio = url.split('?')[0].toLowerCase();
+    if (/\.(jpe?g|png|gif|webp)$/.test(limpio)) {
+      return 'imagen';
+    }
+    return limpio.endsWith('.pdf') ? 'pdf' : 'otro';
+  }
+
+  /**
+   * Angular exige marcar como segura la URL de un <iframe>: sin esto, la
+   * sanea a "unsafe:..." y no carga nada. El archivo entregado se sirve desde
+   * nuestro propio endpoint de subidas o es un enlace que ya se abre aparte,
+   * así que insertarlo en un iframe no da más acceso del que ya tiene.
+   */
+  urlSegura(url: string | null): SafeResourceUrl {
+    return this.sanitizador.bypassSecurityTrustResourceUrl(url ?? '');
   }
 
   calificar(): void {
