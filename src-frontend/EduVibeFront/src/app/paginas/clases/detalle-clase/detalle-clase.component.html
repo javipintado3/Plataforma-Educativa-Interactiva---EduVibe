@@ -90,6 +90,9 @@
         <button type="button" class="pestana" [class.activa]="pestana() === 'materiales'"
                 (click)="cambiarA('materiales')">Materiales</button>
 
+        <button type="button" class="pestana" [class.activa]="pestana() === 'foro'"
+                (click)="cambiarA('foro')">Foro</button>
+
         <button type="button" class="pestana" [class.activa]="pestana() === 'personas'"
                 (click)="cambiarA('personas')">Personas</button>
 
@@ -121,6 +124,10 @@
       [claseId]="detalle.id"
       [puedoEditar]="detalle.puedoEditar"
       [temas]="detalle.temas"></app-pestana-materiales>
+
+    <app-pestana-foro *ngIf="pestana() === 'foro'"
+      [claseId]="detalle.id"
+      [temas]="detalle.temas"></app-pestana-foro>
 
     <app-pestana-personas *ngIf="pestana() === 'personas'"
       [claseId]="detalle.id"></app-pestana-personas>

@@ -1,0 +1,65 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<div class="contenedor" *ngIf="!cargando() && !hilo()">
+  <app-aviso tipo="error" [mensaje]="error()"></app-aviso>
+  <a routerLink="/clases" class="boton boton-contorno mt-2">Volver a mis clases</a>
+</div>
+
+<div class="contenedor" *ngIf="hilo() as h">
+
+  <a [routerLink]="['/clases', h.classId]" class="volver mb-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    {{ h.className }} · Foro
+  </a>
+
+  <div class="fila-entre envolver mb-3">
+    <h1 class="mb-0">{{ h.title }}</h1>
+    <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="h.puedoBorrarHilo"
+            [disabled]="borrandoHilo()" (click)="borrarHilo()">
+      Borrar hilo
+    </button>
+  </div>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <div class="mensaje tarjeta mb-2" *ngFor="let mensaje of h.posts">
+    <div class="tarjeta-cuerpo">
+      <div class="fila-entre envolver mb-1">
+        <span class="fila espaciado-sm">
+          <app-avatar [nombre]="mensaje.authorName" [pequeno]="true"></app-avatar>
+          <span>
+            <span class="fuerte bloque">{{ mensaje.authorName }}</span>
+            <span class="pequeno apagado">{{ mensaje.createdAt | fecha }}</span>
+          </span>
+        </span>
+
+        <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="mensaje.puedoBorrar"
+                [disabled]="borrandoMensaje() === mensaje.id" (click)="borrarMensaje(mensaje)"
+                aria-label="Retirar mensaje">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="mb-0" style="white-space:pre-wrap">{{ mensaje.content }}</p>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+    <div class="tarjeta-cuerpo">
+      <form [formGroup]="formRespuesta" (ngSubmit)="responder()" novalidate>
+        <div class="campo mb-2">
+          <label class="etiqueta" for="respuesta-hilo">Responder</label>
+          <textarea id="respuesta-hilo" class="area" formControlName="content"
+                    placeholder="Escribe tu respuesta."></textarea>
+        </div>
+        <button type="submit" class="boton boton-primario" [disabled]="respondiendo()">
+          {{ respondiendo() ? 'Enviando…' : 'Responder' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

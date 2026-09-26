@@ -224,6 +224,39 @@ export interface EntradaAgenda {
   classColor: string | null;
 }
 
+/** Un hilo en la lista del foro de una clase. */
+export interface HiloForo {
+  id: string;
+  topicId: string | null;
+  title: string;
+  authorName: string;
+  postCount: number;
+  lastActivityAt: string;
+  createdAt: string;
+}
+
+export interface MensajeForo {
+  id: string;
+  content: string;
+  authorName: string;
+  createdAt: string;
+  /** Su autor, o el profesorado de la clase como moderación. */
+  puedoBorrar: boolean;
+}
+
+export interface DetalleHiloForo {
+  id: string;
+  classId: string;
+  className: string;
+  topicId: string | null;
+  title: string;
+  authorName: string;
+  puedoModerar: boolean;
+  puedoBorrarHilo: boolean;
+  posts: MensajeForo[];
+  createdAt: string;
+}
+
 export interface Notificacion {
   id: string;
   type: string;

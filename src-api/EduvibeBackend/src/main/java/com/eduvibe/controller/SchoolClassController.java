@@ -24,6 +24,9 @@ import com.eduvibe.dto.exam.BankQuestionResponse;
 import com.eduvibe.dto.exam.ExamDetailResponse;
 import com.eduvibe.dto.exam.ExamResponse;
 import com.eduvibe.dto.exam.SaveExamRequest;
+import com.eduvibe.dto.forum.ForumThreadDetailResponse;
+import com.eduvibe.dto.forum.ForumThreadResponse;
+import com.eduvibe.dto.forum.SaveForumThreadRequest;
 import com.eduvibe.dto.schoolclass.ClassDetailResponse;
 import com.eduvibe.dto.schoolclass.ClassResponse;
 import com.eduvibe.dto.schoolclass.CreateClassRequest;
@@ -37,6 +40,7 @@ import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.service.AnnouncementService;
 import com.eduvibe.service.AssignmentService;
 import com.eduvibe.service.ExamService;
+import com.eduvibe.service.ForumService;
 import com.eduvibe.service.ResourceService;
 import com.eduvibe.service.SchoolClassService;
 import com.eduvibe.service.SubmissionService;
@@ -64,6 +68,7 @@ public class SchoolClassController {
     private final AnnouncementService announcementService;
     private final ResourceService resourceService;
     private final ExamService examService;
+    private final ForumService forumService;
 
     // ---------------------------------------------------------------- clases
 
@@ -195,5 +200,20 @@ public class SchoolClassController {
     @GetMapping("/{classId}/exams/question-bank")
     public ResponseEntity<List<BankQuestionResponse>> bancoDePreguntas(@PathVariable UUID classId) {
         return ResponseEntity.ok(examService.listarBanco(classId));
+    }
+
+    // ----------------------------------------------------------------- foro
+
+    /** Hilos del foro, con más actividad reciente primero. */
+    @GetMapping("/{classId}/forum-threads")
+    public ResponseEntity<List<ForumThreadResponse>> hilosDeForo(@PathVariable UUID classId) {
+        return ResponseEntity.ok(forumService.listar(classId));
+    }
+
+    @PostMapping("/{classId}/forum-threads")
+    public ResponseEntity<ForumThreadDetailResponse> abrirHilo(@PathVariable UUID classId,
+                                                               @Valid @RequestBody SaveForumThreadRequest peticion) {
+        ForumThreadDetailResponse creado = forumService.crear(classId, peticion);
+        return ResponseEntity.created(URI.create("/api/forum-threads/" + creado.id())).body(creado);
     }
 }

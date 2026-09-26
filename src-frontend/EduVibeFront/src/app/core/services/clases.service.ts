@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
-  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleTarea, Entrega, Examen, Material, Miembro, PreguntaBanco,
-  Tarea, Tema, TipoMaterial,
+  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen, HiloForo, Material,
+  Miembro, PreguntaBanco, Tarea, Tema, TipoMaterial,
 } from '../models';
 
 /**
@@ -118,5 +118,14 @@ export class ClasesService {
   /** Preguntas ya usadas en algún examen de la clase, para reutilizarlas en uno nuevo. */
   bancoDePreguntas(claseId: string): Observable<PreguntaBanco[]> {
     return this.http.get<PreguntaBanco[]>(`${this.api}/${claseId}/exams/question-bank`);
+  }
+
+  /** Hilos del foro, con más actividad reciente primero. */
+  hilosDeForo(claseId: string): Observable<HiloForo[]> {
+    return this.http.get<HiloForo[]>(`${this.api}/${claseId}/forum-threads`);
+  }
+
+  abrirHilo(claseId: string, datos: { title: string; content: string; topicId?: string | null }): Observable<DetalleHiloForo> {
+    return this.http.post<DetalleHiloForo>(`${this.api}/${claseId}/forum-threads`, datos);
   }
 }

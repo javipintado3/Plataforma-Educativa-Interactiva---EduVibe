@@ -1,0 +1,11 @@
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .84rem;
+  font-weight: 550;
+  color: var(--gris);
+  text-decoration: none;
+}
+
+.volver:hover { color: var(--verde-700); text-decoration: none; }

@@ -74,6 +74,12 @@ export const routes: Routes = [
           .then(m => m.HacerExamenComponent),
       },
       {
+        path: 'foro/:id',
+        title: 'Hilo · Eduvibe',
+        loadComponent: () => import('./paginas/foro/detalle-hilo/detalle-hilo.component')
+          .then(m => m.DetalleHiloComponent),
+      },
+      {
         path: 'calendario',
         title: 'Calendario · Eduvibe',
         loadComponent: () => import('./paginas/calendario/calendario.component')
