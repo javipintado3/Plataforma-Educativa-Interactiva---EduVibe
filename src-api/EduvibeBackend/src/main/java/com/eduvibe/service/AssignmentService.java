@@ -48,6 +48,7 @@ public class AssignmentService {
     private final SubmissionService submissionService;
     private final NotificationService notificationService;
     private final TopicService topicService;
+    private final RubricService rubricService;
 
     @Transactional
     public AssignmentDetailResponse crear(UUID classId, SaveAssignmentRequest peticion) {
@@ -66,7 +67,7 @@ public class AssignmentService {
         assignmentRepository.saveAndFlush(tarea);
         notificarAlumnado(classId, clase, tarea);
 
-        return AssignmentDetailResponse.de(tarea, true, null);
+        return AssignmentDetailResponse.de(tarea, true, null, null);
     }
 
     /** Avisa a todo el alumnado matriculado de que hay una novedad con este título. */
@@ -128,8 +129,9 @@ public class AssignmentService {
 
         // Al profesorado no se le adjunta "su" entrega: no la tiene
         var miEntrega = puedoEditar ? null : submissionService.miEntregaSiExiste(tarea);
+        var rubrica = rubricService.obtenerSiExiste(assignmentId);
 
-        return AssignmentDetailResponse.de(tarea, puedoEditar, miEntrega);
+        return AssignmentDetailResponse.de(tarea, puedoEditar, miEntrega, rubrica);
     }
 
     @Transactional
@@ -150,7 +152,7 @@ public class AssignmentService {
 
         assignmentRepository.save(tarea);
 
-        return AssignmentDetailResponse.de(tarea, true, null);
+        return AssignmentDetailResponse.de(tarea, true, null, rubricService.obtenerSiExiste(assignmentId));
     }
 
     /**

@@ -1,14 +1,18 @@
 package com.eduvibe.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eduvibe.dto.rubric.RubricScoreInput;
+import com.eduvibe.dto.rubric.RubricScoreResponse;
 import com.eduvibe.dto.submission.GradeRequest;
 import com.eduvibe.dto.submission.GradeResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
@@ -19,10 +23,15 @@ import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Assignment;
 import com.eduvibe.model.Grade;
 import com.eduvibe.model.Notification;
+import com.eduvibe.model.Rubric;
+import com.eduvibe.model.RubricCriterion;
+import com.eduvibe.model.RubricScore;
 import com.eduvibe.model.Submission;
 import com.eduvibe.model.User;
 import com.eduvibe.repository.AssignmentRepository;
 import com.eduvibe.repository.GradeRepository;
+import com.eduvibe.repository.RubricCriterionRepository;
+import com.eduvibe.repository.RubricScoreRepository;
 import com.eduvibe.repository.SubmissionRepository;
 import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
@@ -47,6 +56,9 @@ public class SubmissionService {
     private final ClassAccessService acceso;
     private final AuthService authService;
     private final NotificationService notificationService;
+    private final RubricService rubricService;
+    private final RubricCriterionRepository rubricCriterionRepository;
+    private final RubricScoreRepository rubricScoreRepository;
 
     /**
      * Crea o actualiza la entrega de quien está autenticado.
@@ -119,6 +131,10 @@ public class SubmissionService {
      * Pone o corrige la nota de una entrega.
      *
      * Calificar un borrador no tiene sentido: todavía no se ha entregado nada.
+     * Si la tarea tiene rúbrica, la nota en bruto es la suma de lo puntuado en
+     * cada criterio y no lo que venga en {@code peticion.score()}: con rúbrica,
+     * la nota es una consecuencia de puntuar los criterios, no un número aparte
+     * que alguien podría dejar sin corresponderse con ellos.
      */
     @Transactional
     public SubmissionResponse calificar(UUID submissionId, GradeRequest peticion) {
@@ -132,8 +148,13 @@ public class SubmissionService {
             throw new BadRequestException("No se puede calificar una entrega que todavía es un borrador");
         }
 
+        Rubric rubrica = rubricService.buscarDe(tarea.getId()).orElse(null);
+        BigDecimal notaEnBruto = rubrica != null
+                ? sumaDeRubrica(rubrica, peticion.rubricScoresOSinNinguna())
+                : notaSuelta(peticion);
+
         BigDecimal maximo = BigDecimal.valueOf(tarea.getPoints());
-        if (peticion.score().compareTo(maximo) > 0) {
+        if (notaEnBruto.compareTo(maximo) > 0) {
             throw new BadRequestException("La nota no puede pasar de " + maximo + ", que es lo que vale la tarea");
         }
 
@@ -145,14 +166,18 @@ public class SubmissionService {
         // y la tarea tiene penalización configurada, el descuento se aplica aquí
         // y no a mano, para que nunca dependa de que alguien se acuerde.
         boolean penalizacionAplicada = entrega.entregadaTarde() && tarea.getLatePenaltyPercent() > 0;
-        BigDecimal notaFinal = tarea.aplicarPenalizacionSiProcede(peticion.score(), entrega.entregadaTarde());
+        BigDecimal notaFinal = tarea.aplicarPenalizacionSiProcede(notaEnBruto, entrega.entregadaTarde());
 
         Grade nota = gradeRepository.findBySubmissionId(submissionId)
-                .orElseGet(() -> new Grade(entrega, peticion.score(), notaFinal, peticion.feedback(), corrector));
+                .orElseGet(() -> new Grade(entrega, notaEnBruto, notaFinal, peticion.feedback(), corrector));
 
         // Si ya existía, se actualiza dejando constancia de quién revisa
-        nota.corregir(peticion.score(), notaFinal, peticion.feedback(), corrector, penalizacionAplicada);
+        nota.corregir(notaEnBruto, notaFinal, peticion.feedback(), corrector, penalizacionAplicada);
         gradeRepository.saveAndFlush(nota);
+
+        List<RubricScoreResponse> puntuacionesRubrica = rubrica != null
+                ? guardarPuntuacionesDeRubrica(rubrica, nota, peticion.rubricScoresOSinNinguna())
+                : List.of();
 
         entrega.marcarComoCalificada();
         submissionRepository.save(entrega);
@@ -161,7 +186,63 @@ public class SubmissionService {
                 "title", tarea.getTitle(), "className", tarea.getSchoolClass().getName(),
                 "assignmentId", tarea.getId().toString()));
 
-        return SubmissionResponse.de(entrega, GradeResponse.de(nota));
+        return SubmissionResponse.de(entrega, GradeResponse.de(nota, puntuacionesRubrica));
+    }
+
+    private BigDecimal notaSuelta(GradeRequest peticion) {
+        if (peticion.score() == null) {
+            throw new BadRequestException("La nota es obligatoria");
+        }
+        return peticion.score();
+    }
+
+    /** Suma lo puntuado en cada criterio, comprobando que cada uno respeta su propio máximo. */
+    private BigDecimal sumaDeRubrica(Rubric rubrica, List<RubricScoreInput> entradas) {
+        if (entradas.isEmpty()) {
+            throw new BadRequestException("Esta tarea tiene rúbrica: puntúa cada criterio");
+        }
+
+        Map<UUID, RubricCriterion> criterios = rubricCriterionRepository
+                .findByRubricIdOrderBySortOrderAsc(rubrica.getId())
+                .stream()
+                .collect(Collectors.toMap(RubricCriterion::getId, c -> c));
+
+        if (entradas.size() != criterios.size()) {
+            throw new BadRequestException("Puntúa todos los criterios de la rúbrica, ni más ni menos");
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (RubricScoreInput entrada : entradas) {
+            RubricCriterion criterio = criterios.get(entrada.criterionId());
+            if (criterio == null) {
+                throw new BadRequestException("Ese criterio no pertenece a la rúbrica de esta tarea");
+            }
+            if (entrada.points().compareTo(criterio.getMaxPoints()) > 0) {
+                throw new BadRequestException(
+                        "\"" + criterio.getDescription() + "\" vale como mucho " + criterio.getMaxPoints());
+            }
+            total = total.add(entrada.points());
+        }
+        return total;
+    }
+
+    /** Reemplaza las puntuaciones de rúbrica de esta nota por las nuevas. */
+    private List<RubricScoreResponse> guardarPuntuacionesDeRubrica(Rubric rubrica, Grade nota,
+                                                                    List<RubricScoreInput> entradas) {
+        rubricScoreRepository.deleteByGradeId(nota.getId());
+
+        Map<UUID, RubricCriterion> criterios = rubricCriterionRepository
+                .findByRubricIdOrderBySortOrderAsc(rubrica.getId())
+                .stream()
+                .collect(Collectors.toMap(RubricCriterion::getId, c -> c));
+
+        List<RubricScore> puntuaciones = new ArrayList<>();
+        for (RubricScoreInput entrada : entradas) {
+            puntuaciones.add(new RubricScore(nota, criterios.get(entrada.criterionId()), entrada.points()));
+        }
+        rubricScoreRepository.saveAll(puntuaciones);
+
+        return puntuaciones.stream().map(RubricScoreResponse::de).toList();
     }
 
     /**
@@ -201,10 +282,14 @@ public class SubmissionService {
         }
 
         List<UUID> ids = entregas.stream().map(Submission::getId).toList();
+        List<Grade> notasEncontradas = gradeRepository.findDeEntregas(ids);
+
+        Map<UUID, List<RubricScoreResponse>> rubricasPorNota = rubricasDe(notasEncontradas);
 
         Map<UUID, GradeResponse> notas = new HashMap<>();
-        for (Grade nota : gradeRepository.findDeEntregas(ids)) {
-            notas.put(nota.getSubmission().getId(), GradeResponse.de(nota));
+        for (Grade nota : notasEncontradas) {
+            notas.put(nota.getSubmission().getId(),
+                    GradeResponse.de(nota, rubricasPorNota.getOrDefault(nota.getId(), List.of())));
         }
 
         return entregas.stream()
@@ -214,7 +299,22 @@ public class SubmissionService {
 
     private GradeResponse notaDe(Submission entrega) {
         return gradeRepository.findBySubmissionId(entrega.getId())
-                .map(GradeResponse::de)
+                .map(nota -> GradeResponse.de(nota, rubricasDe(List.of(nota)).getOrDefault(nota.getId(), List.of())))
                 .orElse(null);
+    }
+
+    /** El desglose por criterio de varias notas de golpe, en lugar de una consulta por nota. */
+    private Map<UUID, List<RubricScoreResponse>> rubricasDe(List<Grade> notas) {
+        if (notas.isEmpty()) {
+            return Map.of();
+        }
+        List<UUID> ids = notas.stream().map(Grade::getId).toList();
+
+        Map<UUID, List<RubricScoreResponse>> porNota = new HashMap<>();
+        for (RubricScore puntuacion : rubricScoreRepository.findByGradeIdIn(ids)) {
+            porNota.computeIfAbsent(puntuacion.getGrade().getId(), k -> new ArrayList<>())
+                    .add(RubricScoreResponse.de(puntuacion));
+        }
+        return porNota;
     }
 }

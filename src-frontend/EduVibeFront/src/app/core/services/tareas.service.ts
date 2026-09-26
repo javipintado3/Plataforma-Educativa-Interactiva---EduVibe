@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { DetalleTarea, Entrega } from '../models';
+import { DetalleTarea, Entrega, Rubrica } from '../models';
 
 /** Tareas, entregas y corrección. */
 @Injectable({ providedIn: 'root' })
@@ -43,12 +43,26 @@ export class TareasService {
     return this.http.get<Entrega[]>(`${this.api}/assignments/${tareaId}/submissions`);
   }
 
-  calificar(entregaId: string, score: number, feedback?: string): Observable<Entrega> {
-    return this.http.put<Entrega>(`${this.api}/submissions/${entregaId}/grade`, { score, feedback });
+  /**
+   * Califica una entrega. Con `rubricScores`, `score` se ignora en el servidor:
+   * la nota es la suma de lo puntuado en cada criterio.
+   */
+  calificar(entregaId: string, score: number | null, feedback?: string,
+            rubricScores?: { criterionId: string; points: number }[]): Observable<Entrega> {
+    return this.http.put<Entrega>(`${this.api}/submissions/${entregaId}/grade`, { score, feedback, rubricScores });
   }
 
   /** Nota rápida sobre la entrega, sin calificarla: p.ej. "revisa este apartado". */
   comentar(entregaId: string, teacherNote: string): Observable<Entrega> {
     return this.http.put<Entrega>(`${this.api}/submissions/${entregaId}/comment`, { teacherNote });
+  }
+
+  /** Crea la rúbrica de la tarea, o sustituye por completo la que ya hubiera. */
+  guardarRubrica(tareaId: string, criteria: { description: string; maxPoints: number }[]): Observable<Rubrica> {
+    return this.http.put<Rubrica>(`${this.api}/assignments/${tareaId}/rubric`, { criteria });
+  }
+
+  borrarRubrica(tareaId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/assignments/${tareaId}/rubric`);
   }
 }

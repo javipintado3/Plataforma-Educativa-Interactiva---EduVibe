@@ -123,7 +123,28 @@ export interface DetalleTarea {
   haVencido: boolean;
   puedoEditar: boolean;
   miEntrega: Entrega | null;
+  /** Su rúbrica, si tiene; null si se califica con una nota suelta. */
+  rubric: Rubrica | null;
   createdAt: string | null;
+}
+
+export interface RubricaCriterio {
+  id: string;
+  description: string;
+  maxPoints: number;
+}
+
+export interface Rubrica {
+  id: string;
+  criteria: RubricaCriterio[];
+}
+
+/** Lo puntuado en un criterio concreto, dentro de una calificación ya hecha. */
+export interface RubricaPuntuacion {
+  criterionId: string;
+  description: string;
+  maxPoints: number;
+  points: number;
 }
 
 export interface Calificacion {
@@ -134,6 +155,8 @@ export interface Calificacion {
   gradedByName: string;
   gradedAt: string;
   latePenaltyApplied: boolean;
+  /** El desglose por criterio, cuando se calificó con rúbrica; vacío si no. */
+  rubricScores: RubricaPuntuacion[];
 }
 
 export interface Entrega {

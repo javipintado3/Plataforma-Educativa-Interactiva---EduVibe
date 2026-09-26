@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -69,12 +69,32 @@ export class DetalleTareaComponent implements OnInit {
     feedback: [''],
   });
 
+  /** Un control por criterio, en el mismo orden que tarea().rubric.criteria. */
+  readonly formPuntuacionesRubrica = this.fb.nonNullable.array<number>([]);
+
   // --- nota rápida, sin calificar ---
   readonly guardandoNotaProfesor = signal(false);
 
   readonly formNotaProfesor = this.fb.nonNullable.group({
     teacherNote: [''],
   });
+
+  // --- rúbrica de la tarea (profesorado) ---
+  readonly dialogoRubricaAbierto = signal(false);
+  readonly guardandoRubrica = signal(false);
+  readonly errorRubrica = signal<string | null>(null);
+
+  readonly formRubrica = this.fb.nonNullable.group({
+    criterios: this.fb.array<FormGroup<{ description: FormControl<string>; maxPoints: FormControl<number> }>>([]),
+  });
+
+  /** Una fila del formulario de rúbrica: descripción y puntuación máxima del criterio. */
+  private filaCriterio(description = '', maxPoints = 10) {
+    return this.fb.nonNullable.group({
+      description: [description, [Validators.required]],
+      maxPoints: [maxPoints, [Validators.required, Validators.min(0.01)]],
+    });
+  }
 
   ngOnInit(): void {
     this.cargar();
@@ -102,6 +122,81 @@ export class DetalleTareaComponent implements OnInit {
       error: (err) => {
         this.error.set(AvisoComponent.mensajeDe(err, 'No se ha podido cargar la tarea'));
         this.cargando.set(false);
+      },
+    });
+  }
+
+  get criteriosRubrica(): FormArray<FormGroup<{ description: FormControl<string>; maxPoints: FormControl<number> }>> {
+    return this.formRubrica.controls.criterios;
+  }
+
+  abrirRubrica(): void {
+    this.errorRubrica.set(null);
+    this.criteriosRubrica.clear();
+
+    const existentes = this.tarea()?.rubric?.criteria ?? [];
+    if (existentes.length) {
+      existentes.forEach(c => this.criteriosRubrica.push(this.filaCriterio(c.description, c.maxPoints)));
+    } else {
+      this.criteriosRubrica.push(this.filaCriterio());
+    }
+    this.dialogoRubricaAbierto.set(true);
+  }
+
+  agregarCriterio(): void {
+    this.criteriosRubrica.push(this.filaCriterio());
+  }
+
+  quitarCriterio(indice: number): void {
+    if (this.criteriosRubrica.length > 1) {
+      this.criteriosRubrica.removeAt(indice);
+    }
+  }
+
+  /** Suma de las puntuaciones máximas de todos los criterios: lo que valdrá la tarea con esta rúbrica. */
+  get totalRubricaEnEdicion(): number {
+    return this.criteriosRubrica.controls.reduce((total, c) => total + Number(c.controls.maxPoints.value || 0), 0);
+  }
+
+  guardarRubrica(): void {
+    this.criteriosRubrica.markAllAsTouched();
+    if (this.formRubrica.invalid || this.guardandoRubrica()) {
+      return;
+    }
+
+    this.guardandoRubrica.set(true);
+    this.errorRubrica.set(null);
+
+    const criteria = this.criteriosRubrica.controls.map(c => c.getRawValue());
+
+    this.tareasService.guardarRubrica(this.id, criteria).subscribe({
+      next: (rubrica) => {
+        this.guardandoRubrica.set(false);
+        this.dialogoRubricaAbierto.set(false);
+        this.tarea.update(t => t ? { ...t, rubric: rubrica } : t);
+      },
+      error: (err) => {
+        this.guardandoRubrica.set(false);
+        this.errorRubrica.set(AvisoComponent.mensajeDe(err));
+      },
+    });
+  }
+
+  async quitarRubrica(): Promise<void> {
+    if (this.guardandoRubrica()) {
+      return;
+    }
+    this.guardandoRubrica.set(true);
+
+    this.tareasService.borrarRubrica(this.id).subscribe({
+      next: () => {
+        this.guardandoRubrica.set(false);
+        this.dialogoRubricaAbierto.set(false);
+        this.tarea.update(t => t ? { ...t, rubric: null } : t);
+      },
+      error: (err) => {
+        this.guardandoRubrica.set(false);
+        this.errorRubrica.set(AvisoComponent.mensajeDe(err));
       },
     });
   }
@@ -156,6 +251,18 @@ export class DetalleTareaComponent implements OnInit {
       feedback: entrega.grade?.feedback ?? '',
     });
     this.formNotaProfesor.setValue({ teacherNote: entrega.teacherNote ?? '' });
+
+    this.formPuntuacionesRubrica.clear();
+    for (const criterio of this.tarea()?.rubric?.criteria ?? []) {
+      const previa = entrega.grade?.rubricScores.find(p => p.criterionId === criterio.id);
+      this.formPuntuacionesRubrica.push(
+        this.fb.nonNullable.control(previa ? Number(previa.points) : 0, [Validators.min(0)]));
+    }
+  }
+
+  /** Suma de lo puntuado en cada criterio: lo que va a guardarse como nota. */
+  get totalPuntuacionRubrica(): number {
+    return this.formPuntuacionesRubrica.controls.reduce((total, c) => total + Number(c.value || 0), 0);
   }
 
   /**
@@ -211,7 +318,10 @@ export class DetalleTareaComponent implements OnInit {
 
   calificar(): void {
     const entrega = this.entregaElegida();
-    if (!entrega || this.calificando() || this.formNota.invalid) {
+    const rubrica = this.tarea()?.rubric;
+    const formularioValido = rubrica ? this.formPuntuacionesRubrica.valid : this.formNota.valid;
+
+    if (!entrega || this.calificando() || !formularioValido) {
       return;
     }
 
@@ -220,7 +330,16 @@ export class DetalleTareaComponent implements OnInit {
 
     const { score, feedback } = this.formNota.getRawValue();
 
-    this.tareasService.calificar(entrega.id, score, feedback || undefined).subscribe({
+    // Con rúbrica, la nota es la suma de lo puntuado en cada criterio: el
+    // servidor la calcula e ignora `score`, así que aquí no hace falta mandarlo.
+    const rubricScores = rubrica
+      ? rubrica.criteria.map((criterio, indice) => ({
+          criterionId: criterio.id,
+          points: this.formPuntuacionesRubrica.at(indice).value,
+        }))
+      : undefined;
+
+    this.tareasService.calificar(entrega.id, rubrica ? null : score, feedback || undefined, rubricScores).subscribe({
       next: (actualizada) => {
         this.calificando.set(false);
         this.entregaElegida.set(null);

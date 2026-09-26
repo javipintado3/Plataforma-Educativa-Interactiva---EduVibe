@@ -36,6 +36,29 @@
 
         <div class="enunciado" *ngIf="t.description">{{ t.description }}</div>
         <p class="apagado" *ngIf="!t.description">Esta tarea no tiene enunciado escrito.</p>
+
+        <!-- Rúbrica: visible al alumnado antes de entregar, editable por el profesorado -->
+        <div class="rubrica mt-3" *ngIf="t.rubric || t.puedoEditar">
+          <div class="fila-entre mb-1">
+            <span class="pequeno apagado">Rúbrica de corrección</span>
+            <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="t.puedoEditar" (click)="abrirRubrica()">
+              {{ t.rubric ? 'Editar rúbrica' : 'Añadir rúbrica' }}
+            </button>
+          </div>
+
+          <table class="tabla" *ngIf="t.rubric">
+            <tbody>
+              <tr *ngFor="let criterio of t.rubric.criteria">
+                <td>{{ criterio.description }}</td>
+                <td style="text-align:right;white-space:nowrap">{{ criterio.maxPoints }} pt.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="pequeno apagado mb-0" *ngIf="!t.rubric && t.puedoEditar">
+            Sin rúbrica: se corrige con una nota suelta.
+          </p>
+        </div>
       </div>
     </article>
 
@@ -64,6 +87,11 @@
             <p class="pequeno mb-0 mt-1" *ngIf="nota.latePenaltyApplied">
               Incluye el descuento por entrega tardía.
             </p>
+            <ul class="pequeno mb-0 mt-2" style="padding-left:1.1rem" *ngIf="nota.rubricScores.length">
+              <li *ngFor="let puntuacion of nota.rubricScores">
+                {{ puntuacion.description }}: {{ puntuacion.points }} / {{ puntuacion.maxPoints }}
+              </li>
+            </ul>
           </div>
 
           <!-- Nota rápida del profesorado, aunque todavía no haya calificación -->
@@ -191,11 +219,28 @@
     <app-aviso class="mb-2" tipo="error" [mensaje]="errorNota()"></app-aviso>
 
     <form [formGroup]="formNota" (ngSubmit)="calificar()" novalidate id="form-nota">
-      <div class="campo">
-        <label class="etiqueta" for="nota">Nota sobre {{ tarea()?.points }}</label>
-        <input id="nota" type="number" step="0.01" min="0" [attr.max]="tarea()?.points"
-               class="entrada" formControlName="score">
-      </div>
+
+      <!-- Con rúbrica: una nota por criterio, sumadas en la nota final -->
+      <ng-container *ngIf="tarea()?.rubric as rubrica; else notaSuelta">
+        <div class="campo" *ngFor="let criterio of rubrica.criteria; let i = index">
+          <label class="etiqueta">{{ criterio.description }}</label>
+          <div class="fila espaciado-sm">
+            <input type="number" step="0.01" min="0" [max]="criterio.maxPoints" class="entrada"
+                   style="max-width:8rem" [formControl]="formPuntuacionesRubrica.controls[i]">
+            <span class="pequeno apagado">/ {{ criterio.maxPoints }}</span>
+          </div>
+        </div>
+        <p class="fuerte mb-3">Nota total: {{ totalPuntuacionRubrica }} / {{ tarea()?.points }}</p>
+      </ng-container>
+
+      <!-- Sin rúbrica: una nota suelta, como siempre -->
+      <ng-template #notaSuelta>
+        <div class="campo">
+          <label class="etiqueta" for="nota">Nota sobre {{ tarea()?.points }}</label>
+          <input id="nota" type="number" step="0.01" min="0" [attr.max]="tarea()?.points"
+                 class="entrada" formControlName="score">
+        </div>
+      </ng-template>
 
       <div class="campo mb-0">
         <label class="etiqueta" for="comentario">Comentario</label>
@@ -209,6 +254,59 @@
     <button type="button" class="boton boton-contorno" (click)="entregaElegida.set(null)">Cancelar</button>
     <button type="submit" form="form-nota" class="boton boton-primario" [disabled]="calificando()">
       {{ calificando() ? 'Guardando…' : 'Guardar calificación' }}
+    </button>
+  </ng-container>
+</app-dialogo>
+
+<!-- Alta / edición de la rúbrica -->
+<app-dialogo [abierto]="dialogoRubricaAbierto()" titulo="Rúbrica de la tarea"
+             [ancho]="'grande'" [cierraAlPulsarFuera]="false" (cerrar)="dialogoRubricaAbierto.set(false)">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorRubrica()"></app-aviso>
+
+  <p class="pequeno apagado mb-2">
+    Cada criterio suma su puntuación a la nota final; al guardar, la tarea pasará a corregirse siempre con esta
+    rúbrica en vez de con una nota suelta.
+  </p>
+
+  <form [formGroup]="formRubrica" (ngSubmit)="guardarRubrica()" novalidate id="form-rubrica">
+    <div class="dos-columnas" *ngFor="let criterio of criteriosRubrica.controls; let i = index">
+      <div class="campo">
+        <label class="etiqueta" [attr.for]="'criterio-desc-' + i">Criterio</label>
+        <input [id]="'criterio-desc-' + i" class="entrada" [formControl]="criterio.controls.description"
+               placeholder="Claridad de la explicación">
+      </div>
+      <div class="campo">
+        <label class="etiqueta" [attr.for]="'criterio-max-' + i">Puntos</label>
+        <div class="fila espaciado-sm">
+          <input [id]="'criterio-max-' + i" type="number" min="0.01" step="0.5" class="entrada"
+                 [formControl]="criterio.controls.maxPoints">
+          <button type="button" class="boton boton-fantasma boton-pequeno" (click)="quitarCriterio(i)"
+                  [disabled]="criteriosRubrica.length <= 1" aria-label="Quitar criterio">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <button type="button" class="boton boton-contorno boton-pequeno mb-2" (click)="agregarCriterio()">
+    + Añadir criterio
+  </button>
+
+  <p class="fuerte mb-0">Total: {{ totalRubricaEnEdicion }} puntos</p>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-fantasma" *ngIf="tarea()?.rubric"
+            [disabled]="guardandoRubrica()" (click)="quitarRubrica()">
+      Quitar rúbrica
+    </button>
+    <button type="button" class="boton boton-contorno" (click)="dialogoRubricaAbierto.set(false)">Cancelar</button>
+    <button type="submit" form="form-rubrica" class="boton boton-primario" [disabled]="guardandoRubrica()">
+      {{ guardandoRubrica() ? 'Guardando…' : 'Guardar rúbrica' }}
     </button>
   </ng-container>
 </app-dialogo>

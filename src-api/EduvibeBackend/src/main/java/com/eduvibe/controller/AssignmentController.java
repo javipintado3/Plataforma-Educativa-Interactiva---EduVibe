@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
 import com.eduvibe.dto.assignment.SaveAssignmentRequest;
+import com.eduvibe.dto.rubric.RubricResponse;
+import com.eduvibe.dto.rubric.SaveRubricRequest;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.dto.submission.SubmitRequest;
 import com.eduvibe.service.AssignmentService;
+import com.eduvibe.service.RubricService;
 import com.eduvibe.service.SubmissionService;
 
 import jakarta.validation.Valid;
@@ -36,6 +39,7 @@ public class AssignmentController {
 
     private final AssignmentService assignmentService;
     private final SubmissionService submissionService;
+    private final RubricService rubricService;
 
     @GetMapping("/{assignmentId}")
     public ResponseEntity<AssignmentDetailResponse> detalle(@PathVariable UUID assignmentId) {
@@ -70,5 +74,18 @@ public class AssignmentController {
     @GetMapping("/{assignmentId}/submissions")
     public ResponseEntity<List<SubmissionResponse>> entregas(@PathVariable UUID assignmentId) {
         return ResponseEntity.ok(submissionService.listarDeTarea(assignmentId));
+    }
+
+    /** Crea la rúbrica de la tarea, o sustituye por completo la que ya hubiera. */
+    @PutMapping("/{assignmentId}/rubric")
+    public ResponseEntity<RubricResponse> guardarRubrica(@PathVariable UUID assignmentId,
+                                                         @Valid @RequestBody SaveRubricRequest peticion) {
+        return ResponseEntity.ok(rubricService.guardar(assignmentId, peticion));
+    }
+
+    @DeleteMapping("/{assignmentId}/rubric")
+    public ResponseEntity<Void> borrarRubrica(@PathVariable UUID assignmentId) {
+        rubricService.eliminar(assignmentId);
+        return ResponseEntity.noContent().build();
     }
 }
