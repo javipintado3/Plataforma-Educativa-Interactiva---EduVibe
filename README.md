@@ -1,60 +1,112 @@
+# EduVibe
 
-# Plataforma Educativa Interactiva - EduVibe
+**Plataforma educativa full-stack**, a medio camino entre Google Classroom (simplicidad) y Moodle (estructura): clases, tareas, exámenes cronometrados, rúbricas de corrección, entregas grupales y foros, con un backend en capas y permisos resueltos en servidor.
 
-#### Curso Escolar 2023-2024
-#### Autor: [Javier Pintado Navarro](https://github.com/javipintado3)
-#### Tutor: [Antonio Gabriel González Casado](https://github.com/antonio-gabriel-gonzalez-casado)
-#### Fecha de Inicio: 15/03/2024
-#### Fecha de Finalización: 12/06/2024
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen)
+![Angular](https://img.shields.io/badge/Angular-17-red)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)
 
-## Breve descripción del proyecto
+## Capturas
 
-EduVibe va a ser una aplicación web diseñada para ofrecer un entorno de aprendizaje interactivo y eficiente para profesores y estudiantes. La plataforma se enfoca en proporcionar herramientas específicas para la gestión de clases y la interacción entre profesores y estudiantes, con el objetivo de mejorar la experiencia
-educativa en línea.
+| Login | Mis clases | Trabajo de clase |
+|---|---|---|
+| ![Login](docs/screenshots/login.jpg) | ![Mis clases](docs/screenshots/mis-clases.jpg) | ![Trabajo de clase](docs/screenshots/trabajo-de-clase.jpg) |
 
-## Definir el objetivo de la aplicación
+## Por qué existe
 
-- **¿Qué va a hacer la aplicación?**
-  
-- La aplicación "EduVibe" proporcionará un entorno educativo interactivo y eficiente para profesores y estudiantes. Permitirá la gestión de clases, la asignación y seguimiento de tareas, la comunicación entre profesores y estudiantes, y la gestión de usuarios con roles diferenciados.
-  
-- **¿Cuál es su atractivo principal?**
-  
-- El principal atractivo de EduVibe radica en su enfoque en la mejora de la experiencia educativa en línea al proporcionar herramientas específicas para la gestión de clases y la interacción entre profesores y estudiantes. Además, busca abordar las deficiencias observadas en otras plataformas educativas, ofreciendo un entorno más eficiente y fácil de usar.
-  
-- **¿Qué problema concreto va a resolver?**
-  
-- EduVibe busca resolver la falta de herramientas específicas y eficientes para la gestión de clases y la interacción entre profesores y estudiantes en entornos educativos en línea. Al abordar estas deficiencias, la aplicación busca mejorar la experiencia educativa en línea y hacer que el proceso de enseñanza y aprendizaje sea más efectivo y satisfactorio.
-  
-- **¿Qué necesidad va a cubrir?**
+No es un CRUD de práctica: es un ejercicio de construir, de verdad, las partes de una plataforma educativa que suelen quedarse fuera de un proyecto de portafolio por falta de tiempo — corrección con rúbrica, penalización automática por entrega tardía, media ponderada, entregas de un subgrupo entero, un banco de preguntas reutilizable entre exámenes. Cada pieza se probó a mano en el navegador contra el backend real antes de darla por cerrada, no solo compilando.
 
-- La aplicación EduVibe tiene como objetivo ayudar a los profesores y estudiantes en sus clases en línea. Con más personas aprendiendo desde casa, se necesita una manera fácil y divertida de enseñar y aprender en internet. EduVibe viene a ser esa herramienta amigable que hace que las clases sean más interesantes y fáciles de seguir. Con funciones especiales para tareas, comunicación entre profesores y alumnos, y una forma sencilla de organizar las clases, EduVibe está diseñada para hacer que la educación en línea sea más accesible y agradable para todos
+## Funcionalidades
 
-## Estructura del Proyecto
+**Cuentas y acceso**
+- Sin registro público: el alta la hace admin, por invitación con token de un solo uso (nunca se envía una contraseña por email).
+- Tres roles (administración, profesorado, alumnado) con permisos resueltos en el backend según la relación real con cada clase, no solo por rol — un profesor no puede tocar la clase de otro.
 
-- src-api
-- src-frontend
-- docs
-- README.md
+**Clases y trabajo**
+- Clases con temas, avisos fijables, materiales (con restricción de visibilidad por fecha) y matriculación.
+- Tareas con fecha límite, puntos, y tres mecanismos de evaluación real:
+  - **Rúbricas**: criterios con su propia puntuación, visibles antes de entregar; la nota final es la suma de lo puntuado en cada uno.
+  - **Ponderación**: cada tarea pesa lo que se le diga en la media de la clase (una media normal no compara tareas de puntuaciones distintas).
+  - **Penalización por entrega tardía**: un porcentaje configurable, aplicado automáticamente al calificar.
+- **Entrega grupal**: subgrupos reutilizables por clase; entregar o calificar una tarea grupal se propaga a todo el equipo, sin duplicar filas de nota.
 
-## Modelo Entidad-Relación
+**Exámenes**
+- Preguntas de opción múltiple con corrección automática y cronómetro.
+- Banco de preguntas reutilizable entre exámenes de la misma clase (se copian, no se comparte fila: retocar el original no afecta a intentos ya hechos).
+- Orden aleatorio de preguntas y respuestas por alumno, estable si recarga la página.
 
-#### Entidades y Atributos
+**Comunicación**
+- Foro de debate por clase, abierto a todo el mundo matriculado (no solo profesorado), con moderación de mensajes.
+- Notificaciones in-app (tarea nueva, nota publicada, aviso nuevo) y calendario mensual con las fechas de entrega ya integradas.
 
-| Entidad   | Atributos                                      |
-|-----------|------------------------------------------------|
-| Usuario   | UsuarioID, Nombre, Correo, Contraseña, RolID  |
-| ListadoClase  | ClaseID, UsuarioID |
-| Clase     | ClaseID, Nombre, Descripcion |
-| Tarea     | TareaID, Titulo, Descripcion, Fecha_Entrega, Nota, ClaseID, UsuarioID |
+**Perfil y administración**
+- Resumen de perfil por rol, foto de perfil, y panel de administración de usuarios con alta masiva.
 
+## Arquitectura
 
-#### Relaciones
+**Backend** — capas estrictas y sin atajos:
 
-- Relacion entre Usuario y Anuncio: un anuncio es publicado por un unico profesor y un profesor publica uno o muchos anuncios.
-- Relación entre Usuario y Clase: se crea una nueva tabla llamada ListadoClase ya que es una relación uno a muchos donde se guarda el id del alumno y de la clase.
-- Relación entre Clase y Tarea: una clase tiene muchas tareas, pero una tarea solo tiene una clase.
-- Relación entre Usuario y Tarea: un usuario tiene una o muchas tareas, pero una tarea esta asignada solo a ese usuario.
+```
+controller/   REST fino: valida entrada, llama al servicio, no lleva lógica
+service/      reglas de negocio, permisos (ClassAccessService centraliza "quién puede ver/editar qué")
+repository/   Spring Data JPA, sin devolver entidades por la API
+dto/          contratos de entrada y salida, separados de las entidades
+model/        entidades JPA
+```
 
+- Migraciones versionadas con **Flyway**, nunca `ddl-auto=update`.
+- Inyección por constructor en todo el proyecto, cero `@Autowired` en campos.
+- Datos de demostración cargados como migración repetible (`db/demo`), no hardcodeados.
 
+**Frontend** — Angular standalone, sin NgRx:
 
+- Componentes standalone con `loadComponent` (carga diferida por ruta), estado con **señales** (`signal`/`computed`), nada de `BehaviorSubject` para estado local.
+- Sistema de diseño propio: sin Material ni Bootstrap. Confirmaciones destructivas con un diálogo propio, nunca `window.confirm`.
+- Un servicio por dominio (`TareasService`, `ForoService`...); los componentes nunca llaman a `HttpClient` directamente.
+
+## Stack
+
+| | |
+|---|---|
+| Backend | Java 17 · Spring Boot 3.2 (Web, Security, Data JPA, Validation) · JWT propio |
+| Frontend | Angular 17 (standalone + signals) · TypeScript |
+| Base de datos | PostgreSQL 16 · Flyway |
+| Infraestructura | Docker Compose (API + frontend + Postgres), subida de archivos a disco con volumen propio |
+
+## Cómo arrancarlo
+
+**Con Docker (recomendado):**
+
+```bash
+docker compose up -d --build
+```
+
+Backend en `:9090`, frontend en `:80`, Postgres con volumen persistente. La base incluye datos de demostración: tres cuentas (administración, profesorado, alumnado), todas con contraseña `demo1234`.
+
+**En local, para desarrollar:**
+
+```bash
+# Base de datos
+docker compose up -d db
+
+# Backend (puerto 9090)
+cd src-api/EduvibeBackend && ./mvnw spring-boot:run
+
+# Frontend (puerto 4200)
+cd src-frontend/EduVibeFront && npm install && npm start
+```
+
+## Estructura del repositorio
+
+```
+src-api/EduvibeBackend/     API REST (Spring Boot)
+src-frontend/EduVibeFront/  SPA (Angular)
+docs/                       memoria del proyecto y capturas
+Docker-compose.yml
+```
+
+## Autor
+
+**Javier Pintado Navarro** — [GitHub](https://github.com/javipintado3) · [LinkedIn](https://www.linkedin.com/in/javier-pintado-navarro-06811a2ab/) · [Portafolio](https://javier-pintado-portfolio.vercel.app/)
