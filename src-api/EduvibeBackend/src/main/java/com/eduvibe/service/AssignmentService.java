@@ -60,6 +60,7 @@ public class AssignmentService {
         Assignment tarea = new Assignment(clase, peticion.title().trim(), peticion.description(),
                 peticion.dueDate(), peticion.puntosOPorDefecto(), autor);
         tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
+        tarea.setLatePenaltyPercent(peticion.penalizacionOPorDefecto());
 
         assignmentRepository.saveAndFlush(tarea);
         notificarAlumnado(classId, clase, tarea);
@@ -142,6 +143,7 @@ public class AssignmentService {
         tarea.setDescription(peticion.description());
         tarea.setDueDate(peticion.dueDate());
         tarea.setPoints(peticion.puntosOPorDefecto());
+        tarea.setLatePenaltyPercent(peticion.penalizacionOPorDefecto());
         tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
 
         assignmentRepository.save(tarea);

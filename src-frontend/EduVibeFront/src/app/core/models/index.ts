@@ -118,6 +118,7 @@ export interface DetalleTarea {
   description: string | null;
   dueDate: string | null;
   points: number;
+  latePenaltyPercent: number;
   haVencido: boolean;
   puedoEditar: boolean;
   miEntrega: Entrega | null;
@@ -126,9 +127,12 @@ export interface DetalleTarea {
 
 export interface Calificacion {
   score: number;
+  /** La nota tal cual se escribió, antes del descuento por entrega tardía. */
+  rawScore: number;
   feedback: string | null;
   gradedByName: string;
   gradedAt: string;
+  latePenaltyApplied: boolean;
 }
 
 export interface Entrega {

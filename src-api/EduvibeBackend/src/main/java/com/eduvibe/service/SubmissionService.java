@@ -141,11 +141,17 @@ public class SubmissionService {
         User corrector = userRepository.findById(autenticado.id())
                 .orElseThrow(() -> NotFoundException.de("Usuario", autenticado.id()));
 
+        // El profesorado pone la nota sobre el trabajo entregado; si llegó tarde
+        // y la tarea tiene penalización configurada, el descuento se aplica aquí
+        // y no a mano, para que nunca dependa de que alguien se acuerde.
+        boolean penalizacionAplicada = entrega.entregadaTarde() && tarea.getLatePenaltyPercent() > 0;
+        BigDecimal notaFinal = tarea.aplicarPenalizacionSiProcede(peticion.score(), entrega.entregadaTarde());
+
         Grade nota = gradeRepository.findBySubmissionId(submissionId)
-                .orElseGet(() -> new Grade(entrega, peticion.score(), peticion.feedback(), corrector));
+                .orElseGet(() -> new Grade(entrega, peticion.score(), notaFinal, peticion.feedback(), corrector));
 
         // Si ya existía, se actualiza dejando constancia de quién revisa
-        nota.corregir(peticion.score(), peticion.feedback(), corrector);
+        nota.corregir(peticion.score(), notaFinal, peticion.feedback(), corrector, penalizacionAplicada);
         gradeRepository.saveAndFlush(nota);
 
         entrega.marcarComoCalificada();

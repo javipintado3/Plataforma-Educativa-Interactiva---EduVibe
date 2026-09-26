@@ -63,7 +63,8 @@ export class ClasesService {
   }
 
   crearTarea(claseId: string, datos: {
-    title: string; description?: string; dueDate?: string | null; points?: number; topicId?: string | null;
+    title: string; description?: string; dueDate?: string | null; points?: number;
+    latePenaltyPercent?: number; topicId?: string | null;
   }): Observable<DetalleTarea> {
     return this.http.post<DetalleTarea>(`${this.api}/${claseId}/assignments`, datos);
   }

@@ -13,15 +13,19 @@ import com.eduvibe.model.Grade;
  */
 public record GradeResponse(
         BigDecimal score,
+        BigDecimal rawScore,
         String feedback,
         String gradedByName,
-        Instant gradedAt) {
+        Instant gradedAt,
+        boolean latePenaltyApplied) {
 
     public static GradeResponse de(Grade nota) {
         return new GradeResponse(
                 nota.getScore(),
+                nota.getRawScore(),
                 nota.getFeedback(),
                 nota.getGradedBy().getName(),
-                nota.getGradedAt());
+                nota.getGradedAt(),
+                nota.isLatePenaltyApplied());
     }
 }

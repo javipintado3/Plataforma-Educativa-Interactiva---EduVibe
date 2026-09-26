@@ -1,5 +1,7 @@
 package com.eduvibe.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -60,6 +62,10 @@ public class Assignment {
     @Column(name = "points", nullable = false)
     private int points;
 
+    /** Porcentaje que se descuenta de la nota si la entrega llega tarde. 0 = sin penalización. */
+    @Column(name = "late_penalty_percent", nullable = false)
+    private int latePenaltyPercent = 0;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
@@ -96,5 +102,21 @@ public class Assignment {
      */
     public boolean seEntregaTarde(Instant momentoDeEntrega) {
         return dueDate != null && momentoDeEntrega != null && momentoDeEntrega.isAfter(dueDate);
+    }
+
+    /**
+     * Aplica el descuento por entrega tardía a una nota, si toca.
+     *
+     * Vive aquí y no en {@link Grade} porque el porcentaje es una regla de la
+     * tarea, no de la nota concreta: la nota solo sabe ejecutar el cálculo que
+     * le llega ya resuelto.
+     */
+    public BigDecimal aplicarPenalizacionSiProcede(BigDecimal score, boolean entregaTarde) {
+        if (!entregaTarde || latePenaltyPercent <= 0) {
+            return score;
+        }
+        BigDecimal factor = BigDecimal.valueOf(100 - latePenaltyPercent)
+                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        return score.multiply(factor).setScale(2, RoundingMode.HALF_UP);
     }
 }

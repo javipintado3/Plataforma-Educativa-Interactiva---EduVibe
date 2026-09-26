@@ -150,7 +150,9 @@ export class DetalleTareaComponent implements OnInit {
     this.entregaElegida.set(entrega);
     this.errorNota.set(null);
     this.formNota.setValue({
-      score: entrega.grade ? Number(entrega.grade.score) : 0,
+      // Se precarga con rawScore, no con score: score ya lleva aplicado el
+      // descuento por entrega tardía, y reguardar sin cambios lo aplicaría dos veces.
+      score: entrega.grade ? Number(entrega.grade.rawScore) : 0,
       feedback: entrega.grade?.feedback ?? '',
     });
     this.formNotaProfesor.setValue({ teacherNote: entrega.teacherNote ?? '' });

@@ -94,6 +94,16 @@
       </div>
     </div>
 
+    <div class="campo">
+      <label class="etiqueta" for="penalizacion">Penalización por entrega tardía</label>
+      <div class="fila espaciado-sm">
+        <input id="penalizacion" type="number" min="0" max="100" class="entrada"
+               formControlName="latePenaltyPercent" style="max-width:6rem">
+        <span class="pequeno apagado">% de descuento si llega fuera de plazo</span>
+      </div>
+      <span class="ayuda-campo">0 = sin penalización</span>
+    </div>
+
     <div class="campo mb-0" *ngIf="temas.length">
       <label class="etiqueta" for="tema">Tema</label>
       <select id="tema" class="selector" formControlName="topicId">

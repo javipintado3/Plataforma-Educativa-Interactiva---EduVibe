@@ -50,8 +50,22 @@ public class Grade {
     @Column(name = "score", nullable = false, precision = 5, scale = 2)
     private BigDecimal score;
 
+    /**
+     * La nota tal cual la escribió quien corrige, antes de cualquier descuento.
+     *
+     * Existe para poder precargar el formulario de corrección al reabrirlo: si
+     * se usara {@code score} (ya penalizada) para eso, reguardar sin cambios
+     * aplicaría el descuento por entrega tardía una segunda vez.
+     */
+    @Column(name = "raw_score", nullable = false, precision = 5, scale = 2)
+    private BigDecimal rawScore;
+
     @Column(name = "feedback")
     private String feedback;
+
+    /** Si esta nota ya lleva aplicado el descuento por entrega tardía de la tarea. */
+    @Column(name = "late_penalty_applied", nullable = false)
+    private boolean latePenaltyApplied = false;
 
     /** Quién ha puesto la nota. */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -66,17 +80,21 @@ public class Grade {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Instant updatedAt;
 
-    public Grade(Submission submission, BigDecimal score, String feedback, User gradedBy) {
+    public Grade(Submission submission, BigDecimal rawScore, BigDecimal score, String feedback, User gradedBy) {
         this.submission = submission;
+        this.rawScore = rawScore;
         this.score = score;
         this.feedback = feedback;
         this.gradedBy = gradedBy;
     }
 
     /** Actualiza una nota ya puesta, dejando constancia de quién la revisa. */
-    public void corregir(BigDecimal score, String feedback, User gradedBy) {
+    public void corregir(BigDecimal rawScore, BigDecimal score, String feedback, User gradedBy,
+                          boolean latePenaltyApplied) {
+        this.rawScore = rawScore;
         this.score = score;
         this.feedback = feedback;
         this.gradedBy = gradedBy;
+        this.latePenaltyApplied = latePenaltyApplied;
     }
 }

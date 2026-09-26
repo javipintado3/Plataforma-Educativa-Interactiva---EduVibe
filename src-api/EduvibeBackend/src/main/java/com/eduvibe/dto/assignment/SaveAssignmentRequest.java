@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -34,10 +35,19 @@ public record SaveAssignmentRequest(
         @Max(value = 1000, message = "La puntuación no puede pasar de 1000")
         Integer points,
 
+        @Min(value = 0, message = "La penalización no puede ser negativa")
+        @Max(value = 100, message = "La penalización no puede pasar del 100%")
+        Integer latePenaltyPercent,
+
         UUID topicId) {
 
     /** Si no se indica puntuación, se toma la de un examen al uso. */
     public int puntosOPorDefecto() {
         return points == null ? 100 : points;
+    }
+
+    /** Sin indicar, no hay penalización: es el comportamiento de siempre. */
+    public int penalizacionOPorDefecto() {
+        return latePenaltyPercent == null ? 0 : latePenaltyPercent;
     }
 }
