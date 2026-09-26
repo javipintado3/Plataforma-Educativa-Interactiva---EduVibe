@@ -59,6 +59,7 @@ export class PestanaTrabajoComponent implements OnInit {
     dueDate: [''],
     points: [100, [Validators.required, Validators.min(1)]],
     latePenaltyPercent: [0, [Validators.min(0), Validators.max(100)]],
+    weight: [1, [Validators.required, Validators.min(0.01)]],
     topicId: [''],
   });
 
@@ -116,7 +117,9 @@ export class PestanaTrabajoComponent implements OnInit {
   }
 
   abrirDialogo(): void {
-    this.formulario.reset({ title: '', description: '', dueDate: '', points: 100, latePenaltyPercent: 0, topicId: '' });
+    this.formulario.reset({
+      title: '', description: '', dueDate: '', points: 100, latePenaltyPercent: 0, weight: 1, topicId: '',
+    });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }
@@ -131,7 +134,7 @@ export class PestanaTrabajoComponent implements OnInit {
     this.creando.set(true);
     this.errorFormulario.set(null);
 
-    const { title, description, dueDate, points, latePenaltyPercent, topicId } = this.formulario.getRawValue();
+    const { title, description, dueDate, points, latePenaltyPercent, weight, topicId } = this.formulario.getRawValue();
 
     this.clasesService.crearTarea(this.claseId, {
       title,
@@ -141,6 +144,7 @@ export class PestanaTrabajoComponent implements OnInit {
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
       points,
       latePenaltyPercent,
+      weight,
       topicId: topicId || null,
     }).subscribe({
       next: () => {

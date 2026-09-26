@@ -1,5 +1,6 @@
 package com.eduvibe.dto.submission;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,6 +13,10 @@ import com.eduvibe.model.Submission;
  *                       la tarea; no está guardado en ninguna columna, y por
  *                       eso una entrega puede estar calificada y tarde a la vez
  * @param grade          null mientras no se haya corregido
+ * @param points         sobre cuánto vale la tarea; hace falta para poder
+ *                       normalizar la nota al calcular la media ponderada de
+ *                       la clase, que mezcla tareas con puntuaciones distintas
+ * @param weight         peso de la tarea en esa media
  */
 public record SubmissionResponse(
         UUID id,
@@ -25,7 +30,9 @@ public record SubmissionResponse(
         Instant submittedAt,
         boolean entregadaTarde,
         GradeResponse grade,
-        String teacherNote) {
+        String teacherNote,
+        int points,
+        BigDecimal weight) {
 
     public static SubmissionResponse de(Submission entrega, GradeResponse nota) {
         return new SubmissionResponse(
@@ -40,6 +47,8 @@ public record SubmissionResponse(
                 entrega.getSubmittedAt(),
                 entrega.entregadaTarde(),
                 nota,
-                entrega.getTeacherNote());
+                entrega.getTeacherNote(),
+                entrega.getAssignment().getPoints(),
+                entrega.getAssignment().getWeight());
     }
 }

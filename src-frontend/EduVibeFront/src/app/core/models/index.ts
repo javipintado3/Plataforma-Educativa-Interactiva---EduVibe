@@ -119,6 +119,7 @@ export interface DetalleTarea {
   dueDate: string | null;
   points: number;
   latePenaltyPercent: number;
+  weight: number;
   haVencido: boolean;
   puedoEditar: boolean;
   miEntrega: Entrega | null;
@@ -149,6 +150,9 @@ export interface Entrega {
   grade: Calificacion | null;
   /** Nota rápida del profesorado, independiente de la calificación. */
   teacherNote: string | null;
+  /** Sobre cuánto vale la tarea y su peso, para poder calcular la media ponderada. */
+  points: number;
+  weight: number;
 }
 
 export interface Anuncio {

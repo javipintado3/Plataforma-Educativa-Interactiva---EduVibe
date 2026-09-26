@@ -66,6 +66,10 @@ public class Assignment {
     @Column(name = "late_penalty_percent", nullable = false)
     private int latePenaltyPercent = 0;
 
+    /** Peso relativo en la media ponderada de la clase. 1 = peso normal. */
+    @Column(name = "weight", nullable = false, precision = 4, scale = 2)
+    private BigDecimal weight = BigDecimal.ONE;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;

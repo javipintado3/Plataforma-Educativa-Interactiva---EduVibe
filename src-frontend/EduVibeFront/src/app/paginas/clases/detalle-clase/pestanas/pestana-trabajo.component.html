@@ -104,6 +104,15 @@
       <span class="ayuda-campo">0 = sin penalización</span>
     </div>
 
+    <div class="campo">
+      <label class="etiqueta" for="peso">Peso en la media de la clase</label>
+      <div class="fila espaciado-sm">
+        <input id="peso" type="number" min="0.01" step="0.5" class="entrada"
+               formControlName="weight" style="max-width:6rem">
+        <span class="pequeno apagado">1 = peso normal; 2 = cuenta el doble</span>
+      </div>
+    </div>
+
     <div class="campo mb-0" *ngIf="temas.length">
       <label class="etiqueta" for="tema">Tema</label>
       <select id="tema" class="selector" formControlName="topicId">

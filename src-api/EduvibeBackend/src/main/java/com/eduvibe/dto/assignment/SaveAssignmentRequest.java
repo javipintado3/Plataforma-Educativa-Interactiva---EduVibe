@@ -1,8 +1,11 @@
 package com.eduvibe.dto.assignment;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +42,10 @@ public record SaveAssignmentRequest(
         @Max(value = 100, message = "La penalización no puede pasar del 100%")
         Integer latePenaltyPercent,
 
+        @DecimalMin(value = "0.01", message = "El peso debe ser mayor que cero")
+        @DecimalMax(value = "99.99", message = "El peso es demasiado grande")
+        BigDecimal weight,
+
         UUID topicId) {
 
     /** Si no se indica puntuación, se toma la de un examen al uso. */
@@ -49,5 +56,10 @@ public record SaveAssignmentRequest(
     /** Sin indicar, no hay penalización: es el comportamiento de siempre. */
     public int penalizacionOPorDefecto() {
         return latePenaltyPercent == null ? 0 : latePenaltyPercent;
+    }
+
+    /** Sin indicar, peso normal: cuenta igual que cualquier otra tarea. */
+    public BigDecimal pesoOPorDefecto() {
+        return weight == null ? BigDecimal.ONE : weight;
     }
 }

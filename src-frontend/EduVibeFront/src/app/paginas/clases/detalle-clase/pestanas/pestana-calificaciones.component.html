@@ -6,8 +6,8 @@
 
   <div class="resumen mb-3" *ngIf="media() !== null">
     <div>
-      <p class="pequeno apagado mb-0">Media de lo corregido</p>
-      <p class="media mb-0">{{ media() }}</p>
+      <p class="pequeno apagado mb-0">Media ponderada de lo corregido</p>
+      <p class="media mb-0">{{ media() }}%</p>
     </div>
     <p class="pequeno apagado mb-0">
       {{ calificadas().length }} de {{ entregas().length }} entrega(s) calificada(s)
@@ -30,6 +30,9 @@
             <td>
               <a [routerLink]="['/tareas', entrega.assignmentId]" class="fuerte">{{ entrega.assignmentTitle }}</a>
               <span class="pastilla pastilla-roja separado" *ngIf="entrega.entregadaTarde">Tarde</span>
+              <span class="pastilla pastilla-gris separado" *ngIf="entrega.weight !== 1">
+                Peso {{ entrega.weight }}
+              </span>
             </td>
             <td><app-pastilla-estado [valor]="entrega.status"></app-pastilla-estado></td>
             <td class="pequeno apagado">{{ entrega.submittedAt | fecha }}</td>

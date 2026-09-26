@@ -12,10 +12,15 @@ import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
 
 /**
  * Pestaña "Calificaciones" del alumnado: sus entregas en esta clase, con la
- * nota de las que ya están corregidas y la media de esas.
+ * nota de las que ya están corregidas y la media ponderada de esas.
  *
  * La media solo cuenta lo calificado. Incluir en ella lo que aún no se ha
  * corregido daría un número que baja solo porque el profesor va con retraso.
+ *
+ * Es ponderada y en porcentaje, no la media simple de las notas tal cual: las
+ * tareas de la clase pueden valer puntuaciones distintas (100, 50…) y tener
+ * un peso distinto en la nota final, así que sumar las notas sin más mezclaría
+ * escalas que no son comparables entre sí.
  */
 @Component({
   selector: 'app-pestana-calificaciones',
@@ -39,13 +44,20 @@ export class PestanaCalificacionesComponent implements OnInit {
 
   readonly calificadas = computed(() => this.entregas().filter(e => e.grade !== null));
 
+  /** Media ponderada, en porcentaje: normaliza cada nota a su propia escala antes de pesarla. */
   readonly media = computed(() => {
     const notas = this.calificadas();
     if (!notas.length) {
       return null;
     }
-    const suma = notas.reduce((total, entrega) => total + Number(entrega.grade!.score), 0);
-    return Math.round((suma / notas.length) * 10) / 10;
+    let sumaPonderada = 0;
+    let sumaPesos = 0;
+    for (const entrega of notas) {
+      const porcentaje = (Number(entrega.grade!.score) / entrega.points) * 100;
+      sumaPonderada += porcentaje * entrega.weight;
+      sumaPesos += entrega.weight;
+    }
+    return Math.round((sumaPonderada / sumaPesos) * 10) / 10;
   });
 
   ngOnInit(): void {

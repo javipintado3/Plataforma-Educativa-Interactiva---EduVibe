@@ -31,6 +31,7 @@
           {{ t.points }} puntos
           <span *ngIf="t.dueDate"> · Entrega hasta el {{ t.dueDate | fecha }}</span>
           <span *ngIf="t.latePenaltyPercent > 0"> · Fuera de plazo: -{{ t.latePenaltyPercent }}% en la nota</span>
+          <span *ngIf="t.weight !== 1"> · Peso {{ t.weight }} en la media de la clase</span>
         </p>
 
         <div class="enunciado" *ngIf="t.description">{{ t.description }}</div>

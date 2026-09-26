@@ -1,5 +1,6 @@
 package com.eduvibe.dto.assignment;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ public record AssignmentDetailResponse(
         Instant dueDate,
         int points,
         int latePenaltyPercent,
+        BigDecimal weight,
         boolean haVencido,
         boolean puedoEditar,
         SubmissionResponse miEntrega,
@@ -41,6 +43,7 @@ public record AssignmentDetailResponse(
                 tarea.getDueDate(),
                 tarea.getPoints(),
                 tarea.getLatePenaltyPercent(),
+                tarea.getWeight(),
                 tarea.haVencido(),
                 puedoEditar,
                 miEntrega,
