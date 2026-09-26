@@ -58,6 +58,10 @@ public class Resource {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
+    /** Desde cuándo es visible para el alumnado. Null = visible desde que se publica. */
+    @Column(name = "available_from")
+    private Instant availableFrom;
+
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", insertable = false, updatable = false)
     private Instant createdAt;
@@ -73,5 +77,10 @@ public class Resource {
         this.fileUrl = fileUrl;
         this.type = type;
         this.sortOrder = sortOrder;
+    }
+
+    /** Si al alumnado todavía no le toca verlo. El profesorado lo ve siempre. */
+    public boolean bloqueadoParaAlumnado() {
+        return availableFrom != null && Instant.now().isBefore(availableFrom);
     }
 }

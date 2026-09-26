@@ -19,7 +19,8 @@ export class MaterialesService {
   private readonly api = `${environment.apiUrl}/resources`;
 
   actualizar(materialId: string, datos: {
-    title: string; fileUrl?: string; type?: TipoMaterial | ''; topicId?: string | null;
+    title: string; fileUrl?: string; type?: TipoMaterial | ''; availableFrom?: string | null;
+    topicId?: string | null;
   }): Observable<Material> {
     return this.http.put<Material>(`${this.api}/${materialId}`, datos);
   }

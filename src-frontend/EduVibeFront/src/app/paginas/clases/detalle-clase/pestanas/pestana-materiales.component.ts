@@ -11,6 +11,7 @@ import { CargandoComponent } from '../../../../shared/cargando/cargando.componen
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
+import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
 import { RutaArchivoPipe } from '../../../../shared/pipes/ruta-archivo.pipe';
 import { SubidaArchivoComponent } from '../../../../shared/subida-archivo/subida-archivo.component';
 
@@ -27,7 +28,7 @@ import { SubidaArchivoComponent } from '../../../../shared/subida-archivo/subida
   imports: [
     NgIf, NgFor, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent,
-    SubidaArchivoComponent, RutaArchivoPipe,
+    SubidaArchivoComponent, RutaArchivoPipe, FechaPipe,
   ],
   templateUrl: './pestana-materiales.component.html',
   styleUrl: './pestana-materiales.component.css',
@@ -57,6 +58,7 @@ export class PestanaMaterialesComponent implements OnInit {
     title: ['', [Validators.required, Validators.maxLength(200)]],
     fileUrl: [''],
     type: this.fb.nonNullable.control<TipoMaterial | ''>(''),
+    availableFrom: [''],
     topicId: [''],
   });
 
@@ -89,7 +91,7 @@ export class PestanaMaterialesComponent implements OnInit {
 
   abrirCrear(): void {
     this.editando.set(null);
-    this.formulario.reset({ title: '', fileUrl: '', type: '', topicId: '' });
+    this.formulario.reset({ title: '', fileUrl: '', type: '', availableFrom: '', topicId: '' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }
@@ -100,10 +102,18 @@ export class PestanaMaterialesComponent implements OnInit {
       title: material.title,
       fileUrl: material.fileUrl ?? '',
       type: material.type ?? '',
+      availableFrom: material.availableFrom ? this.aFechaLocal(material.availableFrom) : '',
       topicId: material.topicId ?? '',
     });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
+  }
+
+  /** El input datetime-local pinta en hora local; la API guarda un instante en UTC. */
+  private aFechaLocal(iso: string): string {
+    const fecha = new Date(iso);
+    const offset = fecha.getTimezoneOffset() * 60000;
+    return new Date(fecha.getTime() - offset).toISOString().slice(0, 16);
   }
 
   guardar(): void {
@@ -116,10 +126,16 @@ export class PestanaMaterialesComponent implements OnInit {
     this.guardando.set(true);
     this.errorFormulario.set(null);
 
-    const { title, fileUrl, type, topicId } = this.formulario.getRawValue();
+    const { title, fileUrl, type, availableFrom, topicId } = this.formulario.getRawValue();
     // El @Pattern del backend admite null pero no "": sin esto, dejar el tipo
     // sin especificar devolvía 400 en vez de guardar el material.
-    const datos = { title, fileUrl: fileUrl || undefined, type: type || undefined, topicId: topicId || null };
+    const datos = {
+      title,
+      fileUrl: fileUrl || undefined,
+      type: type || undefined,
+      availableFrom: availableFrom ? new Date(availableFrom).toISOString() : null,
+      topicId: topicId || null,
+    };
     const edicion = this.editando();
 
     const peticion = edicion

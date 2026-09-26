@@ -170,6 +170,10 @@ export interface Material {
   fileUrl: string | null;
   type: TipoMaterial | null;
   sortOrder: number;
+  /** Desde cuándo lo ve el alumnado; null si no tiene restricción. */
+  availableFrom: string | null;
+  /** Si quien consulta todavía no puede verlo. Al profesorado nunca se le bloquea. */
+  bloqueado: boolean;
   createdAt: string | null;
 }
 

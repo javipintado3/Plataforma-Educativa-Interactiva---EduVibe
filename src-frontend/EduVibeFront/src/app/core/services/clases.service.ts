@@ -93,7 +93,8 @@ export class ClasesService {
   }
 
   crearMaterial(claseId: string, datos: {
-    title: string; fileUrl?: string; type?: TipoMaterial | ''; topicId?: string | null;
+    title: string; fileUrl?: string; type?: TipoMaterial | ''; availableFrom?: string | null;
+    topicId?: string | null;
   }): Observable<Material> {
     return this.http.post<Material>(`${this.api}/${claseId}/resources`, datos);
   }

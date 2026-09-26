@@ -34,10 +34,11 @@ public class ResourceService {
     @Transactional(readOnly = true)
     public List<ResourceResponse> listar(UUID classId) {
         acceso.exigirVisible(classId);
+        boolean esProfesor = acceso.puedeCalificarEn(classId);
 
         return resourceRepository.findBySchoolClassIdOrderBySortOrderAscTitleAsc(classId)
                 .stream()
-                .map(ResourceResponse::de)
+                .map(material -> ResourceResponse.de(material, esProfesor))
                 .toList();
     }
 
@@ -52,9 +53,10 @@ public class ResourceService {
         Resource material = new Resource(clase, peticion.title().trim(), normalizar(peticion.fileUrl()),
                 tipoOSinTipo(peticion.type()), orden);
         material.setTopic(tema);
+        material.setAvailableFrom(peticion.availableFrom());
         resourceRepository.saveAndFlush(material);
 
-        return ResourceResponse.de(material);
+        return ResourceResponse.de(material, true);
     }
 
     @Transactional
@@ -69,9 +71,10 @@ public class ResourceService {
         material.setFileUrl(normalizar(peticion.fileUrl()));
         material.setType(tipoOSinTipo(peticion.type()));
         material.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
+        material.setAvailableFrom(peticion.availableFrom());
         resourceRepository.save(material);
 
-        return ResourceResponse.de(material);
+        return ResourceResponse.de(material, true);
     }
 
     @Transactional

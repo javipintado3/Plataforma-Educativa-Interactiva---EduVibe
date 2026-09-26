@@ -37,6 +37,12 @@
         <span class="meta">
           <app-pastilla-estado *ngIf="material.type" [valor]="material.type"></app-pastilla-estado>
           <span class="apagado"> · {{ tituloDelTema(material.topicId) }}</span>
+          <span class="pastilla pastilla-ambar" *ngIf="material.bloqueado">
+            Se ve a partir del {{ material.availableFrom | fecha }}
+          </span>
+          <span class="apagado" *ngIf="puedoEditar && !material.bloqueado && material.availableFrom">
+            · Programado desde el {{ material.availableFrom | fecha }}
+          </span>
         </span>
       </span>
 
@@ -100,6 +106,12 @@
           <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
         </select>
       </div>
+    </div>
+
+    <div class="campo mb-0">
+      <label class="etiqueta" for="disponible-desde">Visible para el alumnado a partir de</label>
+      <input id="disponible-desde" type="datetime-local" class="entrada" formControlName="availableFrom">
+      <span class="ayuda-campo">Opcional: sin fecha, se ve en cuanto se publica</span>
     </div>
   </form>
 
