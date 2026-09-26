@@ -64,6 +64,14 @@ public class Submission {
     @Column(name = "submitted_at")
     private Instant submittedAt;
 
+    /**
+     * El subgrupo que entregó, en una tarea grupal. Null en el resto: la
+     * entrega es de ese alumno y punto.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_group_id")
+    private ClassGroup classGroup;
+
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", insertable = false, updatable = false)
     private Instant createdAt;
@@ -92,10 +100,21 @@ public class Submission {
      * llame.
      */
     public void enviar(String content, String fileUrl) {
+        enviar(content, fileUrl, Instant.now());
+    }
+
+    /**
+     * Igual que {@link #enviar(String, String)}, pero con el momento del envío
+     * fijado desde fuera: en una tarea grupal, todas las entregas del mismo
+     * subgrupo tienen que compartir literalmente el mismo instante para que
+     * "llegó tarde" no pueda dar una respuesta distinta según a qué miembro se
+     * le pregunte.
+     */
+    public void enviar(String content, String fileUrl, Instant momento) {
         this.content = content;
         this.fileUrl = fileUrl;
         this.status = SubmissionStatus.SUBMITTED;
-        this.submittedAt = Instant.now();
+        this.submittedAt = momento;
     }
 
     public void marcarComoCalificada() {

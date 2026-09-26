@@ -120,11 +120,14 @@ export interface DetalleTarea {
   points: number;
   latePenaltyPercent: number;
   weight: number;
+  groupAssignment: boolean;
   haVencido: boolean;
   puedoEditar: boolean;
   miEntrega: Entrega | null;
   /** Su rúbrica, si tiene; null si se califica con una nota suelta. */
   rubric: Rubrica | null;
+  /** El subgrupo de quien consulta, en una tarea grupal; null si no está en ninguno todavía. */
+  myGroup: Subgrupo | null;
   createdAt: string | null;
 }
 
@@ -176,6 +179,8 @@ export interface Entrega {
   /** Sobre cuánto vale la tarea y su peso, para poder calcular la media ponderada. */
   points: number;
   weight: number;
+  /** El subgrupo que la entregó, en una tarea grupal; null en el resto. */
+  groupName: string | null;
 }
 
 export interface Anuncio {
@@ -222,6 +227,18 @@ export interface EntradaAgenda {
   className: string | null;
   classSubject: string | null;
   classColor: string | null;
+}
+
+export interface MiembroSubgrupo {
+  id: string;
+  name: string;
+}
+
+/** Un subgrupo de la clase: un equipo de trabajo reutilizable. */
+export interface Subgrupo {
+  id: string;
+  name: string;
+  members: MiembroSubgrupo[];
 }
 
 /** Un hilo en la lista del foro de una clase. */

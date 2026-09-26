@@ -340,11 +340,14 @@ export class DetalleTareaComponent implements OnInit {
       : undefined;
 
     this.tareasService.calificar(entrega.id, rubrica ? null : score, feedback || undefined, rubricScores).subscribe({
-      next: (actualizada) => {
+      next: () => {
         this.calificando.set(false);
         this.entregaElegida.set(null);
-        this.entregas.update(lista =>
-          lista.map(e => e.id === actualizada.id ? actualizada : e));
+        // En una tarea grupal, calificar una entrega califica a todo el
+        // subgrupo a la vez: se recarga la lista entera en vez de solo la
+        // que se acaba de corregir, para que las demás filas del mismo
+        // subgrupo dejen de aparecer como pendientes sin tener que refrescar.
+        this.cargarEntregas();
       },
       error: (err) => {
         this.calificando.set(false);
@@ -356,5 +359,9 @@ export class DetalleTareaComponent implements OnInit {
   /** Cuántas entregas quedan por corregir, para la cabecera de la lista. */
   get pendientesDeCorregir(): number {
     return this.entregas().filter(e => e.status === 'submitted').length;
+  }
+
+  nombresDe(miembros: { name: string }[]): string {
+    return miembros.map(m => m.name).join(', ');
   }
 }

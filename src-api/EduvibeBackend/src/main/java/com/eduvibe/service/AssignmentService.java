@@ -49,6 +49,7 @@ public class AssignmentService {
     private final NotificationService notificationService;
     private final TopicService topicService;
     private final RubricService rubricService;
+    private final ClassGroupService classGroupService;
 
     @Transactional
     public AssignmentDetailResponse crear(UUID classId, SaveAssignmentRequest peticion) {
@@ -63,11 +64,12 @@ public class AssignmentService {
         tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
         tarea.setLatePenaltyPercent(peticion.penalizacionOPorDefecto());
         tarea.setWeight(peticion.pesoOPorDefecto());
+        tarea.setGroupAssignment(peticion.esGrupalOPorDefecto());
 
         assignmentRepository.saveAndFlush(tarea);
         notificarAlumnado(classId, clase, tarea);
 
-        return AssignmentDetailResponse.de(tarea, true, null, null);
+        return AssignmentDetailResponse.de(tarea, true, null, null, null);
     }
 
     /** Avisa a todo el alumnado matriculado de que hay una novedad con este título. */
@@ -131,7 +133,12 @@ public class AssignmentService {
         var miEntrega = puedoEditar ? null : submissionService.miEntregaSiExiste(tarea);
         var rubrica = rubricService.obtenerSiExiste(assignmentId);
 
-        return AssignmentDetailResponse.de(tarea, puedoEditar, miEntrega, rubrica);
+        AuthenticatedUser autenticado = authService.identidadActual();
+        var miGrupo = (!puedoEditar && tarea.isGroupAssignment())
+                ? classGroupService.miGrupoEnClase(autenticado.id(), classId)
+                : null;
+
+        return AssignmentDetailResponse.de(tarea, puedoEditar, miEntrega, rubrica, miGrupo);
     }
 
     @Transactional
@@ -148,11 +155,12 @@ public class AssignmentService {
         tarea.setPoints(peticion.puntosOPorDefecto());
         tarea.setLatePenaltyPercent(peticion.penalizacionOPorDefecto());
         tarea.setWeight(peticion.pesoOPorDefecto());
+        tarea.setGroupAssignment(peticion.esGrupalOPorDefecto());
         tarea.setTopic(topicService.resolverDeClase(peticion.topicId(), classId));
 
         assignmentRepository.save(tarea);
 
-        return AssignmentDetailResponse.de(tarea, true, null, rubricService.obtenerSiExiste(assignmentId));
+        return AssignmentDetailResponse.de(tarea, true, null, rubricService.obtenerSiExiste(assignmentId), null);
     }
 
     /**

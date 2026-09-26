@@ -113,6 +113,13 @@
       </div>
     </div>
 
+    <div class="campo">
+      <label class="fila espaciado-sm" style="font-weight:normal;cursor:pointer">
+        <input type="checkbox" formControlName="groupAssignment">
+        Entrega grupal (se entrega y se corrige una vez por subgrupo)
+      </label>
+    </div>
+
     <div class="campo mb-0" *ngIf="temas.length">
       <label class="etiqueta" for="tema">Tema</label>
       <select id="tema" class="selector" formControlName="topicId">

@@ -24,3 +24,20 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.lista-miembros {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio-sm);
+  padding: 4px 10px;
+}
+
+.miembro-casilla {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 2px;
+  font-size: .9rem;
+  cursor: pointer;
+}

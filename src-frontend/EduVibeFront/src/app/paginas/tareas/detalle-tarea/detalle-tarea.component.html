@@ -32,6 +32,7 @@
           <span *ngIf="t.dueDate"> · Entrega hasta el {{ t.dueDate | fecha }}</span>
           <span *ngIf="t.latePenaltyPercent > 0"> · Fuera de plazo: -{{ t.latePenaltyPercent }}% en la nota</span>
           <span *ngIf="t.weight !== 1"> · Peso {{ t.weight }} en la media de la clase</span>
+          <span *ngIf="t.groupAssignment"> · Entrega grupal</span>
         </p>
 
         <div class="enunciado" *ngIf="t.description">{{ t.description }}</div>
@@ -104,6 +105,18 @@
             <span>Esta entrega llegó fuera de plazo.</span>
           </div>
 
+          <ng-container *ngIf="t.groupAssignment">
+            <div class="nota-profesor mb-2" *ngIf="t.myGroup as grupo">
+              <span class="pequeno apagado">Entregas en nombre de tu subgrupo</span>
+              <p class="pequeno mb-0 mt-1">
+                <strong>{{ grupo.name }}</strong>: {{ nombresDe(grupo.members) }}
+              </p>
+            </div>
+            <div class="aviso aviso-atencion mb-2" *ngIf="!t.myGroup">
+              <span>No perteneces a ningún subgrupo de esta clase; pide al profesorado que te añada a uno para poder entregar.</span>
+            </div>
+          </ng-container>
+
           <app-aviso class="mb-2" tipo="exito" [mensaje]="mensajeEntrega()"></app-aviso>
 
           <form [formGroup]="formEntrega" novalidate>
@@ -124,11 +137,11 @@
 
           <div class="fila espaciado-sm" *ngIf="!bloqueada">
             <button type="button" class="boton boton-contorno crecer"
-                    [disabled]="guardando()" (click)="guardar(false)">
+                    [disabled]="guardando() || (t.groupAssignment && !t.myGroup)" (click)="guardar(false)">
               Guardar borrador
             </button>
             <button type="button" class="boton boton-primario crecer"
-                    [disabled]="guardando()" (click)="guardar(true)">
+                    [disabled]="guardando() || (t.groupAssignment && !t.myGroup)" (click)="guardar(true)">
               {{ guardando() ? 'Enviando…' : 'Entregar' }}
             </button>
           </div>
@@ -160,6 +173,7 @@
             <span class="alumno">{{ entrega.studentName }}</span>
             <span class="pequeno apagado bloque">
               {{ entrega.submittedAt ? (entrega.submittedAt | fecha) : 'Sin enviar' }}
+              <span *ngIf="entrega.groupName"> · {{ entrega.groupName }}</span>
             </span>
           </span>
 
@@ -214,6 +228,10 @@
         Llegó fuera de plazo: al guardar se descontará automáticamente el
         {{ tarea()?.latePenaltyPercent }}% de la nota que pongas aquí abajo.
       </span>
+    </div>
+
+    <div class="aviso aviso-atencion mb-2" *ngIf="entrega.groupName">
+      <span>Es una entrega grupal: esta nota se aplicará a todo el subgrupo "{{ entrega.groupName }}", no solo a {{ entrega.studentName }}.</span>
     </div>
 
     <app-aviso class="mb-2" tipo="error" [mensaje]="errorNota()"></app-aviso>

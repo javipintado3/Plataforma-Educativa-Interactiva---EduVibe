@@ -46,6 +46,9 @@ public record SaveAssignmentRequest(
         @DecimalMax(value = "99.99", message = "El peso es demasiado grande")
         BigDecimal weight,
 
+        /** Si se entrega y se corrige una vez por subgrupo. Sin indicar, es individual. */
+        Boolean groupAssignment,
+
         UUID topicId) {
 
     /** Si no se indica puntuación, se toma la de un examen al uso. */
@@ -61,5 +64,10 @@ public record SaveAssignmentRequest(
     /** Sin indicar, peso normal: cuenta igual que cualquier otra tarea. */
     public BigDecimal pesoOPorDefecto() {
         return weight == null ? BigDecimal.ONE : weight;
+    }
+
+    /** Sin indicar, individual: es el comportamiento de siempre. */
+    public boolean esGrupalOPorDefecto() {
+        return groupAssignment != null && groupAssignment;
     }
 }

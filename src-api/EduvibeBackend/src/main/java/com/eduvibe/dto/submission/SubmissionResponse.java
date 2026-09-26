@@ -17,6 +17,8 @@ import com.eduvibe.model.Submission;
  *                       normalizar la nota al calcular la media ponderada de
  *                       la clase, que mezcla tareas con puntuaciones distintas
  * @param weight         peso de la tarea en esa media
+ * @param groupName      el subgrupo que la entregó, en una tarea grupal; null
+ *                       en el resto
  */
 public record SubmissionResponse(
         UUID id,
@@ -32,7 +34,8 @@ public record SubmissionResponse(
         GradeResponse grade,
         String teacherNote,
         int points,
-        BigDecimal weight) {
+        BigDecimal weight,
+        String groupName) {
 
     public static SubmissionResponse de(Submission entrega, GradeResponse nota) {
         return new SubmissionResponse(
@@ -49,6 +52,7 @@ public record SubmissionResponse(
                 nota,
                 entrega.getTeacherNote(),
                 entrega.getAssignment().getPoints(),
-                entrega.getAssignment().getWeight());
+                entrega.getAssignment().getWeight(),
+                entrega.getClassGroup() == null ? null : entrega.getClassGroup().getName());
     }
 }

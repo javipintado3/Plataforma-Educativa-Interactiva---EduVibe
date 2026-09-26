@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen, HiloForo, Material,
-  Miembro, PreguntaBanco, Tarea, Tema, TipoMaterial,
+  Miembro, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
 } from '../models';
 
 /**
@@ -64,7 +64,7 @@ export class ClasesService {
 
   crearTarea(claseId: string, datos: {
     title: string; description?: string; dueDate?: string | null; points?: number;
-    latePenaltyPercent?: number; weight?: number; topicId?: string | null;
+    latePenaltyPercent?: number; weight?: number; groupAssignment?: boolean; topicId?: string | null;
   }): Observable<DetalleTarea> {
     return this.http.post<DetalleTarea>(`${this.api}/${claseId}/assignments`, datos);
   }
@@ -127,5 +127,13 @@ export class ClasesService {
 
   abrirHilo(claseId: string, datos: { title: string; content: string; topicId?: string | null }): Observable<DetalleHiloForo> {
     return this.http.post<DetalleHiloForo>(`${this.api}/${claseId}/forum-threads`, datos);
+  }
+
+  subgrupos(claseId: string): Observable<Subgrupo[]> {
+    return this.http.get<Subgrupo[]>(`${this.api}/${claseId}/groups`);
+  }
+
+  crearSubgrupo(claseId: string, datos: { name: string; memberIds: string[] }): Observable<Subgrupo> {
+    return this.http.post<Subgrupo>(`${this.api}/${claseId}/groups`, datos);
   }
 }

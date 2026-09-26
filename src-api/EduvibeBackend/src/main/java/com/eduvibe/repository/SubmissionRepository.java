@@ -36,6 +36,12 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
 
     long countByAssignmentId(UUID assignmentId);
 
+    /**
+     * Las otras entregas del mismo subgrupo en la misma tarea, para propagarles
+     * lo que se acaba de guardar o calificar sin tocar la entrega de origen.
+     */
+    List<Submission> findByAssignmentIdAndClassGroupIdAndIdNot(UUID assignmentId, UUID classGroupId, UUID exceptId);
+
     /** Para el resumen de perfil del profesorado: cuánto trabajo tiene por corregir. */
     @Query("""
             SELECT COUNT(s) FROM Submission s

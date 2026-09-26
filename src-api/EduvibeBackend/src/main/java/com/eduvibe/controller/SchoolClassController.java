@@ -20,6 +20,8 @@ import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
 import com.eduvibe.dto.assignment.AssignmentResponse;
 import com.eduvibe.dto.assignment.SaveAssignmentRequest;
+import com.eduvibe.dto.classgroup.ClassGroupResponse;
+import com.eduvibe.dto.classgroup.SaveClassGroupRequest;
 import com.eduvibe.dto.exam.BankQuestionResponse;
 import com.eduvibe.dto.exam.ExamDetailResponse;
 import com.eduvibe.dto.exam.ExamResponse;
@@ -39,6 +41,7 @@ import com.eduvibe.dto.schoolclass.TopicResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.service.AnnouncementService;
 import com.eduvibe.service.AssignmentService;
+import com.eduvibe.service.ClassGroupService;
 import com.eduvibe.service.ExamService;
 import com.eduvibe.service.ForumService;
 import com.eduvibe.service.ResourceService;
@@ -69,6 +72,7 @@ public class SchoolClassController {
     private final ResourceService resourceService;
     private final ExamService examService;
     private final ForumService forumService;
+    private final ClassGroupService classGroupService;
 
     // ---------------------------------------------------------------- clases
 
@@ -215,5 +219,18 @@ public class SchoolClassController {
                                                                @Valid @RequestBody SaveForumThreadRequest peticion) {
         ForumThreadDetailResponse creado = forumService.crear(classId, peticion);
         return ResponseEntity.created(URI.create("/api/forum-threads/" + creado.id())).body(creado);
+    }
+
+    // ------------------------------------------------------------ subgrupos
+
+    @GetMapping("/{classId}/groups")
+    public ResponseEntity<List<ClassGroupResponse>> subgrupos(@PathVariable UUID classId) {
+        return ResponseEntity.ok(classGroupService.listar(classId));
+    }
+
+    @PostMapping("/{classId}/groups")
+    public ResponseEntity<ClassGroupResponse> crearSubgrupo(@PathVariable UUID classId,
+                                                            @Valid @RequestBody SaveClassGroupRequest peticion) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(classGroupService.crear(classId, peticion));
     }
 }

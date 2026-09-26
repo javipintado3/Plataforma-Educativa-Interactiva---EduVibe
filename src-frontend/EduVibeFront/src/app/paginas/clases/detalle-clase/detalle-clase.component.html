@@ -130,7 +130,8 @@
       [temas]="detalle.temas"></app-pestana-foro>
 
     <app-pestana-personas *ngIf="pestana() === 'personas'"
-      [claseId]="detalle.id"></app-pestana-personas>
+      [claseId]="detalle.id"
+      [puedoEditar]="detalle.puedoEditar"></app-pestana-personas>
 
     <app-pestana-calificaciones *ngIf="pestana() === 'calificaciones'"
       [claseId]="detalle.id"></app-pestana-calificaciones>

@@ -70,6 +70,10 @@ public class Assignment {
     @Column(name = "weight", nullable = false, precision = 4, scale = 2)
     private BigDecimal weight = BigDecimal.ONE;
 
+    /** Si se entrega y se corrige una vez por subgrupo, en vez de una vez por alumno. */
+    @Column(name = "group_assignment", nullable = false)
+    private boolean groupAssignment = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;

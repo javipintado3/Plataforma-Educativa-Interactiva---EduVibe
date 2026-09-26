@@ -1,6 +1,7 @@
 package com.eduvibe.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,8 @@ import com.eduvibe.dto.submission.TeacherNoteRequest;
 import com.eduvibe.exception.BadRequestException;
 import com.eduvibe.exception.NotFoundException;
 import com.eduvibe.model.Assignment;
+import com.eduvibe.model.ClassGroup;
+import com.eduvibe.model.ClassGroupMember;
 import com.eduvibe.model.Grade;
 import com.eduvibe.model.Notification;
 import com.eduvibe.model.Rubric;
@@ -29,6 +32,7 @@ import com.eduvibe.model.RubricScore;
 import com.eduvibe.model.Submission;
 import com.eduvibe.model.User;
 import com.eduvibe.repository.AssignmentRepository;
+import com.eduvibe.repository.ClassGroupMemberRepository;
 import com.eduvibe.repository.GradeRepository;
 import com.eduvibe.repository.RubricCriterionRepository;
 import com.eduvibe.repository.RubricScoreRepository;
@@ -59,6 +63,7 @@ public class SubmissionService {
     private final RubricService rubricService;
     private final RubricCriterionRepository rubricCriterionRepository;
     private final RubricScoreRepository rubricScoreRepository;
+    private final ClassGroupMemberRepository classGroupMemberRepository;
 
     /**
      * Crea o actualiza la entrega de quien está autenticado.
@@ -66,6 +71,12 @@ public class SubmissionService {
      * Un mismo endpoint sirve para guardar el borrador y para enviar, porque es
      * literalmente el mismo gesto con una casilla distinta, y tener dos rutas
      * obligaría al cliente a decidir cuál llamar en cada pulsación.
+     *
+     * En una tarea grupal, lo entregado no es de quien pulsa "Entregar" sino de
+     * todo su subgrupo: se guarda la misma fila (contenido, archivo, momento
+     * del envío) en la entrega de cada miembro, no solo en la propia. Así el
+     * resto del modelo —una entrega por alumno y tarea, una nota por entrega—
+     * no necesita saber que existen los subgrupos.
      */
     @Transactional
     public SubmissionResponse guardarMiEntrega(UUID assignmentId, SubmitRequest peticion) {
@@ -79,25 +90,50 @@ public class SubmissionService {
         User alumno = userRepository.findById(autenticado.id())
                 .orElseThrow(() -> NotFoundException.de("Usuario", autenticado.id()));
 
-        Submission entrega = submissionRepository
-                .findByAssignmentIdAndStudentId(assignmentId, alumno.getId())
-                .orElseGet(() -> new Submission(tarea, alumno));
+        ClassGroup grupo = null;
+        List<User> destinatarios = List.of(alumno);
 
-        // Una vez corregida, el alumno ya no puede cambiar lo entregado: la nota
-        // dejaría de corresponder a lo que se calificó
-        if (entrega.estaCalificada()) {
-            throw new BadRequestException("Esta entrega ya está corregida y no se puede modificar");
+        if (tarea.isGroupAssignment()) {
+            ClassGroupMember membresia = classGroupMemberRepository.findDeAlumnoEnClase(alumno.getId(), classId)
+                    .orElseThrow(() -> new BadRequestException(
+                            "No perteneces a ningún subgrupo de esta clase; pide al profesorado que te añada a uno."));
+            grupo = membresia.getClassGroup();
+            destinatarios = classGroupMemberRepository.findByClassGroupId(grupo.getId()).stream()
+                    .map(ClassGroupMember::getUser)
+                    .toList();
         }
 
-        if (peticion.quiereEnviar()) {
-            entrega.enviar(peticion.content(), peticion.fileUrl());
-        } else {
-            entrega.guardarBorrador(peticion.content(), peticion.fileUrl());
+        // Mismo instante para todos los miembros: si se calculara por separado,
+        // "llegó tarde" podría dar una respuesta distinta según a quién se le
+        // preguntase por su propia fila.
+        Instant momento = Instant.now();
+        Submission miEntrega = null;
+
+        for (User miembro : destinatarios) {
+            Submission entrega = submissionRepository
+                    .findByAssignmentIdAndStudentId(assignmentId, miembro.getId())
+                    .orElseGet(() -> new Submission(tarea, miembro));
+
+            // Una vez corregida, ya no se puede cambiar lo entregado: la nota
+            // dejaría de corresponder a lo que se calificó
+            if (entrega.estaCalificada()) {
+                throw new BadRequestException("Esta entrega ya está corregida y no se puede modificar");
+            }
+
+            entrega.setClassGroup(grupo);
+            if (peticion.quiereEnviar()) {
+                entrega.enviar(peticion.content(), peticion.fileUrl(), momento);
+            } else {
+                entrega.guardarBorrador(peticion.content(), peticion.fileUrl());
+            }
+            submissionRepository.saveAndFlush(entrega);
+
+            if (miembro.getId().equals(alumno.getId())) {
+                miEntrega = entrega;
+            }
         }
 
-        submissionRepository.saveAndFlush(entrega);
-
-        return SubmissionResponse.de(entrega, null);
+        return SubmissionResponse.de(miEntrega, null);
     }
 
     /** La entrega de quien consulta para una tarea, o null si aún no tiene. */
@@ -135,6 +171,11 @@ public class SubmissionService {
      * cada criterio y no lo que venga en {@code peticion.score()}: con rúbrica,
      * la nota es una consecuencia de puntuar los criterios, no un número aparte
      * que alguien podría dejar sin corresponderse con ellos.
+     *
+     * En una tarea grupal, calificar cualquier entrega del subgrupo califica a
+     * todo el subgrupo con la misma nota: no tendría sentido que dos compañeros
+     * que entregaron lo mismo sacasen notas distintas por corregirlos por
+     * separado.
      */
     @Transactional
     public SubmissionResponse calificar(UUID submissionId, GradeRequest peticion) {
@@ -149,6 +190,26 @@ public class SubmissionService {
         }
 
         Rubric rubrica = rubricService.buscarDe(tarea.getId()).orElse(null);
+        AuthenticatedUser autenticado = authService.identidadActual();
+        User corrector = userRepository.findById(autenticado.id())
+                .orElseThrow(() -> NotFoundException.de("Usuario", autenticado.id()));
+
+        GradeResponse notaOrigen = calificarUna(entrega, tarea, rubrica, peticion, corrector);
+
+        if (entrega.getClassGroup() != null) {
+            List<Submission> companeras = submissionRepository.findByAssignmentIdAndClassGroupIdAndIdNot(
+                    tarea.getId(), entrega.getClassGroup().getId(), entrega.getId());
+            for (Submission companera : companeras) {
+                calificarUna(companera, tarea, rubrica, peticion, corrector);
+            }
+        }
+
+        return SubmissionResponse.de(entrega, notaOrigen);
+    }
+
+    /** Califica una única entrega: valida el máximo, aplica la penalización y guarda la nota (y su rúbrica, si toca). */
+    private GradeResponse calificarUna(Submission entrega, Assignment tarea, Rubric rubrica, GradeRequest peticion,
+                                       User corrector) {
         BigDecimal notaEnBruto = rubrica != null
                 ? sumaDeRubrica(rubrica, peticion.rubricScoresOSinNinguna())
                 : notaSuelta(peticion);
@@ -158,17 +219,13 @@ public class SubmissionService {
             throw new BadRequestException("La nota no puede pasar de " + maximo + ", que es lo que vale la tarea");
         }
 
-        AuthenticatedUser autenticado = authService.identidadActual();
-        User corrector = userRepository.findById(autenticado.id())
-                .orElseThrow(() -> NotFoundException.de("Usuario", autenticado.id()));
-
         // El profesorado pone la nota sobre el trabajo entregado; si llegó tarde
         // y la tarea tiene penalización configurada, el descuento se aplica aquí
         // y no a mano, para que nunca dependa de que alguien se acuerde.
         boolean penalizacionAplicada = entrega.entregadaTarde() && tarea.getLatePenaltyPercent() > 0;
         BigDecimal notaFinal = tarea.aplicarPenalizacionSiProcede(notaEnBruto, entrega.entregadaTarde());
 
-        Grade nota = gradeRepository.findBySubmissionId(submissionId)
+        Grade nota = gradeRepository.findBySubmissionId(entrega.getId())
                 .orElseGet(() -> new Grade(entrega, notaEnBruto, notaFinal, peticion.feedback(), corrector));
 
         // Si ya existía, se actualiza dejando constancia de quién revisa
@@ -186,7 +243,7 @@ public class SubmissionService {
                 "title", tarea.getTitle(), "className", tarea.getSchoolClass().getName(),
                 "assignmentId", tarea.getId().toString()));
 
-        return SubmissionResponse.de(entrega, GradeResponse.de(nota, puntuacionesRubrica));
+        return GradeResponse.de(nota, puntuacionesRubrica);
     }
 
     private BigDecimal notaSuelta(GradeRequest peticion) {
