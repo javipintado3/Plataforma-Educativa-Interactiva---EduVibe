@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduvibe.dto.analytics.ClassAnalyticsResponse;
 import com.eduvibe.dto.announcement.AnnouncementResponse;
 import com.eduvibe.dto.announcement.SaveAnnouncementRequest;
 import com.eduvibe.dto.assignment.AssignmentDetailResponse;
@@ -39,6 +40,7 @@ import com.eduvibe.dto.resource.ResourceResponse;
 import com.eduvibe.dto.resource.SaveResourceRequest;
 import com.eduvibe.dto.schoolclass.TopicResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
+import com.eduvibe.service.AnalyticsService;
 import com.eduvibe.service.AnnouncementService;
 import com.eduvibe.service.AssignmentService;
 import com.eduvibe.service.ClassGroupService;
@@ -73,6 +75,7 @@ public class SchoolClassController {
     private final ExamService examService;
     private final ForumService forumService;
     private final ClassGroupService classGroupService;
+    private final AnalyticsService analyticsService;
 
     // ---------------------------------------------------------------- clases
 
@@ -232,6 +235,14 @@ public class SchoolClassController {
     @GetMapping("/{classId}/groups")
     public ResponseEntity<List<ClassGroupResponse>> subgrupos(@PathVariable UUID classId) {
         return ResponseEntity.ok(classGroupService.listar(classId));
+    }
+
+    // ---------------------------------------------------------------- analítica
+
+    /** Panel del profesorado: quién ha entregado, quién no, y quién está en riesgo. */
+    @GetMapping("/{classId}/analytics")
+    public ResponseEntity<ClassAnalyticsResponse> analitica(@PathVariable UUID classId) {
+        return ResponseEntity.ok(analyticsService.analiticaDe(classId));
     }
 
     @PostMapping("/{classId}/groups")

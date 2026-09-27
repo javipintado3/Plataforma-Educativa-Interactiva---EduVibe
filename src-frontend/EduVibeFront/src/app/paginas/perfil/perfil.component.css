@@ -63,22 +63,6 @@
 
 .accion-rapida:hover { background: var(--fondo); color: var(--tinta); text-decoration: none; }
 
-.rejilla-resumen {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.stat {
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.stat-numero { font-size: 1.6rem; font-weight: 650; line-height: 1.1; }
-.stat-etiqueta { font-size: .8rem; color: var(--tinta-70); }
-
 .disposicion-perfil {
   display: grid;
   grid-template-columns: 1.4fr 1fr;

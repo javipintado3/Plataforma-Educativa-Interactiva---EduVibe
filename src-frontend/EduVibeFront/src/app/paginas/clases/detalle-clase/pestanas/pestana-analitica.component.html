@@ -1,0 +1,82 @@
+<app-cargando *ngIf="cargando()"></app-cargando>
+
+<app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+<ng-container *ngIf="!cargando() && analitica() as a">
+
+  <app-estado-vacio *ngIf="!a.assignments.length"
+    titulo="Todavía no hay nada que analizar"
+    descripcion="En cuanto haya tareas y alumnado matriculado, aquí aparecerá quién entrega y quién no."></app-estado-vacio>
+
+  <ng-container *ngIf="a.assignments.length">
+
+    <div class="rejilla-resumen mb-3">
+      <div class="tarjeta stat">
+        <span class="stat-numero">{{ a.overallCompletionPercent }}%</span>
+        <span class="stat-etiqueta">Entregas de la clase</span>
+      </div>
+
+      <div class="tarjeta stat" [ngClass]="{ 'stat-alerta': a.atRiskCount > 0 }">
+        <span class="stat-numero">{{ a.atRiskCount }}</span>
+        <span class="stat-etiqueta">Alumnado en riesgo</span>
+      </div>
+
+      <div class="tarjeta stat">
+        <span class="stat-numero">{{ a.assignments.length }}</span>
+        <span class="stat-etiqueta">Tareas creadas</span>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <ng-container *ngFor="let alumno of a.students">
+
+        <button type="button" class="fila-alumno" (click)="alternar(alumno.userId)">
+          <span class="crecer" style="min-width:0">
+            <span class="nombre-alumno">
+              {{ alumno.name }}
+              <span class="pastilla pastilla-roja" *ngIf="alumno.atRisk">En riesgo</span>
+            </span>
+            <span class="pequeno apagado">
+              {{ alumno.submittedCount }} / {{ alumno.totalAssignments }} entregadas
+              <ng-container *ngIf="alumno.averageScore !== null"> · media {{ alumno.averageScore }}%</ng-container>
+            </span>
+          </span>
+
+          <span class="medidor" [attr.aria-label]="alumno.completionPercent + '% entregado'">
+            <span class="medidor-relleno" [style.width.%]="alumno.completionPercent"></span>
+          </span>
+          <span class="medidor-cifra">{{ alumno.completionPercent }}%</span>
+
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+               [ngClass]="{ 'icono-girado': desplegado() === alumno.userId }">
+            <path d="m6 9 6 6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="detalle-alumno" *ngIf="desplegado() === alumno.userId">
+          <ng-container *ngIf="alumno.grades.length; else sinNotas">
+            <p class="pequeno apagado mb-2">Evolución de sus notas, tarea a tarea.</p>
+
+            <svg [attr.viewBox]="'0 0 ' + anchoGrafica + ' ' + altoGrafica" class="grafica-notas">
+              <line x1="0" [attr.y1]="altoGrafica - 10" [attr.x2]="anchoGrafica" [attr.y2]="altoGrafica - 10" class="linea-base"/>
+
+              <polyline [attr.points]="puntosSvg(alumno)" class="linea-notas"/>
+
+              <ng-container *ngFor="let punto of puntosDe(alumno)">
+                <circle [attr.cx]="punto.x" [attr.cy]="punto.y" r="5" class="punto-nota">
+                  <title>{{ punto.assignmentTitle }} · {{ punto.percent }}%</title>
+                </circle>
+                <text [attr.x]="punto.x" [attr.y]="punto.y - 10" class="etiqueta-punto">{{ punto.percent }}%</text>
+              </ng-container>
+            </svg>
+          </ng-container>
+
+          <ng-template #sinNotas>
+            <p class="pequeno apagado mb-0">Todavía no tiene ninguna tarea calificada.</p>
+          </ng-template>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+</ng-container>

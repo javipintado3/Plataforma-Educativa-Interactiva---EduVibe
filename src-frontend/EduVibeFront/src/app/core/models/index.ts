@@ -422,6 +422,46 @@ export interface IntentoResumenExamen {
   entregado: boolean;
 }
 
+/** Un punto de la gráfica de evolución de notas de un alumno: una tarea calificada. */
+export interface PuntoNota {
+  assignmentTitle: string;
+  gradedAt: string;
+  percent: number;
+}
+
+/** Cuánta gente ha entregado una tarea concreta, para el panel de analítica. */
+export interface AnaliticaTarea {
+  id: string;
+  title: string;
+  dueDate: string | null;
+  submittedCount: number;
+  pendingCount: number;
+  completionPercent: number;
+}
+
+/** Cómo va un alumno concreto: cuánto ha entregado, su media, y si está en riesgo. */
+export interface AnaliticaAlumno {
+  userId: string;
+  name: string;
+  submittedCount: number;
+  pendingCount: number;
+  totalAssignments: number;
+  completionPercent: number;
+  /** Media ponderada en % de lo que ya tiene calificado; null si no tiene ninguna nota. */
+  averageScore: number | null;
+  atRisk: boolean;
+  grades: PuntoNota[];
+}
+
+/** Panel de analítica de una clase, solo para profesorado y administración. */
+export interface AnaliticaClase {
+  classSize: number;
+  overallCompletionPercent: number;
+  atRiskCount: number;
+  assignments: AnaliticaTarea[];
+  students: AnaliticaAlumno[];
+}
+
 /** Forma de los errores que devuelve la API. */
 export interface ErrorApi {
   status: number;

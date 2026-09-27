@@ -88,6 +88,10 @@
         <button type="button" class="pestana" *ngIf="muestraCalificaciones()"
                 [class.activa]="pestana() === 'calificaciones'"
                 (click)="cambiarA('calificaciones')">Mis calificaciones</button>
+
+        <button type="button" class="pestana" *ngIf="muestraAnalitica()"
+                [class.activa]="pestana() === 'analitica'"
+                (click)="cambiarA('analitica')">Analítica</button>
       </nav>
     </div>
   </header>
@@ -124,6 +128,9 @@
 
     <app-pestana-calificaciones *ngIf="pestana() === 'calificaciones'"
       [claseId]="detalle.id"></app-pestana-calificaciones>
+
+    <app-pestana-analitica *ngIf="pestana() === 'analitica'"
+      [claseId]="detalle.id"></app-pestana-analitica>
   </div>
 </ng-container>
 

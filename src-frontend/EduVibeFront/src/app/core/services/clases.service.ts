@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
-  Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen, HiloForo, Material,
-  Miembro, ModoVistaClase, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
+  AnaliticaClase, Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen,
+  HiloForo, Material, Miembro, ModoVistaClase, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
 } from '../models';
 
 /**
@@ -139,5 +139,10 @@ export class ClasesService {
 
   crearSubgrupo(claseId: string, datos: { name: string; memberIds: string[] }): Observable<Subgrupo> {
     return this.http.post<Subgrupo>(`${this.api}/${claseId}/groups`, datos);
+  }
+
+  /** Panel de analítica: solo lo puede pedir el profesorado de la clase o administración. */
+  analitica(claseId: string): Observable<AnaliticaClase> {
+    return this.http.get<AnaliticaClase>(`${this.api}/${claseId}/analytics`);
   }
 }

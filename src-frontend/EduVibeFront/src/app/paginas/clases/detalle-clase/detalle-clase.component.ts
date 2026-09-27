@@ -13,6 +13,7 @@ import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
 import { PALETA_CLASE } from '../../../shared/paleta-clase';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
+import { PestanaAnaliticaComponent } from './pestanas/pestana-analitica.component';
 import { PestanaAvisosComponent } from './pestanas/pestana-avisos.component';
 import { PestanaCalificacionesComponent } from './pestanas/pestana-calificaciones.component';
 import { PestanaForoComponent } from './pestanas/pestana-foro.component';
@@ -21,7 +22,7 @@ import { PestanaPersonasComponent } from './pestanas/pestana-personas.component'
 import { PestanaTemasComponent } from './pestanas/pestana-temas.component';
 import { PortadaClaseComponent } from '../../../shared/portada-clase/portada-clase.component';
 
-type Pestana = 'avisos' | 'temas' | 'modulos' | 'foro' | 'personas' | 'calificaciones';
+type Pestana = 'avisos' | 'temas' | 'modulos' | 'foro' | 'personas' | 'calificaciones' | 'analitica';
 
 /**
  * Pantalla de una clase.
@@ -38,7 +39,7 @@ type Pestana = 'avisos' | 'temas' | 'modulos' | 'foro' | 'personas' | 'calificac
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, AvisoComponent, DialogoComponent, PortadaClaseComponent, SubidaArchivoComponent,
     PestanaAvisosComponent, PestanaTemasComponent, PestanaModulosComponent,
-    PestanaForoComponent, PestanaPersonasComponent, PestanaCalificacionesComponent,
+    PestanaForoComponent, PestanaPersonasComponent, PestanaCalificacionesComponent, PestanaAnaliticaComponent,
   ],
   templateUrl: './detalle-clase.component.html',
   styleUrl: './detalle-clase.component.css',
@@ -77,6 +78,9 @@ export class DetalleClaseComponent implements OnInit {
    * tiene sentido para quien las tiene: el alumnado de la clase.
    */
   readonly muestraCalificaciones = computed(() => this.clase()?.miRol === 'student');
+
+  /** El panel de analítica solo tiene sentido para quien puede editar la clase: profesorado o administración. */
+  readonly muestraAnalitica = computed(() => this.clase()?.puedoEditar === true);
 
   ngOnInit(): void {
     this.clasesService.detalle(this.id).subscribe({

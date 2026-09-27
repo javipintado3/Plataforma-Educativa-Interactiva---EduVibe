@@ -34,6 +34,11 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
     List<Submission> findDeAlumnoEnTareas(@Param("studentId") UUID studentId,
                                           @Param("assignmentIds") List<UUID> assignmentIds);
 
+    /** Todas las entregas de una clase de golpe, para la analítica del profesorado. */
+    @EntityGraph(attributePaths = { "student", "assignment" })
+    @Query("SELECT s FROM Submission s WHERE s.assignment.schoolClass.id = :classId")
+    List<Submission> findDeClase(@Param("classId") UUID classId);
+
     long countByAssignmentId(UUID assignmentId);
 
     /**
