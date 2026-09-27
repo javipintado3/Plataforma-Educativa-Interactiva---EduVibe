@@ -24,6 +24,7 @@ import com.eduvibe.model.Organization;
 import com.eduvibe.model.SchoolClass;
 import com.eduvibe.model.Topic;
 import com.eduvibe.model.User;
+import com.eduvibe.model.enums.ClassViewMode;
 import com.eduvibe.model.enums.EnrollmentRole;
 import com.eduvibe.repository.EnrollmentRepository;
 import com.eduvibe.repository.OrganizationRepository;
@@ -60,6 +61,7 @@ public class SchoolClassService {
 
         SchoolClass clase = new SchoolClass(organizacion, peticion.name().trim(),
                 normalizar(peticion.subject()), peticion.color(), normalizar(peticion.imageUrl()));
+        clase.setViewMode(modoDeVista(peticion.viewMode()));
         schoolClassRepository.saveAndFlush(clase);
 
         return ClassDetailResponse.de(clase, ROL_ADMINISTRACION, true, List.of(), 0, List.of());
@@ -149,6 +151,9 @@ public class SchoolClassService {
         clase.setSubject(normalizar(peticion.subject()));
         clase.setColor(peticion.color());
         clase.setImageUrl(normalizar(peticion.imageUrl()));
+        if (peticion.viewMode() != null) {
+            clase.setViewMode(ClassViewMode.desdeValor(peticion.viewMode()));
+        }
         schoolClassRepository.save(clase);
 
         return detalle(classId);
@@ -226,6 +231,23 @@ public class SchoolClassService {
         return TopicResponse.de(tema);
     }
 
+    /** Solo renombra: el orden se conserva salvo que la petición traiga uno nuevo explícito. */
+    @Transactional
+    public TopicResponse actualizarTema(UUID classId, UUID topicId, CreateTopicRequest peticion) {
+        acceso.exigirEditable(classId);
+
+        Topic tema = topicRepository.findByIdAndSchoolClassId(topicId, classId)
+                .orElseThrow(() -> NotFoundException.de("Tema", topicId));
+
+        tema.setTitle(peticion.title().trim());
+        if (peticion.sortOrder() != null) {
+            tema.setSortOrder(peticion.sortOrder());
+        }
+        topicRepository.save(tema);
+
+        return TopicResponse.de(tema);
+    }
+
     /** Papel de la persona en la clase, o "admin" si solo la ve por ser administración. */
     private String miRolEn(UUID classId, AuthenticatedUser usuario) {
         return enrollmentRepository.findBySchoolClassIdAndUserId(classId, usuario.id())
@@ -241,5 +263,9 @@ public class SchoolClassService {
 
     private String normalizar(String texto) {
         return (texto == null || texto.isBlank()) ? null : texto.trim();
+    }
+
+    private ClassViewMode modoDeVista(String viewMode) {
+        return viewMode != null ? ClassViewMode.desdeValor(viewMode) : ClassViewMode.STRUCTURED;
     }
 }

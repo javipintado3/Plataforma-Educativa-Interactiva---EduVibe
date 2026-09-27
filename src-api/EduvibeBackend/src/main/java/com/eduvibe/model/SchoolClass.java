@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
 
+import com.eduvibe.model.enums.ClassViewMode;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -65,6 +67,10 @@ public class SchoolClass {
      */
     @Column(name = "image_url")
     private String imageUrl;
+
+    /** Temas separados con actividades/materiales, o todo mezclado en módulos. */
+    @Column(name = "view_mode", nullable = false)
+    private ClassViewMode viewMode = ClassViewMode.STRUCTURED;
 
     @Generated(event = EventType.INSERT)
     @Column(name = "created_at", insertable = false, updatable = false)

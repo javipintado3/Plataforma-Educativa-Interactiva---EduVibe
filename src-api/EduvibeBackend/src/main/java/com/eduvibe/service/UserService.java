@@ -84,14 +84,16 @@ public class UserService {
      * aparece en la consulta.
      */
     @Transactional(readOnly = true)
-    public PageResponse<UserResponse> listar(String role, String status, String busqueda, Pageable pageable) {
+    public PageResponse<UserResponse> listar(String role, String status, String busqueda, UUID excludeClassId,
+                                             Pageable pageable) {
         AuthenticatedUser admin = authService.identidadActual();
 
         Specification<User> filtro = Specification
                 .where(UserSpecifications.deOrganizacion(admin.organizationId()))
                 .and(UserSpecifications.conRol(rolONulo(role)))
                 .and(UserSpecifications.conEstado(estadoONulo(status)))
-                .and(UserSpecifications.queContenga(busqueda));
+                .and(UserSpecifications.queContenga(busqueda))
+                .and(UserSpecifications.noMatriculadoEn(excludeClassId));
 
         Page<User> pagina = userRepository.findAll(filtro, pageable);
 

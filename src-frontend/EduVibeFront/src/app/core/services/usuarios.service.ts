@@ -16,6 +16,8 @@ export class UsuariosService {
     role?: Rol | '';
     status?: EstadoCuenta | '';
     q?: string;
+    /** Deja fuera a quien ya está matriculado en esa clase; para el selector de "Añadir a la clase". */
+    excludeClassId?: string;
     page?: number;
     size?: number;
   } = {}): Observable<Pagina<Usuario>> {
@@ -25,6 +27,7 @@ export class UsuariosService {
     if (filtros.role) params = params.set('role', filtros.role);
     if (filtros.status) params = params.set('status', filtros.status);
     if (filtros.q?.trim()) params = params.set('q', filtros.q.trim());
+    if (filtros.excludeClassId) params = params.set('excludeClassId', filtros.excludeClassId);
     params = params.set('page', filtros.page ?? 0).set('size', filtros.size ?? 20);
 
     return this.http.get<Pagina<Usuario>>(this.api, { params });

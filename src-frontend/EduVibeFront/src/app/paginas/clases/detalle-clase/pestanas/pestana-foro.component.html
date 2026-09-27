@@ -13,7 +13,7 @@
 
 <ng-container *ngIf="!cargando()">
 
-  <div class="tarjeta" *ngIf="!hilos().length">
+  <div class="tarjeta" *ngIf="!hilosVisibles.length">
     <app-estado-vacio
       titulo="Todavía no hay hilos"
       descripcion="Abre el primero para empezar el debate.">
@@ -23,12 +23,12 @@
     </app-estado-vacio>
   </div>
 
-  <div class="tarjeta" *ngIf="hilos().length">
-    <a class="tarea" *ngFor="let hilo of hilos()" [routerLink]="['/foro', hilo.id]">
+  <div class="tarjeta" *ngIf="hilosVisibles.length">
+    <a class="tarea" *ngFor="let hilo of hilosVisibles" [routerLink]="['/foro', hilo.id]">
       <span class="crecer" style="min-width:0">
         <span class="titulo">{{ hilo.title }}</span>
         <span class="meta">
-          {{ hilo.authorName }} · {{ tituloDelTema(hilo.topicId) }}
+          {{ hilo.authorName }}<ng-container *ngIf="temaFiltro === undefined"> · {{ tituloDelTema(hilo.topicId) }}</ng-container>
           <span class="apagado"> · última actividad {{ hilo.lastActivityAt | fecha }}</span>
         </span>
       </span>
@@ -58,9 +58,9 @@
     </div>
 
     <div class="campo mb-0" *ngIf="temas.length">
-      <label class="etiqueta" for="tema-hilo">Tema</label>
+      <label class="etiqueta" for="tema-hilo">{{ etiquetaUnidad }}</label>
       <select id="tema-hilo" class="selector" formControlName="topicId">
-        <option value="">Sin tema</option>
+        <option value="">{{ etiquetaSinUnidad }}</option>
         <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
       </select>
     </div>

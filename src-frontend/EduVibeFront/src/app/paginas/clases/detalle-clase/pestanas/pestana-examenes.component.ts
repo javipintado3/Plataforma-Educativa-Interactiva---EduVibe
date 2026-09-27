@@ -47,6 +47,15 @@ export class PestanaExamenesComponent implements OnInit {
   @Input() puedoEditar = false;
   @Input() temas: Tema[] = [];
 
+  /**
+   * Filtra a un solo bloque: `undefined` = todos (comportamiento por defecto),
+   * un id de tema = solo ese, `null` = solo lo que no tiene tema.
+   */
+  @Input() temaFiltro: string | null | undefined = undefined;
+
+  /** Cómo llamar al agrupador en este modo de vista: "Unidad" o "Módulo". */
+  @Input() etiquetaUnidad = 'Unidad';
+
   readonly bloques = signal<Bloque[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
@@ -122,6 +131,23 @@ export class PestanaExamenesComponent implements OnInit {
     return bloques;
   }
 
+  get etiquetaUnidadMinuscula(): string {
+    return this.etiquetaUnidad.toLowerCase();
+  }
+
+  get etiquetaSinUnidad(): string {
+    return 'Sin ' + this.etiquetaUnidadMinuscula;
+  }
+
+  /** Los bloques que toca pintar, según {@link temaFiltro}. */
+  get bloquesVisibles(): Bloque[] {
+    const todos = this.bloques();
+    if (this.temaFiltro === undefined) {
+      return todos;
+    }
+    return todos.filter(b => this.temaFiltro === null ? b.tema === null : b.tema?.id === this.temaFiltro);
+  }
+
   /** Estado que se muestra al alumnado: sin intento todavía cuenta como "no_empezado". */
   estadoDe(examen: Examen): 'no_empezado' | 'en_curso' | 'entregado' {
     return examen.miEstado ?? 'no_empezado';
@@ -179,7 +205,7 @@ export class PestanaExamenesComponent implements OnInit {
 
   abrirDialogo(): void {
     this.formulario.reset({
-      title: '', description: '', durationMinutes: 30, dueDate: '', topicId: '',
+      title: '', description: '', durationMinutes: 30, dueDate: '', topicId: this.temaFiltro ?? '',
     });
     while (this.preguntas.length) {
       this.preguntas.removeAt(0);

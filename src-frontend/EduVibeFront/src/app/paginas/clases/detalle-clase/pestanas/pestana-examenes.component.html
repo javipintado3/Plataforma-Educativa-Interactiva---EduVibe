@@ -1,5 +1,5 @@
 <div class="fila-entre mb-2" *ngIf="puedoEditar">
-  <p class="pequeno apagado mb-0">Los exámenes se agrupan por el tema al que pertenecen.</p>
+  <p class="pequeno apagado mb-0">Los exámenes se agrupan por {{ etiquetaUnidadMinuscula }}.</p>
   <button type="button" class="boton boton-primario boton-pequeno" (click)="abrirDialogo()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -13,7 +13,7 @@
 
 <ng-container *ngIf="!cargando()">
 
-  <div class="tarjeta" *ngIf="!bloques().length">
+  <div class="tarjeta" *ngIf="!bloquesVisibles.length">
     <app-estado-vacio
       titulo="Todavía no hay exámenes"
       [descripcion]="puedoEditar
@@ -25,8 +25,8 @@
     </app-estado-vacio>
   </div>
 
-  <section class="bloque" *ngFor="let bloque of bloques()">
-    <h3 class="titulo-bloque">{{ bloque.tema?.title || 'Sin tema' }}</h3>
+  <section class="bloque" *ngFor="let bloque of bloquesVisibles">
+    <h3 class="titulo-bloque" *ngIf="temaFiltro === undefined">{{ bloque.tema?.title || etiquetaSinUnidad }}</h3>
 
     <div class="tarjeta">
       <a class="examen" *ngFor="let examen of bloque.examenes" [routerLink]="['/examenes', examen.id]">
@@ -97,9 +97,9 @@
     </div>
 
     <div class="campo" *ngIf="temas.length">
-      <label class="etiqueta" for="tema-examen">Tema</label>
+      <label class="etiqueta" for="tema-examen">{{ etiquetaUnidad }}</label>
       <select id="tema-examen" class="selector" formControlName="topicId">
-        <option value="">Sin tema</option>
+        <option value="">{{ etiquetaSinUnidad }}</option>
         <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
       </select>
     </div>

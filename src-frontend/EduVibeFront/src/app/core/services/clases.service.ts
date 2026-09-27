@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen, HiloForo, Material,
-  Miembro, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
+  Miembro, ModoVistaClase, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
 } from '../models';
 
 /**
@@ -30,11 +30,11 @@ export class ClasesService {
     return this.http.get<DetalleClase>(`${this.api}/${claseId}`);
   }
 
-  crear(datos: { name: string; subject?: string; color?: string; imageUrl?: string }): Observable<DetalleClase> {
+  crear(datos: { name: string; subject?: string; color?: string; imageUrl?: string; viewMode?: ModoVistaClase }): Observable<DetalleClase> {
     return this.http.post<DetalleClase>(this.api, datos);
   }
 
-  actualizar(claseId: string, datos: { name: string; subject?: string; color?: string; imageUrl?: string }): Observable<DetalleClase> {
+  actualizar(claseId: string, datos: { name: string; subject?: string; color?: string; imageUrl?: string; viewMode?: ModoVistaClase }): Observable<DetalleClase> {
     return this.http.put<DetalleClase>(`${this.api}/${claseId}`, datos);
   }
 
@@ -56,6 +56,10 @@ export class ClasesService {
 
   crearTema(claseId: string, title: string): Observable<Tema> {
     return this.http.post<Tema>(`${this.api}/${claseId}/topics`, { title });
+  }
+
+  actualizarTema(claseId: string, temaId: string, title: string): Observable<Tema> {
+    return this.http.put<Tema>(`${this.api}/${claseId}/topics/${temaId}`, { title });
   }
 
   tareas(claseId: string): Observable<Tarea[]> {

@@ -44,6 +44,15 @@ export class PestanaMaterialesComponent implements OnInit {
   @Input() puedoEditar = false;
   @Input() temas: Tema[] = [];
 
+  /**
+   * Filtra a un solo tema: `undefined` = todos (comportamiento por defecto),
+   * un id de tema = solo ese, `null` = solo lo que no tiene tema.
+   */
+  @Input() temaFiltro: string | null | undefined = undefined;
+
+  /** Cómo llamar al agrupador en este modo de vista: "Unidad" o "Módulo". */
+  @Input() etiquetaUnidad = 'Unidad';
+
   readonly materiales = signal<Material[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
@@ -82,16 +91,33 @@ export class PestanaMaterialesComponent implements OnInit {
     });
   }
 
+  /** Los materiales que toca pintar, según {@link temaFiltro}. */
+  get materialesVisibles(): Material[] {
+    const todos = this.materiales();
+    if (this.temaFiltro === undefined) {
+      return todos;
+    }
+    return todos.filter(m => m.topicId === this.temaFiltro);
+  }
+
+  get etiquetaUnidadMinuscula(): string {
+    return this.etiquetaUnidad.toLowerCase();
+  }
+
+  get etiquetaSinUnidad(): string {
+    return 'Sin ' + this.etiquetaUnidadMinuscula;
+  }
+
   tituloDelTema(topicId: string | null): string {
     if (!topicId) {
-      return 'Sin tema';
+      return this.etiquetaSinUnidad;
     }
-    return this.temas.find(t => t.id === topicId)?.title ?? 'Sin tema';
+    return this.temas.find(t => t.id === topicId)?.title ?? this.etiquetaSinUnidad;
   }
 
   abrirCrear(): void {
     this.editando.set(null);
-    this.formulario.reset({ title: '', fileUrl: '', type: '', availableFrom: '', topicId: '' });
+    this.formulario.reset({ title: '', fileUrl: '', type: '', availableFrom: '', topicId: this.temaFiltro ?? '' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }

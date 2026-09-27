@@ -7,7 +7,7 @@ import { switchMap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
 import { SubidasService } from '../../../core/services/subidas.service';
-import { DetalleClase, Tema } from '../../../core/models';
+import { DetalleClase, ModoVistaClase, Tema } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
@@ -15,14 +15,13 @@ import { PALETA_CLASE } from '../../../shared/paleta-clase';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { PestanaAvisosComponent } from './pestanas/pestana-avisos.component';
 import { PestanaCalificacionesComponent } from './pestanas/pestana-calificaciones.component';
-import { PestanaExamenesComponent } from './pestanas/pestana-examenes.component';
 import { PestanaForoComponent } from './pestanas/pestana-foro.component';
-import { PestanaMaterialesComponent } from './pestanas/pestana-materiales.component';
+import { PestanaModulosComponent } from './pestanas/pestana-modulos.component';
 import { PestanaPersonasComponent } from './pestanas/pestana-personas.component';
-import { PestanaTrabajoComponent } from './pestanas/pestana-trabajo.component';
+import { PestanaTemasComponent } from './pestanas/pestana-temas.component';
 import { PortadaClaseComponent } from '../../../shared/portada-clase/portada-clase.component';
 
-type Pestana = 'avisos' | 'trabajo' | 'examenes' | 'materiales' | 'foro' | 'personas' | 'calificaciones';
+type Pestana = 'avisos' | 'temas' | 'modulos' | 'foro' | 'personas' | 'calificaciones';
 
 /**
  * Pantalla de una clase.
@@ -38,7 +37,7 @@ type Pestana = 'avisos' | 'trabajo' | 'examenes' | 'materiales' | 'foro' | 'pers
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, AvisoComponent, DialogoComponent, PortadaClaseComponent, SubidaArchivoComponent,
-    PestanaAvisosComponent, PestanaTrabajoComponent, PestanaExamenesComponent, PestanaMaterialesComponent,
+    PestanaAvisosComponent, PestanaTemasComponent, PestanaModulosComponent,
     PestanaForoComponent, PestanaPersonasComponent, PestanaCalificacionesComponent,
   ],
   templateUrl: './detalle-clase.component.html',
@@ -57,7 +56,7 @@ export class DetalleClaseComponent implements OnInit {
   readonly clase = signal<DetalleClase | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
-  readonly pestana = signal<Pestana>('trabajo');
+  readonly pestana = signal<Pestana>('temas');
 
   readonly paleta = PALETA_CLASE;
   readonly dialogoEditarAbierto = signal(false);
@@ -70,14 +69,7 @@ export class DetalleClaseComponent implements OnInit {
     subject: [''],
     color: [PALETA_CLASE[0].valor],
     imageUrl: [''],
-  });
-
-  readonly dialogoTemasAbierto = signal(false);
-  readonly creandoTema = signal(false);
-  readonly errorTema = signal<string | null>(null);
-
-  readonly formularioTema = this.fb.nonNullable.group({
-    title: ['', [Validators.required]],
+    viewMode: this.fb.nonNullable.control<ModoVistaClase>('structured'),
   });
 
   /**
@@ -90,6 +82,7 @@ export class DetalleClaseComponent implements OnInit {
     this.clasesService.detalle(this.id).subscribe({
       next: (clase) => {
         this.clase.set(clase);
+        this.pestana.set(clase.viewMode === 'flexible' ? 'modulos' : 'temas');
         this.cargando.set(false);
       },
       error: (err) => {
@@ -101,6 +94,19 @@ export class DetalleClaseComponent implements OnInit {
 
   cambiarA(pestana: Pestana): void {
     this.pestana.set(pestana);
+  }
+
+  /**
+   * Al matricular o quitar a alguien desde la pestaña Personas, la cabecera
+   * (profesorado y número de alumnos) se queda con el dato con el que se
+   * cargó la página. Se releen solo esos datos, sin tocar `pestana` ni
+   * `cargando`, para no interrumpir lo que se esté viendo.
+   */
+  recargarCabecera(): void {
+    this.clasesService.detalle(this.id).subscribe({
+      next: (clase) => this.clase.set(clase),
+      error: () => {}, // no es crítico: la cabecera se queda con el dato anterior
+    });
   }
 
   /** Nombres del profesorado, para la línea bajo el título. */
@@ -118,6 +124,7 @@ export class DetalleClaseComponent implements OnInit {
       subject: detalle.subject ?? '',
       color: detalle.color ?? PALETA_CLASE[0].valor,
       imageUrl: detalle.imageUrl ?? '',
+      viewMode: detalle.viewMode,
     });
     this.errorEdicion.set(null);
     this.dialogoEditarAbierto.set(true);
@@ -145,6 +152,7 @@ export class DetalleClaseComponent implements OnInit {
         subject: detalle.subject || undefined,
         color: detalle.color || PALETA_CLASE[0].valor,
         imageUrl: url,
+        viewMode: detalle.viewMode,
       })),
     ).subscribe({
       next: (actualizada) => {
@@ -169,15 +177,18 @@ export class DetalleClaseComponent implements OnInit {
     this.guardandoClase.set(true);
     this.errorEdicion.set(null);
 
-    const { name, subject, color, imageUrl } = this.formularioClase.getRawValue();
+    const { name, subject, color, imageUrl, viewMode } = this.formularioClase.getRawValue();
 
     this.clasesService.actualizar(this.id, {
-      name, subject: subject || undefined, color, imageUrl: imageUrl || undefined,
+      name, subject: subject || undefined, color, imageUrl: imageUrl || undefined, viewMode,
     }).subscribe({
       next: (actualizada) => {
         this.guardandoClase.set(false);
         this.dialogoEditarAbierto.set(false);
         this.clase.set(actualizada);
+        if (this.pestana() === 'temas' || this.pestana() === 'modulos') {
+          this.pestana.set(actualizada.viewMode === 'flexible' ? 'modulos' : 'temas');
+        }
       },
       error: (err) => {
         this.guardandoClase.set(false);
@@ -188,37 +199,18 @@ export class DetalleClaseComponent implements OnInit {
 
   // ------------------------------------------------------------------ temas
 
-  abrirTemas(): void {
-    this.formularioTema.reset({ title: '' });
-    this.errorTema.set(null);
-    this.dialogoTemasAbierto.set(true);
+  /**
+   * Se dispara desde app-pestana-temas/modulos al dar de alta una unidad.
+   * Se añade a la clase en memoria: las pestañas ya abiertas la ven sin recargar.
+   */
+  onTemaCreada(tema: Tema): void {
+    this.clase.update(detalle => detalle ? { ...detalle, temas: [...detalle.temas, tema] } : detalle);
   }
 
-  /**
-   * Solo da de alta: el backend no tiene forma de renombrar ni borrar un tema
-   * todavía, así que el frontend no finge que se puede.
-   */
-  crearTema(): void {
-    this.formularioTema.markAllAsTouched();
-
-    if (this.formularioTema.invalid || this.creandoTema()) {
-      return;
-    }
-
-    this.creandoTema.set(true);
-    this.errorTema.set(null);
-
-    this.clasesService.crearTema(this.id, this.formularioTema.getRawValue().title).subscribe({
-      next: (tema: Tema) => {
-        this.creandoTema.set(false);
-        this.formularioTema.reset({ title: '' });
-        // Se añade a la clase en memoria: las pestañas ya abiertas lo ven sin recargar
-        this.clase.update(detalle => detalle ? { ...detalle, temas: [...detalle.temas, tema] } : detalle);
-      },
-      error: (err) => {
-        this.creandoTema.set(false);
-        this.errorTema.set(AvisoComponent.mensajeDe(err));
-      },
-    });
+  /** Se dispara al renombrar una unidad/módulo desde su diálogo de edición. */
+  onTemaActualizada(tema: Tema): void {
+    this.clase.update(detalle => detalle
+      ? { ...detalle, temas: detalle.temas.map(t => t.id === tema.id ? tema : t) }
+      : detalle);
   }
 }

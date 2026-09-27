@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
-import { Clase } from '../../../core/models';
+import { Clase, ModoVistaClase } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
@@ -52,6 +52,7 @@ export class ListaClasesComponent implements OnInit {
     subject: [''],
     color: [PALETA_CLASE[0].valor],
     imageUrl: [''],
+    viewMode: this.fb.nonNullable.control<ModoVistaClase>('structured'),
   });
 
   ngOnInit(): void {
@@ -75,7 +76,7 @@ export class ListaClasesComponent implements OnInit {
   }
 
   abrirDialogo(): void {
-    this.formulario.reset({ name: '', subject: '', color: PALETA_CLASE[0].valor, imageUrl: '' });
+    this.formulario.reset({ name: '', subject: '', color: PALETA_CLASE[0].valor, imageUrl: '', viewMode: 'structured' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }
@@ -90,13 +91,14 @@ export class ListaClasesComponent implements OnInit {
     this.creando.set(true);
     this.errorFormulario.set(null);
 
-    const { name, subject, color, imageUrl } = this.formulario.getRawValue();
+    const { name, subject, color, imageUrl, viewMode } = this.formulario.getRawValue();
 
     this.clasesService.crear({
       name,
       subject: subject || undefined,
       color,
       imageUrl: imageUrl.trim() || undefined,
+      viewMode,
     }).subscribe({
       next: () => {
         this.creando.set(false);

@@ -5,7 +5,15 @@
 <ng-container *ngIf="!cargando()">
 
   <section class="mb-3">
-    <h3 class="titulo-grupo">Profesorado · {{ profesorado().length }}</h3>
+    <div class="fila-entre mb-1">
+      <h3 class="titulo-grupo mb-0">Profesorado · {{ profesorado().length }}</h3>
+      <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="auth.esAdmin()"
+              (click)="abrirAnadir('teacher')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Añadir profesorado
+      </button>
+    </div>
 
     <div class="tarjeta">
       <div class="persona" *ngFor="let miembro of profesorado()">
@@ -22,12 +30,20 @@
 
       <app-estado-vacio *ngIf="!profesorado().length"
         titulo="Sin profesorado asignado"
-        descripcion="Matricula a un profesor desde el panel de usuarios."></app-estado-vacio>
+        [descripcion]="auth.esAdmin() ? 'Añade un profesor con el botón de arriba.' : 'Todavía no hay profesorado en esta clase.'"></app-estado-vacio>
     </div>
   </section>
 
   <section>
-    <h3 class="titulo-grupo">Alumnado · {{ alumnado().length }}</h3>
+    <div class="fila-entre mb-1">
+      <h3 class="titulo-grupo mb-0">Alumnado · {{ alumnado().length }}</h3>
+      <button type="button" class="boton boton-contorno boton-pequeno" *ngIf="auth.esAdmin()"
+              (click)="abrirAnadir('student')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Añadir alumnado
+      </button>
+    </div>
 
     <div class="tarjeta">
       <div class="persona" *ngFor="let miembro of alumnado()">
@@ -44,7 +60,7 @@
 
       <app-estado-vacio *ngIf="!alumnado().length"
         titulo="Todavía no hay alumnado"
-        descripcion="Matricula alumnos en esta clase para que puedan ver las tareas."></app-estado-vacio>
+        [descripcion]="auth.esAdmin() ? 'Añade alumnado con el botón de arriba para que puedan ver las tareas.' : 'Todavía no hay alumnado en esta clase.'"></app-estado-vacio>
     </div>
   </section>
 
@@ -89,6 +105,94 @@
     </div>
   </section>
 </ng-container>
+
+<!-- Matricular en la clase -->
+<app-dialogo [abierto]="dialogoAnadirAbierto()" [titulo]="tituloAnadir" ancho="grande"
+             (cerrar)="dialogoAnadirAbierto.set(false)">
+
+  <form [formGroup]="formBusqueda" (ngSubmit)="buscar(0)" novalidate class="fila espaciado-sm mb-2">
+    <input class="entrada crecer" formControlName="q" placeholder="Buscar por nombre o email">
+    <button type="submit" class="boton boton-contorno">Buscar</button>
+  </form>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="errorAnadir()"></app-aviso>
+
+  <app-cargando *ngIf="buscando()"></app-cargando>
+
+  <ng-container *ngIf="!buscando() && pagina() as p">
+
+    <app-estado-vacio *ngIf="!p.contenido.length"
+      titulo="Nadie coincide"
+      descripcion="Prueba a quitar el texto de búsqueda."></app-estado-vacio>
+
+    <div class="tabla-envoltorio" *ngIf="p.contenido.length">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th style="width:36px">
+              <label class="casilla">
+                <input type="checkbox" [checked]="todosSeleccionadosEnPagina"
+                       (change)="alternarTodosEnPagina($any($event.target).checked)"
+                       aria-label="Seleccionar todos los de esta página">
+              </label>
+            </th>
+            <th>Persona</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of p.contenido" class="fila-seleccionable"
+              (click)="alternarSeleccion(usuario, !estaSeleccionado(usuario.id))">
+            <td (click)="$event.stopPropagation()">
+              <label class="casilla">
+                <input type="checkbox"
+                       [checked]="estaSeleccionado(usuario.id)"
+                       (change)="alternarSeleccion(usuario, $any($event.target).checked)"
+                       [attr.aria-label]="'Seleccionar a ' + usuario.name">
+              </label>
+            </td>
+            <td>
+              <div class="fila espaciado-sm">
+                <app-avatar [nombre]="usuario.name" [pequeno]="true"></app-avatar>
+                <div style="min-width:0">
+                  <p class="fuerte mb-0">{{ usuario.name }}</p>
+                  <p class="pequeno apagado mb-0 correo">{{ usuario.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td><app-pastilla-estado [valor]="usuario.status"></app-pastilla-estado></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="paginacion" *ngIf="p.contenido.length">
+      <span class="pequeno apagado">{{ p.totalElementos }} persona(s)</span>
+      <div class="fila espaciado-sm">
+        <span class="pequeno apagado">Página {{ p.pagina + 1 }} de {{ p.totalPaginas }}</span>
+        <button type="button" class="boton-pagina" [disabled]="p.pagina === 0"
+                (click)="buscar(p.pagina - 1)" aria-label="Página anterior">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button type="button" class="boton-pagina" [disabled]="p.ultima"
+                (click)="buscar(p.pagina + 1)" aria-label="Página siguiente">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container acciones>
+    <span class="pequeno apagado crecer" *ngIf="numSeleccionados">{{ numSeleccionados }} seleccionado(s)</span>
+    <button type="button" class="boton boton-contorno" (click)="dialogoAnadirAbierto.set(false)">Cerrar</button>
+    <button type="button" class="boton boton-primario" [disabled]="!numSeleccionados || anadiendoLote()"
+            (click)="anadirSeleccionados()">
+      {{ anadiendoLote() ? 'Añadiendo…' : (numSeleccionados ? 'Añadir seleccionados (' + numSeleccionados + ')' : 'Añadir seleccionados') }}
+    </button>
+  </ng-container>
+</app-dialogo>
 
 <!-- Alta / edición de subgrupo -->
 <app-dialogo [abierto]="dialogoSubgrupoAbierto()" [titulo]="editando() ? 'Editar subgrupo' : 'Nuevo subgrupo'"

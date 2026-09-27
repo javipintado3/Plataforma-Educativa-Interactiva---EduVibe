@@ -133,6 +133,12 @@ public class SchoolClassController {
                 .body(schoolClassService.crearTema(classId, peticion));
     }
 
+    @PutMapping("/{classId}/topics/{topicId}")
+    public ResponseEntity<TopicResponse> actualizarTema(@PathVariable UUID classId, @PathVariable UUID topicId,
+                                                        @Valid @RequestBody CreateTopicRequest peticion) {
+        return ResponseEntity.ok(schoolClassService.actualizarTema(classId, topicId, peticion));
+    }
+
     // ---------------------------------------------------------------- tareas
 
     /** Trabajo de clase. Lo que se devuelve depende de quién pregunte. */

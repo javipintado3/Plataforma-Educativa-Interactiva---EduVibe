@@ -1,0 +1,22 @@
+<app-dialogo [abierto]="abierto()" [titulo]="tituloDialogo"
+             [cierraAlPulsarFuera]="false" (cerrar)="cerrar()">
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate id="form-unidad">
+    <div class="campo mb-0">
+      <label class="etiqueta" for="titulo-unidad">Título</label>
+      <input id="titulo-unidad" class="entrada" formControlName="title" placeholder="Bloque 3 — Geometría" autofocus>
+      <span class="ayuda-campo" *ngIf="!editando()">
+        Las tareas, exámenes y materiales se podrán asignar a {{ estaEste }} {{ etiquetaUnidad.toLowerCase() }} al crearlos.
+      </span>
+    </div>
+  </form>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="cerrar()">Cancelar</button>
+    <button type="submit" form="form-unidad" class="boton boton-primario" [disabled]="guardando()">
+      {{ guardando() ? (editando() ? 'Guardando…' : 'Creando…') : tituloBoton }}
+    </button>
+  </ng-container>
+</app-dialogo>

@@ -55,6 +55,8 @@ export interface Pagina<T> {
   ultima: boolean;
 }
 
+export type ModoVistaClase = 'structured' | 'flexible';
+
 export interface Clase {
   id: string;
   name: string;
@@ -65,6 +67,7 @@ export interface Clase {
   proximaEntrega: string | null;
   profesores: string[];
   createdAt: string | null;
+  viewMode: ModoVistaClase;
 }
 
 export interface Miembro {
@@ -92,6 +95,7 @@ export interface DetalleClase {
   profesores: Miembro[];
   numeroAlumnos: number;
   temas: Tema[];
+  viewMode: ModoVistaClase;
 }
 
 export interface Tarea {

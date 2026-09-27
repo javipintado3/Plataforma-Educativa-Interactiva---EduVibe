@@ -1,0 +1,61 @@
+<ng-container *ngIf="seleccionada() === null; else detalle">
+  <p class="pequeno apagado mb-2">El contenido de la clase se organiza por unidad. Elige una para ver su contenido.</p>
+
+  <div class="lista-unidades">
+    <div class="tarjeta fila-unidad" *ngFor="let tema of temas">
+      <button type="button" class="fila-unidad-cuerpo" (click)="seleccionar(tema.id)">
+        <span class="titulo-unidad">{{ tema.title }}</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+
+      <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="puedoEditar"
+              (click)="dialogoCrear.editar(tema)" aria-label="Editar nombre de la unidad">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/>
+          <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tarjeta fila-unidad">
+      <button type="button" class="fila-unidad-cuerpo" (click)="seleccionar(sinUnidad)">
+        <span class="titulo-unidad apagado">Sin unidad</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+
+    <button type="button" class="fila-nueva-unidad" *ngIf="puedoEditar" (click)="dialogoCrear.abrir()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Nueva unidad
+    </button>
+  </div>
+</ng-container>
+
+<ng-template #detalle>
+  <button type="button" class="enlace-volver mb-2" (click)="volver()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+    Unidades
+  </button>
+
+  <h3 class="titulo-unidad-activa mb-2">{{ tituloSeleccionada }}</h3>
+
+  <h4 class="titulo-subseccion">Actividades</h4>
+  <app-pestana-trabajo [claseId]="claseId" [puedoEditar]="puedoEditar" [temas]="temas" [temaFiltro]="temaFiltroActual"></app-pestana-trabajo>
+  <app-pestana-examenes class="mt-2" [claseId]="claseId" [puedoEditar]="puedoEditar" [temas]="temas" [temaFiltro]="temaFiltroActual"></app-pestana-examenes>
+
+  <h4 class="titulo-subseccion mt-3">Materiales</h4>
+  <app-pestana-materiales [claseId]="claseId" [puedoEditar]="puedoEditar" [temas]="temas" [temaFiltro]="temaFiltroActual"></app-pestana-materiales>
+</ng-template>
+
+<app-crear-unidad-dialogo #dialogoCrear [claseId]="claseId" (creada)="onCreada($event)" (actualizada)="onActualizada($event)"></app-crear-unidad-dialogo>

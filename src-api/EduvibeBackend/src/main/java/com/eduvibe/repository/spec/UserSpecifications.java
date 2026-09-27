@@ -4,9 +4,12 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.eduvibe.model.Enrollment;
 import com.eduvibe.model.User;
 import com.eduvibe.model.enums.UserRole;
 import com.eduvibe.model.enums.UserStatus;
+
+import jakarta.persistence.criteria.Subquery;
 
 /**
  * Filtros componibles para el listado de usuarios.
@@ -48,6 +51,29 @@ public final class UserSpecifications {
             return null;
         }
         return (raiz, consulta, cb) -> cb.equal(raiz.get("status"), estado);
+    }
+
+    /**
+     * Excluye a quien ya está matriculado en esa clase.
+     *
+     * Vive aquí y no se filtra en el cliente para que la paginación
+     * (totalElementos, totalPaginas) que devuelve el Pageable sea correcta:
+     * si se filtrase después de traer la página, una página podría llegar con
+     * menos filas de las que pide `size`, o el conteo total no cuadraría con
+     * lo que de verdad se puede añadir.
+     */
+    public static Specification<User> noMatriculadoEn(UUID classId) {
+        if (classId == null) {
+            return null;
+        }
+        return (raiz, consulta, cb) -> {
+            Subquery<UUID> matriculados = consulta.subquery(UUID.class);
+            var enrollment = matriculados.from(Enrollment.class);
+            matriculados.select(enrollment.get("user").get("id"))
+                    .where(cb.equal(enrollment.get("schoolClass").get("id"), classId));
+
+            return cb.not(raiz.get("id").in(matriculados));
+        };
     }
 
     /** Busca el texto en el nombre o en el email, sin distinguir mayúsculas. */

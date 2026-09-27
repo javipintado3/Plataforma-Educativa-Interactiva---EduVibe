@@ -23,7 +23,8 @@ public record ClassDetailResponse(
         boolean puedoEditar,
         List<MemberResponse> profesores,
         long numeroAlumnos,
-        List<TopicResponse> temas) {
+        List<TopicResponse> temas,
+        String viewMode) {
 
     public static ClassDetailResponse de(SchoolClass clase, String miRol, boolean puedoEditar,
                                          List<MemberResponse> profesores, long numeroAlumnos,
@@ -38,6 +39,7 @@ public record ClassDetailResponse(
                 puedoEditar,
                 profesores,
                 numeroAlumnos,
-                temas);
+                temas,
+                clase.getViewMode().getValor());
     }
 }

@@ -69,11 +69,23 @@
       <span class="ayuda-campo">Identifica la asignatura en todas las pantallas.</span>
     </div>
 
-    <div class="campo mt-2 mb-0">
+    <div class="campo mt-2">
       <label class="etiqueta">Portada</label>
       <app-subida-archivo formControlName="imageUrl" tipo="imagen" placeholder="https://… o sube una foto"></app-subida-archivo>
       <span class="ayuda-campo">
         Si la dejas vacía se compone una portada con el color de la clase.
+      </span>
+    </div>
+
+    <div class="campo mb-0">
+      <label class="etiqueta" for="modo-vista">Organización del contenido</label>
+      <select id="modo-vista" class="selector" formControlName="viewMode">
+        <option value="structured">Unidades — actividades y materiales separados</option>
+        <option value="flexible">Módulos — todo mezclado</option>
+      </select>
+      <span class="ayuda-campo">
+        Unidades: pensado para primaria/secundaria. Módulos: todo el contenido de cada bloque
+        junto, estilo universidad. Se puede cambiar después.
       </span>
     </div>
   </form>

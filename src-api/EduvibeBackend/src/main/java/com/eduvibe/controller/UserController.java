@@ -42,16 +42,18 @@ public class UserController {
     private final UserService userService;
 
     /**
-     * Listado con filtros opcionales por rol, estado y texto libre.
+     * Listado con filtros opcionales por rol, estado, texto libre y, para el
+     * selector de matriculación, exclusión de quien ya está en una clase.
      */
     @GetMapping
     public ResponseEntity<PageResponse<UserResponse>> listar(
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status,
             @RequestParam(required = false, name = "q") String busqueda,
+            @RequestParam(required = false) UUID excludeClassId,
             @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
 
-        return ResponseEntity.ok(userService.listar(role, status, busqueda, pageable));
+        return ResponseEntity.ok(userService.listar(role, status, busqueda, excludeClassId, pageable));
     }
 
     @GetMapping("/{id}")

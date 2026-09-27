@@ -19,5 +19,9 @@ public record CreateClassRequest(
 
         /** Enlace a la portada. Opcional: sin él se compone una automática. */
         @Size(max = 2000, message = "El enlace de la portada es demasiado largo")
-        String imageUrl) {
+        String imageUrl,
+
+        /** 'structured' o 'flexible'. Opcional: sin él, la clase nace en modo structured. */
+        @Pattern(regexp = "structured|flexible", message = "El modo de vista debe ser structured o flexible")
+        String viewMode) {
 }

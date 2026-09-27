@@ -39,6 +39,15 @@ export class PestanaForoComponent implements OnInit {
   @Input({ required: true }) claseId!: string;
   @Input() temas: Tema[] = [];
 
+  /**
+   * Filtra a un solo tema: `undefined` = todos (comportamiento por defecto),
+   * un id de tema = solo ese, `null` = solo lo que no tiene tema.
+   */
+  @Input() temaFiltro: string | null | undefined = undefined;
+
+  /** Cómo llamar al agrupador en este modo de vista: "Unidad" o "Módulo". */
+  @Input() etiquetaUnidad = 'Unidad';
+
   readonly hilos = signal<HiloForo[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
@@ -73,15 +82,32 @@ export class PestanaForoComponent implements OnInit {
     });
   }
 
+  /** Los hilos que toca pintar, según {@link temaFiltro}. */
+  get hilosVisibles(): HiloForo[] {
+    const todos = this.hilos();
+    if (this.temaFiltro === undefined) {
+      return todos;
+    }
+    return todos.filter(h => h.topicId === this.temaFiltro);
+  }
+
+  get etiquetaUnidadMinuscula(): string {
+    return this.etiquetaUnidad.toLowerCase();
+  }
+
+  get etiquetaSinUnidad(): string {
+    return 'Sin ' + this.etiquetaUnidadMinuscula;
+  }
+
   tituloDelTema(topicId: string | null): string {
     if (!topicId) {
-      return 'Sin tema';
+      return this.etiquetaSinUnidad;
     }
-    return this.temas.find(t => t.id === topicId)?.title ?? 'Sin tema';
+    return this.temas.find(t => t.id === topicId)?.title ?? this.etiquetaSinUnidad;
   }
 
   abrirDialogo(): void {
-    this.formulario.reset({ title: '', content: '', topicId: '' });
+    this.formulario.reset({ title: '', content: '', topicId: this.temaFiltro ?? '' });
     this.errorFormulario.set(null);
     this.dialogoAbierto.set(true);
   }

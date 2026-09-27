@@ -13,7 +13,7 @@
 
 <ng-container *ngIf="!cargando()">
 
-  <div class="tarjeta" *ngIf="!materiales().length">
+  <div class="tarjeta" *ngIf="!materialesVisibles.length">
     <app-estado-vacio
       titulo="Todavía no hay materiales"
       [descripcion]="puedoEditar
@@ -25,8 +25,8 @@
     </app-estado-vacio>
   </div>
 
-  <div class="tarjeta" *ngIf="materiales().length">
-    <article class="material" *ngFor="let material of materiales()">
+  <div class="tarjeta" *ngIf="materialesVisibles.length">
+    <article class="material" *ngFor="let material of materialesVisibles">
 
       <span class="crecer" style="min-width:0">
         <a class="titulo" *ngIf="material.fileUrl" [href]="material.fileUrl | rutaArchivo" target="_blank" rel="noopener">
@@ -36,7 +36,7 @@
 
         <span class="meta">
           <app-pastilla-estado *ngIf="material.type" [valor]="material.type"></app-pastilla-estado>
-          <span class="apagado"> · {{ tituloDelTema(material.topicId) }}</span>
+          <span class="apagado" *ngIf="temaFiltro === undefined"> · {{ tituloDelTema(material.topicId) }}</span>
           <span class="pastilla pastilla-ambar" *ngIf="material.bloqueado">
             Se ve a partir del {{ material.availableFrom | fecha }}
           </span>
@@ -77,7 +77,7 @@
 
     <div class="campo">
       <label class="etiqueta" for="titulo-material">Título</label>
-      <input id="titulo-material" class="entrada" formControlName="title" placeholder="Apuntes del tema 1">
+      <input id="titulo-material" class="entrada" formControlName="title" placeholder="Apuntes de la unidad 1">
     </div>
 
     <div class="campo">
@@ -100,9 +100,9 @@
       </div>
 
       <div class="campo mb-0" *ngIf="temas.length">
-        <label class="etiqueta" for="tema-material">Tema</label>
+        <label class="etiqueta" for="tema-material">{{ etiquetaUnidad }}</label>
         <select id="tema-material" class="selector" formControlName="topicId">
-          <option value="">Sin tema</option>
+          <option value="">{{ etiquetaSinUnidad }}</option>
           <option *ngFor="let tema of temas" [value]="tema.id">{{ tema.title }}</option>
         </select>
       </div>

@@ -24,7 +24,8 @@ public record ClassResponse(
         String miRol,
         Instant proximaEntrega,
         java.util.List<String> profesores,
-        Instant createdAt) {
+        Instant createdAt,
+        String viewMode) {
 
     public static ClassResponse de(SchoolClass clase, String miRol,
                                    Instant proximaEntrega, java.util.List<String> profesores) {
@@ -37,6 +38,7 @@ public record ClassResponse(
                 miRol,
                 proximaEntrega,
                 profesores,
-                clase.getCreatedAt());
+                clase.getCreatedAt(),
+                clase.getViewMode().getValor());
     }
 }

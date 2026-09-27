@@ -1,17 +1,20 @@
-import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { ClasesService } from '../../../../core/services/clases.service';
 import { ConfirmacionService } from '../../../../core/services/confirmacion.service';
 import { SubgruposService } from '../../../../core/services/subgrupos.service';
-import { Miembro, Subgrupo } from '../../../../core/models';
+import { UsuariosService } from '../../../../core/services/usuarios.service';
+import { Miembro, Pagina, RolEnClase, Subgrupo, Usuario } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AvatarComponent } from '../../../../shared/avatar/avatar.component';
 import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
+import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
 
 /**
  * Pestaña "Personas": quién imparte la clase, quién la cursa, y sus subgrupos.
@@ -28,7 +31,7 @@ import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vac
   standalone: true,
   imports: [
     NgIf, NgFor, ReactiveFormsModule,
-    AvatarComponent, CargandoComponent, EstadoVacioComponent, AvisoComponent, DialogoComponent,
+    AvatarComponent, CargandoComponent, EstadoVacioComponent, AvisoComponent, DialogoComponent, PastillaEstadoComponent,
   ],
   templateUrl: './pestana-personas.component.html',
   styleUrl: './pestana-personas.component.css',
@@ -37,12 +40,16 @@ export class PestanaPersonasComponent implements OnInit {
 
   private readonly clasesService = inject(ClasesService);
   private readonly subgruposService = inject(SubgruposService);
+  private readonly usuariosService = inject(UsuariosService);
   private readonly confirmacion = inject(ConfirmacionService);
   private readonly fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
 
   @Input({ required: true }) claseId!: string;
   @Input() puedoEditar = false;
+
+  /** Se emite al matricular o quitar a alguien, para que la cabecera de la clase se refresque. */
+  @Output() cambioMiembros = new EventEmitter<void>();
 
   readonly miembros = signal<Miembro[]>([]);
   readonly cargando = signal(true);
@@ -51,6 +58,121 @@ export class PestanaPersonasComponent implements OnInit {
 
   readonly profesorado = computed(() => this.miembros().filter(m => m.roleInClass === 'teacher'));
   readonly alumnado = computed(() => this.miembros().filter(m => m.roleInClass === 'student'));
+
+  // --- matriculación ---
+
+  private static readonly TAMANO_PAGINA_ANADIR = 8;
+
+  readonly dialogoAnadirAbierto = signal(false);
+  readonly rolAAnadir = signal<RolEnClase>('student');
+  readonly pagina = signal<Pagina<Usuario> | null>(null);
+  readonly seleccionados = signal<Set<string>>(new Set());
+  readonly buscando = signal(false);
+  readonly anadiendoLote = signal(false);
+  readonly errorAnadir = signal<string | null>(null);
+
+  readonly formBusqueda = this.fb.nonNullable.group({
+    q: [''],
+  });
+
+  get tituloAnadir(): string {
+    return this.rolAAnadir() === 'teacher' ? 'Añadir profesorado' : 'Añadir alumnado';
+  }
+
+  get numSeleccionados(): number {
+    return this.seleccionados().size;
+  }
+
+  abrirAnadir(rol: RolEnClase): void {
+    this.rolAAnadir.set(rol);
+    this.formBusqueda.reset({ q: '' });
+    this.pagina.set(null);
+    this.seleccionados.set(new Set());
+    this.errorAnadir.set(null);
+    this.dialogoAnadirAbierto.set(true);
+    this.buscar(0);
+  }
+
+  estaSeleccionado(usuarioId: string): boolean {
+    return this.seleccionados().has(usuarioId);
+  }
+
+  alternarSeleccion(usuario: Usuario, marcado: boolean): void {
+    this.seleccionados.update(actuales => {
+      const nuevo = new Set(actuales);
+      marcado ? nuevo.add(usuario.id) : nuevo.delete(usuario.id);
+      return nuevo;
+    });
+  }
+
+  get todosSeleccionadosEnPagina(): boolean {
+    const contenido = this.pagina()?.contenido ?? [];
+    return contenido.length > 0 && contenido.every(u => this.estaSeleccionado(u.id));
+  }
+
+  alternarTodosEnPagina(marcado: boolean): void {
+    const contenido = this.pagina()?.contenido ?? [];
+    this.seleccionados.update(actuales => {
+      const nuevo = new Set(actuales);
+      for (const usuario of contenido) {
+        marcado ? nuevo.add(usuario.id) : nuevo.delete(usuario.id);
+      }
+      return nuevo;
+    });
+  }
+
+  /**
+   * `excludeClassId` deja fuera del todo a quien ya está en la clase —no
+   * solo se oculta en el cliente— así que la paginación que devuelve el
+   * Pageable del backend (totalElementos, totalPaginas) es siempre exacta.
+   */
+  buscar(pagina: number): void {
+    this.buscando.set(true);
+    this.errorAnadir.set(null);
+
+    this.usuariosService.listar({
+      role: this.rolAAnadir(), q: this.formBusqueda.getRawValue().q, excludeClassId: this.claseId,
+      page: pagina, size: PestanaPersonasComponent.TAMANO_PAGINA_ANADIR,
+    }).subscribe({
+      next: (resultado) => {
+        this.buscando.set(false);
+        this.pagina.set(resultado);
+      },
+      error: (err) => {
+        this.buscando.set(false);
+        this.errorAnadir.set(AvisoComponent.mensajeDe(err, 'No se ha podido buscar'));
+      },
+    });
+  }
+
+  anadirSeleccionados(): void {
+    const ids = Array.from(this.seleccionados());
+
+    if (!ids.length || this.anadiendoLote()) {
+      return;
+    }
+
+    this.anadiendoLote.set(true);
+    this.errorAnadir.set(null);
+
+    forkJoin(ids.map(id => this.clasesService.matricular(this.claseId, id, this.rolAAnadir()))).subscribe({
+      next: (miembros) => {
+        this.anadiendoLote.set(false);
+        this.miembros.update(lista => [...lista, ...miembros]);
+        this.seleccionados.set(new Set());
+        this.cambioMiembros.emit();
+        this.buscar(this.pagina()?.pagina ?? 0);
+      },
+      error: (err) => {
+        this.anadiendoLote.set(false);
+        // Algunas altas del lote pueden haberse completado antes del fallo; se recarga
+        // para que la lista de miembros y los seleccionables reflejen lo que quedó hecho.
+        this.errorAnadir.set(AvisoComponent.mensajeDe(err));
+        this.cargar();
+        this.buscar(this.pagina()?.pagina ?? 0);
+      },
+    });
+  }
 
   // --- subgrupos ---
   readonly subgrupos = signal<Subgrupo[]>([]);
@@ -103,6 +225,7 @@ export class PestanaPersonasComponent implements OnInit {
       next: () => {
         this.quitando.set(null);
         this.miembros.update(lista => lista.filter(m => m.userId !== miembro.userId));
+        this.cambioMiembros.emit();
       },
       error: (err) => {
         this.quitando.set(null);
