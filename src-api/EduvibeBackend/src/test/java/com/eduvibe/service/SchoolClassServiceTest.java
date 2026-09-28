@@ -29,8 +29,10 @@ import com.eduvibe.model.Topic;
 import com.eduvibe.model.enums.ClassViewMode;
 import com.eduvibe.model.enums.UserRole;
 import com.eduvibe.repository.EnrollmentRepository;
+import com.eduvibe.repository.ExamAttemptRepository;
 import com.eduvibe.repository.OrganizationRepository;
 import com.eduvibe.repository.SchoolClassRepository;
+import com.eduvibe.repository.SubmissionRepository;
 import com.eduvibe.repository.TopicRepository;
 import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
@@ -54,6 +56,12 @@ class SchoolClassServiceTest {
     private OrganizationRepository organizationRepository;
 
     @Mock
+    private SubmissionRepository submissionRepository;
+
+    @Mock
+    private ExamAttemptRepository examAttemptRepository;
+
+    @Mock
     private ClassAccessService acceso;
 
     @Mock
@@ -70,7 +78,7 @@ class SchoolClassServiceTest {
     void crearServicio() {
         schoolClassService = new SchoolClassService(
                 schoolClassRepository, enrollmentRepository, topicRepository, userRepository,
-                organizationRepository, acceso, authService);
+                organizationRepository, submissionRepository, examAttemptRepository, acceso, authService);
     }
 
     @Nested

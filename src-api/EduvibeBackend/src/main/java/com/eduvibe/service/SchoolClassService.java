@@ -27,8 +27,10 @@ import com.eduvibe.model.User;
 import com.eduvibe.model.enums.ClassViewMode;
 import com.eduvibe.model.enums.EnrollmentRole;
 import com.eduvibe.repository.EnrollmentRepository;
+import com.eduvibe.repository.ExamAttemptRepository;
 import com.eduvibe.repository.OrganizationRepository;
 import com.eduvibe.repository.SchoolClassRepository;
+import com.eduvibe.repository.SubmissionRepository;
 import com.eduvibe.repository.TopicRepository;
 import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
@@ -49,6 +51,8 @@ public class SchoolClassService {
     private final TopicRepository topicRepository;
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
+    private final SubmissionRepository submissionRepository;
+    private final ExamAttemptRepository examAttemptRepository;
     private final ClassAccessService acceso;
     private final AuthService authService;
 
@@ -96,8 +100,9 @@ public class SchoolClassService {
         }
 
         // Consulta 2: todas las matriculaciones de esas clases, de las que salen
-        // tanto el profesorado de cada una como el papel de quien consulta
+        // tanto el profesorado como el alumnado de cada una y el papel de quien consulta
         Map<UUID, List<String>> profesoradoPorClase = new HashMap<>();
+        Map<UUID, Integer> alumnadoPorClase = new HashMap<>();
         Map<UUID, String> miRolPorClase = new HashMap<>();
 
         for (Enrollment matricula : enrollmentRepository.findBySchoolClassIdIn(ids)) {
@@ -107,6 +112,8 @@ public class SchoolClassService {
                 profesoradoPorClase
                         .computeIfAbsent(claseId, k -> new ArrayList<>())
                         .add(matricula.getUser().getName());
+            } else {
+                alumnadoPorClase.merge(claseId, 1, Integer::sum);
             }
             if (matricula.getUser().getId().equals(usuario.id())) {
                 miRolPorClase.put(claseId, matricula.getRoleInClass().getValor());
@@ -120,8 +127,31 @@ public class SchoolClassService {
                         clase,
                         miRolPorClase.getOrDefault(clase.getId(), rolSiNoEstaMatriculado),
                         proximas.get(clase.getId()),
-                        profesoradoPorClase.getOrDefault(clase.getId(), List.of())))
+                        profesoradoPorClase.getOrDefault(clase.getId(), List.of()),
+                        alumnadoPorClase.getOrDefault(clase.getId(), 0)))
                 .toList();
+    }
+
+    /**
+     * Borra la clase entera y todo lo que cuelga de ella (matriculaciones,
+     * temas, tareas, exámenes, avisos, materiales, foros...).
+     *
+     * Solo administración puede hacerlo, y solo si nadie ha entregado nada
+     * todavía: si ya hay entregas o intentos de examen, borrar destruiría
+     * histórico académico real, y lo correcto ahí es archivar, no borrar
+     * (archivar queda fuera del alcance actual).
+     */
+    @Transactional
+    public void eliminar(UUID classId) {
+        SchoolClass clase = acceso.exigirSerAdmin(classId);
+
+        if (submissionRepository.existsByAssignmentSchoolClassId(classId)
+                || examAttemptRepository.existsByExamSchoolClassId(classId)) {
+            throw new ConflictException(
+                    "No se puede borrar: ya hay entregas o exámenes hechos en esta clase");
+        }
+
+        schoolClassRepository.delete(clase);
     }
 
     @Transactional(readOnly = true)

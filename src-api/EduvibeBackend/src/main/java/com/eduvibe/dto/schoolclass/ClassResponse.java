@@ -14,6 +14,7 @@ import com.eduvibe.model.SchoolClass;
  * @param miRol          papel de quien consulta dentro de la clase
  * @param proximaEntrega fecha de la siguiente tarea con plazo, o null si no hay
  * @param profesores     nombres del profesorado, para la línea bajo el título
+ * @param alumnado       número de alumnos matriculados, para el panel de gestión de administración
  */
 public record ClassResponse(
         UUID id,
@@ -25,10 +26,11 @@ public record ClassResponse(
         Instant proximaEntrega,
         java.util.List<String> profesores,
         Instant createdAt,
-        String viewMode) {
+        String viewMode,
+        int alumnado) {
 
     public static ClassResponse de(SchoolClass clase, String miRol,
-                                   Instant proximaEntrega, java.util.List<String> profesores) {
+                                   Instant proximaEntrega, java.util.List<String> profesores, int alumnado) {
         return new ClassResponse(
                 clase.getId(),
                 clase.getName(),
@@ -39,6 +41,7 @@ public record ClassResponse(
                 proximaEntrega,
                 profesores,
                 clase.getCreatedAt(),
-                clase.getViewMode().getValor());
+                clase.getViewMode().getValor(),
+                alumnado);
     }
 }

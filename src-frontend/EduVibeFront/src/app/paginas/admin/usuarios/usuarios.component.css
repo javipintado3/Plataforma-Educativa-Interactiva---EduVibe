@@ -14,6 +14,60 @@
 
 .acciones { display: flex; gap: 7px; justify-content: flex-end; flex-wrap: wrap; }
 
+.fila-usuario { cursor: pointer; }
+.fila-usuario:hover { background: var(--borde-sutil); }
+
+.barra-lote { padding: 12px 18px; }
+
+/* --------------------------------------------------------- importar CSV */
+
+.entrada-oculta { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+
+.zona-csv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 40px 20px;
+  border: 2px dashed var(--borde);
+  border-radius: var(--radio);
+  background: var(--fondo);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color .12s ease, background .12s ease;
+}
+
+.zona-csv:hover { border-color: var(--gris-claro); }
+.zona-csv.arrastrando { border-color: var(--verde-600); background: var(--verde-50); }
+
+.icono-csv {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--verde-100);
+  color: var(--verde-700);
+  margin-bottom: 6px;
+}
+
+.texto-zona-csv { font-size: .95rem; font-weight: 600; }
+.formatos-zona-csv { font-size: .8rem; color: var(--tinta-70); }
+
+.archivo-csv-elegido {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--borde-sutil);
+  border-radius: var(--radio);
+  background: var(--fondo);
+}
+
+.icono-documento-csv { color: var(--verde-700); flex-shrink: 0; }
+
 .paginacion {
   display: flex;
   align-items: center;

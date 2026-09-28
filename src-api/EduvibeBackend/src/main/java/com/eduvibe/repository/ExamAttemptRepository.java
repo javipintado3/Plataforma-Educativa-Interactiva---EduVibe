@@ -17,6 +17,9 @@ public interface ExamAttemptRepository extends JpaRepository<ExamAttempt, UUID> 
 
     long countByExamId(UUID examId);
 
+    /** Si ya hay algún intento de examen en la clase, para no dejar borrarla sin más. */
+    boolean existsByExamSchoolClassId(UUID classId);
+
     /** Todos los intentos de un examen, para la vista de corrección del profesorado. */
     @EntityGraph(attributePaths = "student")
     List<ExamAttempt> findByExamIdOrderByStudentNameAsc(UUID examId);

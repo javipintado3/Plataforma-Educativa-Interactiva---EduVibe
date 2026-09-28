@@ -2,10 +2,10 @@
 
   <div class="fila-entre envolver mb-3">
     <div>
-      <h1>Mis clases</h1>
+      <h1>{{ auth.esAdmin() ? 'Clases' : 'Mis clases' }}</h1>
       <p class="apagado mb-0">
         {{ auth.esAdmin()
-            ? 'Todas las clases del centro'
+            ? 'Gestión de las clases del centro: crea, edita y da de baja.'
             : 'Las clases en las que participas' }}
       </p>
     </div>
@@ -23,9 +23,75 @@
 
   <ng-container *ngIf="!cargando()">
 
-    <div class="rejilla" *ngIf="clases().length; else sinClases">
-      <app-tarjeta-clase *ngFor="let clase of clases()" [clase]="clase"></app-tarjeta-clase>
-    </div>
+    <!-- Administración: tabla de gestión -->
+    <ng-container *ngIf="auth.esAdmin(); else vistaTarjetas">
+      <ng-container *ngIf="clases().length; else sinClases">
+
+        <div class="fila espaciado-sm mb-2">
+          <input class="entrada" style="max-width:320px" [value]="busqueda()"
+                 (input)="busqueda.set($any($event.target).value)"
+                 placeholder="Buscar por nombre o asignatura">
+          <app-limpiar-filtros (limpiar)="busqueda.set('')"></app-limpiar-filtros>
+        </div>
+
+        <div class="tarjeta" *ngIf="clasesFiltradas().length; else sinResultados">
+          <div class="tabla-envoltorio">
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Clase</th>
+                  <th>Profesorado</th>
+                  <th>Alumnado</th>
+                  <th>Próxima entrega</th>
+                  <th style="text-align:right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let clase of clasesFiltradas()"
+                    class="fila-clase" [routerLink]="['/clases', clase.id]">
+                  <td>
+                    <div class="fila espaciado-sm">
+                      <span class="pastilla-color" [style.background]="clase.color || 'var(--verde-600)'"></span>
+                      <div style="min-width:0">
+                        <p class="fuerte mb-0">{{ clase.name }}</p>
+                        <p class="pequeno apagado mb-0">{{ clase.subject || 'Sin asignatura' }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="pequeno">{{ clase.profesores.length ? clase.profesores.join(', ') : 'Sin profesorado' }}</td>
+                  <td class="pequeno">{{ clase.alumnado }}</td>
+                  <td class="pequeno apagado">
+                    {{ clase.proximaEntrega ? (clase.proximaEntrega | plazo) : 'Sin tareas pendientes' }}
+                  </td>
+                  <td>
+                    <div class="acciones">
+                      <button type="button" class="boton boton-peligro boton-pequeno"
+                              [disabled]="borrando() === clase.id"
+                              (click)="eliminar(clase, $event)">
+                        {{ borrando() === clase.id ? 'Borrando…' : 'Borrar' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <ng-template #sinResultados>
+          <div class="tarjeta">
+            <app-estado-vacio titulo="Ninguna clase coincide" descripcion="Prueba a buscar por otro nombre o asignatura."></app-estado-vacio>
+          </div>
+        </ng-template>
+      </ng-container>
+    </ng-container>
+
+    <!-- Profesorado y alumnado: sus tarjetas -->
+    <ng-template #vistaTarjetas>
+      <div class="rejilla" *ngIf="clases().length; else sinClases">
+        <app-tarjeta-clase *ngFor="let clase of clases()" [clase]="clase"></app-tarjeta-clase>
+      </div>
+    </ng-template>
 
     <ng-template #sinClases>
       <div class="tarjeta">

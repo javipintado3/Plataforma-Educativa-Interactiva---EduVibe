@@ -8,7 +8,7 @@
     <!-- Navegación principal -->
     <nav class="nav" [class.desplegada]="navegacionAbierta()">
       <a routerLink="/clases" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
-        Mis clases
+        {{ auth.esAdmin() ? 'Clases' : 'Mis clases' }}
       </a>
       <a routerLink="/calendario" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
         Calendario

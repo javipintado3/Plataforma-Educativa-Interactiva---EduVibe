@@ -36,6 +36,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     /** Para el resumen de perfil: en cuántas clases participa, como profesor o como alumno. */
     long countByUserIdAndRoleInClass(UUID userId, EnrollmentRole rol);
 
+    /** Las clases de una persona, para su ficha en el panel de administración. */
+    @EntityGraph(attributePaths = "schoolClass")
+    List<Enrollment> findByUserIdOrderBySchoolClassNameAsc(UUID userId);
+
     /**
      * Alumnado distinto en las clases que imparte un profesor. DISTINCT porque
      * un mismo alumno puede estar en varias de sus clases y no debe contar dos veces.

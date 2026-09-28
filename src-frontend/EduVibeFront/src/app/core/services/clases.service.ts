@@ -38,6 +38,11 @@ export class ClasesService {
     return this.http.put<DetalleClase>(`${this.api}/${claseId}`, datos);
   }
 
+  /** Solo administración, y solo si nadie ha entregado nada todavía en la clase. */
+  eliminar(claseId: string): Observable<void> {
+    return this.http.delete<void>(`${this.api}/${claseId}`);
+  }
+
   miembros(claseId: string): Observable<Miembro[]> {
     return this.http.get<Miembro[]>(`${this.api}/${claseId}/members`);
   }

@@ -8,11 +8,19 @@
       </p>
     </div>
 
-    <button type="button" class="boton boton-primario" (click)="abrirDialogo()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      Nuevo usuario
-    </button>
+    <div class="fila espaciado-sm envolver">
+      <button type="button" class="boton boton-contorno" [disabled]="exportando()" (click)="exportar()">
+        {{ exportando() ? 'Exportando…' : 'Exportar CSV' }}
+      </button>
+      <button type="button" class="boton boton-contorno" (click)="abrirImportar()">
+        Importar CSV
+      </button>
+      <button type="button" class="boton boton-primario" (click)="abrirDialogo()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nuevo usuario
+      </button>
+    </div>
   </div>
 
   <!-- Filtros -->
@@ -35,10 +43,22 @@
     </select>
 
     <button type="submit" class="boton boton-contorno">Buscar</button>
-    <button type="button" class="boton boton-fantasma" (click)="limpiarFiltros()">Limpiar</button>
+    <app-limpiar-filtros (limpiar)="limpiarFiltros()"></app-limpiar-filtros>
   </form>
 
   <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+
+  <!-- Barra de acciones en lote: solo aparece con selección, como en un DataGrid -->
+  <div class="tarjeta tarjeta-cuerpo fila-entre envolver mb-2 barra-lote" *ngIf="seleccionados().size">
+    <p class="fuerte mb-0">{{ seleccionados().size }} seleccionado(s)</p>
+    <div class="fila espaciado-sm">
+      <button type="button" class="boton boton-suave boton-pequeno"
+              [disabled]="aplicandoLote()" (click)="cambiarEstadoLote('active')">Activar</button>
+      <button type="button" class="boton boton-contorno boton-pequeno"
+              [disabled]="aplicandoLote()" (click)="cambiarEstadoLote('disabled')">Desactivar</button>
+      <button type="button" class="boton boton-fantasma boton-pequeno" (click)="limpiarSeleccion()">Cancelar</button>
+    </div>
+  </div>
 
   <app-cargando *ngIf="cargando()"></app-cargando>
 
@@ -52,6 +72,10 @@
       <table class="tabla">
         <thead>
           <tr>
+            <th style="width:1px">
+              <input type="checkbox" [checked]="todosSeleccionadosEnPagina"
+                     (change)="alternarTodosEnPagina($any($event.target).checked)">
+            </th>
             <th>Persona</th>
             <th>Rol</th>
             <th>Estado</th>
@@ -60,7 +84,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let usuario of p.contenido">
+          <tr *ngFor="let usuario of p.contenido" class="fila-usuario"
+              [routerLink]="['/admin/usuarios', usuario.id]">
+            <td (click)="$event.stopPropagation()">
+              <input type="checkbox" [checked]="estaSeleccionado(usuario.id)"
+                     (change)="alternarSeleccion(usuario, $any($event.target).checked)">
+            </td>
             <td>
               <div class="fila espaciado-sm">
                 <app-avatar [nombre]="usuario.name" [pequeno]="true"></app-avatar>
@@ -73,7 +102,7 @@
             <td><app-pastilla-estado [valor]="usuario.role"></app-pastilla-estado></td>
             <td><app-pastilla-estado [valor]="usuario.status"></app-pastilla-estado></td>
             <td class="pequeno apagado">{{ usuario.createdAt | fecha : false }}</td>
-            <td>
+            <td (click)="$event.stopPropagation()">
               <div class="acciones">
                 <button type="button" class="boton boton-suave boton-pequeno"
                         *ngIf="usuario.status === 'pending'"
@@ -178,6 +207,91 @@
     <button type="submit" form="form-usuario" class="boton boton-primario"
             *ngIf="!invitacionEmitida()" [disabled]="creando()">
       {{ creando() ? 'Creando…' : 'Crear e invitar' }}
+    </button>
+  </ng-container>
+</app-dialogo>
+
+<!-- Importar CSV -->
+<app-dialogo [abierto]="dialogoImportarAbierto()" titulo="Importar usuarios desde CSV" ancho="grande"
+             (cerrar)="dialogoImportarAbierto.set(false)">
+
+  <ng-container *ngIf="!resultadoImportar()">
+    <p class="pequeno apagado mb-2">
+      El fichero necesita cabecera con las columnas <code>name</code>, <code>email</code> y
+      <code>role</code> (admin, teacher, student o guardian), en cualquier orden. Cada fila crea una
+      cuenta pendiente y emite su invitación, igual que el alta manual.
+    </p>
+
+    <app-aviso class="mb-2" tipo="error" [mensaje]="errorImportar()" *ngIf="!ficheroImportar()"></app-aviso>
+
+    <!-- Nada elegido todavía: la zona grande de arrastrar y soltar -->
+    <label class="zona-csv" *ngIf="!ficheroImportar()" [class.arrastrando]="arrastrandoCsv()"
+           (dragover)="onDragOverCsv($event)" (dragleave)="onDragLeaveCsv($event)" (drop)="onDropCsv($event)">
+      <input type="file" class="entrada-oculta" accept=".csv,text/csv" (change)="ficheroElegido($event)">
+
+      <span class="icono-csv" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>
+          <path d="M9 15h1.5a1.5 1.5 0 0 0 0-3H9v5"/><path d="M15 12v5"/><path d="M15 14.5h1.5"/>
+        </svg>
+      </span>
+      <span class="texto-zona-csv">Arrastra aquí tu fichero CSV, o haz clic para elegirlo</span>
+      <span class="formatos-zona-csv">Cabecera name, email, role · .csv</span>
+    </label>
+
+    <!-- Ya hay uno elegido: una ficha compacta, como al subir una imagen -->
+    <div class="archivo-csv-elegido" *ngIf="ficheroImportar() as fichero">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="icono-documento-csv">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>
+      </svg>
+      <div class="crecer" style="min-width:0">
+        <p class="fuerte mb-0" [title]="fichero.name">{{ fichero.name }}</p>
+        <p class="pequeno apagado mb-0">{{ tamanoLegible(fichero.size) }}</p>
+      </div>
+      <button type="button" class="boton boton-fantasma boton-pequeno" (click)="quitarFichero()">Quitar</button>
+    </div>
+
+    <app-aviso class="mt-2" tipo="error" [mensaje]="errorImportar()" *ngIf="ficheroImportar()"></app-aviso>
+  </ng-container>
+
+  <ng-container *ngIf="resultadoImportar() as resultado">
+    <div class="aviso mb-2" [class.aviso-exito]="resultado.creados === resultado.total"
+         [class.aviso-atencion]="resultado.creados !== resultado.total">
+      <span>
+        {{ resultado.creados }} de {{ resultado.total }} fila(s) dieron de alta una cuenta.
+      </span>
+    </div>
+
+    <div class="tabla-envoltorio" *ngIf="resultado.filas.length">
+      <table class="tabla">
+        <thead>
+          <tr><th>Fila</th><th>Email</th><th>Resultado</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fila of resultado.filas">
+            <td class="pequeno">{{ fila.fila }}</td>
+            <td class="pequeno">{{ fila.email || '—' }}</td>
+            <td>
+              <span class="pastilla pastilla-verde" *ngIf="fila.creado">Creada</span>
+              <span class="pastilla pastilla-roja" *ngIf="!fila.creado" [attr.title]="fila.motivo">
+                {{ fila.motivo || 'Error' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-container acciones>
+    <button type="button" class="boton boton-contorno" (click)="dialogoImportarAbierto.set(false)">
+      {{ resultadoImportar() ? 'Cerrar' : 'Cancelar' }}
+    </button>
+    <button type="button" class="boton boton-primario" *ngIf="!resultadoImportar()"
+            [disabled]="!ficheroImportar() || !!errorImportar() || importando()" (click)="importarCsv()">
+      {{ importando() ? 'Importando…' : 'Importar' }}
     </button>
   </ng-container>
 </app-dialogo>

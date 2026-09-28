@@ -69,6 +69,24 @@ public class ClassAccessService {
         throw new AccessDeniedException("Solo el profesorado de esta clase puede hacer esto");
     }
 
+    /**
+     * Devuelve la clase si quien pregunta es administración.
+     *
+     * Editar contenido lo puede hacer el profesorado de la clase, pero
+     * borrarla entera —con todo lo que cuelga de ella— queda reservado a
+     * administración, igual que el alta.
+     */
+    @Transactional(readOnly = true)
+    public SchoolClass exigirSerAdmin(UUID classId) {
+        AuthenticatedUser usuario = authService.identidadActual();
+        SchoolClass clase = buscarEnMiOrganizacion(classId, usuario);
+
+        if (usuario.esAdmin()) {
+            return clase;
+        }
+        throw new AccessDeniedException("Solo administración puede borrar una clase");
+    }
+
     /** Comprueba que quien pregunta es alumno de la clase. */
     @Transactional(readOnly = true)
     public void exigirSerAlumnoDe(UUID classId) {

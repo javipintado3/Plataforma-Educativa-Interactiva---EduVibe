@@ -102,6 +102,13 @@ public class SchoolClassController {
         return ResponseEntity.ok(schoolClassService.actualizar(classId, peticion));
     }
 
+    /** Borra la clase entera. Solo administración, y solo si nadie ha entregado nada todavía. */
+    @DeleteMapping("/{classId}")
+    public ResponseEntity<Void> eliminar(@PathVariable UUID classId) {
+        schoolClassService.eliminar(classId);
+        return ResponseEntity.noContent().build();
+    }
+
     // ----------------------------------------------------------- matrículas
 
     @GetMapping("/{classId}/members")

@@ -41,6 +41,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
 
     long countByAssignmentId(UUID assignmentId);
 
+    /** Si ya hay alguna entrega en la clase, para no dejar borrarla sin más. */
+    boolean existsByAssignmentSchoolClassId(UUID classId);
+
     /**
      * Las otras entregas del mismo subgrupo en la misma tarea, para propagarles
      * lo que se acaba de guardar o calificar sin tocar la entrega de origen.

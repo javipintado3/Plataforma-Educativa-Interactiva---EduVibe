@@ -1,0 +1,108 @@
+<div class="contenedor contenedor-estrecho">
+
+  <a routerLink="/admin/usuarios" class="volver mb-2">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    Usuarios
+  </a>
+
+  <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
+  <app-cargando *ngIf="cargando()"></app-cargando>
+
+  <ng-container *ngIf="!cargando() && usuario() as u">
+
+    <div class="tarjeta tarjeta-cuerpo mb-2 cabecera">
+      <app-avatar [nombre]="u.name" [avatarUrl]="u.avatarUrl" [grande]="true"></app-avatar>
+      <div style="min-width:0">
+        <h1 class="mb-0">{{ u.name }}</h1>
+        <p class="apagado mb-1">{{ u.email }}</p>
+        <div class="fila espaciado-sm">
+          <app-pastilla-estado [valor]="u.role"></app-pastilla-estado>
+          <app-pastilla-estado [valor]="u.status"></app-pastilla-estado>
+        </div>
+      </div>
+    </div>
+
+    <app-aviso class="mb-2" tipo="error" [mensaje]="errorAccion()"></app-aviso>
+
+    <!-- Datos -->
+    <div class="tarjeta mb-2">
+      <div class="tarjeta-cabecera"><h3>Datos</h3></div>
+      <div class="tarjeta-cuerpo">
+        <app-aviso class="mb-2" tipo="error" [mensaje]="errorGuardar()"></app-aviso>
+        <div class="aviso aviso-exito mb-2" *ngIf="guardado()"><span>Cambios guardados.</span></div>
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()">
+          <div class="campo">
+            <label class="etiqueta" for="nombre">Nombre y apellidos</label>
+            <input id="nombre" class="entrada" formControlName="name">
+          </div>
+
+          <div class="campo">
+            <label class="etiqueta" for="correo">Email</label>
+            <input id="correo" type="email" class="entrada" formControlName="email">
+          </div>
+
+          <div class="campo mb-0">
+            <label class="etiqueta" for="rol">Rol</label>
+            <select id="rol" class="selector" formControlName="role">
+              <option value="student">Alumnado</option>
+              <option value="teacher">Profesorado</option>
+              <option value="admin">Administración</option>
+              <option value="guardian">Tutor legal</option>
+            </select>
+          </div>
+
+          <button type="submit" class="boton boton-primario mt-2" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Cuenta -->
+    <div class="tarjeta mb-2">
+      <div class="tarjeta-cabecera"><h3>Cuenta</h3></div>
+      <div class="tarjeta-cuerpo">
+        <p class="pequeno apagado mb-2">Alta el {{ u.createdAt | fecha : false }}.</p>
+
+        <div class="acciones">
+          <button type="button" class="boton boton-suave boton-pequeno"
+                  *ngIf="u.status === 'pending'" [disabled]="trabajando()"
+                  (click)="reenviarInvitacion()">Reenviar invitación</button>
+
+          <button type="button" class="boton boton-contorno boton-pequeno"
+                  *ngIf="u.status === 'active'" [disabled]="trabajando()"
+                  (click)="cambiarEstado('disabled')">Desactivar cuenta</button>
+
+          <button type="button" class="boton boton-suave boton-pequeno"
+                  *ngIf="u.status === 'disabled'" [disabled]="trabajando()"
+                  (click)="cambiarEstado('active')">Reactivar cuenta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clases -->
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3>Clases</h3></div>
+      <div class="tarjeta-cuerpo">
+        <app-cargando *ngIf="cargandoClases()"></app-cargando>
+
+        <app-estado-vacio *ngIf="!cargandoClases() && !clases().length"
+          titulo="No participa en ninguna clase" descripcion="Se le puede matricular desde la propia clase."></app-estado-vacio>
+
+        <a *ngFor="let clase of clases()" class="fila-clase" [routerLink]="['/clases', clase.classId]">
+          <span class="pastilla-color" [style.background]="clase.color || 'var(--verde-600)'"></span>
+          <div style="min-width:0;flex:1">
+            <p class="fuerte mb-0">{{ clase.name }}</p>
+            <p class="pequeno apagado mb-0">{{ clase.subject || 'Sin asignatura' }}</p>
+          </div>
+          <span class="pastilla" [class.pastilla-verde]="clase.roleInClass === 'teacher'"
+                [class.pastilla-azul]="clase.roleInClass === 'student'">
+            {{ clase.roleInClass === 'teacher' ? 'Profesorado' : 'Alumnado' }}
+          </span>
+        </a>
+      </div>
+    </div>
+  </ng-container>
+</div>

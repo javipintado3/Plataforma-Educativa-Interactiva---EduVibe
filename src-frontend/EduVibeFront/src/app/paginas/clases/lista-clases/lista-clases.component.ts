@@ -1,15 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
+import { ConfirmacionService } from '../../../core/services/confirmacion.service';
 import { Clase, ModoVistaClase } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.component';
+import { LimpiarFiltrosComponent } from '../../../shared/limpiar-filtros/limpiar-filtros.component';
 import { PALETA_CLASE } from '../../../shared/paleta-clase';
+import { PlazoPipe } from '../../../shared/pipes/fecha.pipe';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-clase.component';
 
@@ -24,9 +28,9 @@ import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-cla
   selector: 'app-lista-clases',
   standalone: true,
   imports: [
-    NgIf, NgFor, ReactiveFormsModule,
-    TarjetaClaseComponent, EstadoVacioComponent, CargandoComponent,
-    DialogoComponent, AvisoComponent, SubidaArchivoComponent,
+    NgIf, NgFor, RouterLink, ReactiveFormsModule,
+    TarjetaClaseComponent, EstadoVacioComponent, CargandoComponent, LimpiarFiltrosComponent,
+    DialogoComponent, AvisoComponent, SubidaArchivoComponent, PlazoPipe,
   ],
   templateUrl: './lista-clases.component.html',
   styleUrl: './lista-clases.component.css',
@@ -34,6 +38,7 @@ import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-cla
 export class ListaClasesComponent implements OnInit {
 
   private readonly clasesService = inject(ClasesService);
+  private readonly confirmacion = inject(ConfirmacionService);
   private readonly fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
 
@@ -46,6 +51,19 @@ export class ListaClasesComponent implements OnInit {
   readonly dialogoAbierto = signal(false);
   readonly creando = signal(false);
   readonly errorFormulario = signal<string | null>(null);
+
+  // --- gestión (vista de administración) ---
+  readonly busqueda = signal('');
+  readonly borrando = signal<string | null>(null);
+
+  readonly clasesFiltradas = computed(() => {
+    const texto = this.busqueda().trim().toLowerCase();
+    if (!texto) {
+      return this.clases();
+    }
+    return this.clases().filter(c =>
+      c.name.toLowerCase().includes(texto) || (c.subject ?? '').toLowerCase().includes(texto));
+  });
 
   readonly formulario = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -108,6 +126,37 @@ export class ListaClasesComponent implements OnInit {
       error: (err) => {
         this.creando.set(false);
         this.errorFormulario.set(AvisoComponent.mensajeDe(err));
+      },
+    });
+  }
+
+  /**
+   * Borra la clase entera. Solo se ofrece a administración, y el backend
+   * rechaza el borrado si ya hay entregas o exámenes hechos: aquí solo se
+   * pide confirmación, la regla de negocio vive en el servidor.
+   */
+  async eliminar(clase: Clase, evento: Event): Promise<void> {
+    evento.preventDefault();
+    evento.stopPropagation();
+
+    const confirmado = await this.confirmacion.preguntar(
+      `¿Borrar "${clase.name}"? Se pierde todo lo que tiene dentro: tareas, exámenes, materiales y matriculaciones.`,
+      { titulo: 'Borrar clase', textoConfirmar: 'Borrar' });
+    if (!confirmado) {
+      return;
+    }
+
+    this.borrando.set(clase.id);
+    this.error.set(null);
+
+    this.clasesService.eliminar(clase.id).subscribe({
+      next: () => {
+        this.borrando.set(null);
+        this.clases.update(lista => lista.filter(c => c.id !== clase.id));
+      },
+      error: (err) => {
+        this.borrando.set(null);
+        this.error.set(AvisoComponent.mensajeDe(err));
       },
     });
   }

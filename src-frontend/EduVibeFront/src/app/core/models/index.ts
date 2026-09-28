@@ -68,6 +68,29 @@ export interface Clase {
   profesores: string[];
   createdAt: string | null;
   viewMode: ModoVistaClase;
+  alumnado: number;
+}
+
+/** Una clase en la que participa una persona, para su ficha de administración. */
+export interface ClaseDeUsuario {
+  classId: string;
+  name: string;
+  subject: string | null;
+  color: string | null;
+  roleInClass: RolEnClase;
+}
+
+export interface FilaImportada {
+  fila: number;
+  email: string;
+  creado: boolean;
+  motivo: string | null;
+}
+
+export interface ResultadoImportacion {
+  total: number;
+  creados: number;
+  filas: FilaImportada[];
 }
 
 export interface Miembro {

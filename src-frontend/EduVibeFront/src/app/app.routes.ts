@@ -98,6 +98,13 @@ export const routes: Routes = [
         loadComponent: () => import('./paginas/admin/usuarios/usuarios.component')
           .then(m => m.UsuariosComponent),
       },
+      {
+        path: 'admin/usuarios/:id',
+        canActivate: [adminGuard],
+        title: 'Usuario · Eduvibe',
+        loadComponent: () => import('./paginas/admin/usuarios/detalle-usuario/detalle-usuario.component')
+          .then(m => m.DetalleUsuarioComponent),
+      },
     ],
   },
 

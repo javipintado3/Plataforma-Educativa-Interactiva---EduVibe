@@ -25,6 +25,9 @@ public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificat
 
     boolean existsByEmail(String email);
 
+    /** Para comprobar unicidad al editar sin que la propia cuenta se choque consigo misma. */
+    boolean existsByEmailAndIdNot(String email, UUID id);
+
     /** Para el resumen de perfil de administración: usuarios por rol. */
     long countByOrganizationIdAndRole(UUID organizationId, UserRole role);
 
