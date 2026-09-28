@@ -36,4 +36,4 @@
   flex-shrink: 0;
 }
 
-.acciones { display: flex; gap: 7px; justify-content: flex-end; flex-wrap: wrap; }
+.barra-lote { padding: 12px 18px; }

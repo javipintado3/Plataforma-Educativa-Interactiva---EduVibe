@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
@@ -54,7 +55,6 @@ export class ListaClasesComponent implements OnInit {
 
   // --- gestión (vista de administración) ---
   readonly busqueda = signal('');
-  readonly borrando = signal<string | null>(null);
 
   readonly clasesFiltradas = computed(() => {
     const texto = this.busqueda().trim().toLowerCase();
@@ -64,6 +64,42 @@ export class ListaClasesComponent implements OnInit {
     return this.clases().filter(c =>
       c.name.toLowerCase().includes(texto) || (c.subject ?? '').toLowerCase().includes(texto));
   });
+
+  // --- selección en lote ---
+  readonly seleccionados = signal<Set<string>>(new Set());
+  readonly aplicandoLote = signal(false);
+
+  estaSeleccionado(claseId: string): boolean {
+    return this.seleccionados().has(claseId);
+  }
+
+  alternarSeleccion(clase: Clase, marcado: boolean): void {
+    this.seleccionados.update(actuales => {
+      const nuevo = new Set(actuales);
+      marcado ? nuevo.add(clase.id) : nuevo.delete(clase.id);
+      return nuevo;
+    });
+  }
+
+  get todosSeleccionados(): boolean {
+    const visibles = this.clasesFiltradas();
+    return visibles.length > 0 && visibles.every(c => this.estaSeleccionado(c.id));
+  }
+
+  alternarTodos(marcado: boolean): void {
+    const visibles = this.clasesFiltradas();
+    this.seleccionados.update(actuales => {
+      const nuevo = new Set(actuales);
+      for (const clase of visibles) {
+        marcado ? nuevo.add(clase.id) : nuevo.delete(clase.id);
+      }
+      return nuevo;
+    });
+  }
+
+  limpiarSeleccion(): void {
+    this.seleccionados.set(new Set());
+  }
 
   readonly formulario = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -131,32 +167,39 @@ export class ListaClasesComponent implements OnInit {
   }
 
   /**
-   * Borra la clase entera. Solo se ofrece a administración, y el backend
-   * rechaza el borrado si ya hay entregas o exámenes hechos: aquí solo se
-   * pide confirmación, la regla de negocio vive en el servidor.
+   * Borra las clases seleccionadas. Solo se ofrece a administración, y el
+   * backend rechaza el borrado si una clase ya tiene entregas o exámenes
+   * hechos: aquí solo se pide confirmación, la regla de negocio vive en el
+   * servidor. Si alguna del lote falla, se recarga para reflejar solo lo
+   * que sí se llegó a borrar, igual que el lote de usuarios.
    */
-  async eliminar(clase: Clase, evento: Event): Promise<void> {
-    evento.preventDefault();
-    evento.stopPropagation();
+  async eliminarSeleccionadas(): Promise<void> {
+    const ids = Array.from(this.seleccionados());
+    if (!ids.length || this.aplicandoLote()) {
+      return;
+    }
 
     const confirmado = await this.confirmacion.preguntar(
-      `¿Borrar "${clase.name}"? Se pierde todo lo que tiene dentro: tareas, exámenes, materiales y matriculaciones.`,
-      { titulo: 'Borrar clase', textoConfirmar: 'Borrar' });
+      `¿Borrar ${ids.length} clase(s)? Se pierde todo lo que tienen dentro: tareas, exámenes, materiales y matriculaciones.`,
+      { titulo: 'Borrar clases', textoConfirmar: 'Borrar' });
     if (!confirmado) {
       return;
     }
 
-    this.borrando.set(clase.id);
+    this.aplicandoLote.set(true);
     this.error.set(null);
 
-    this.clasesService.eliminar(clase.id).subscribe({
+    forkJoin(ids.map(id => this.clasesService.eliminar(id))).subscribe({
       next: () => {
-        this.borrando.set(null);
-        this.clases.update(lista => lista.filter(c => c.id !== clase.id));
+        this.aplicandoLote.set(false);
+        this.limpiarSeleccion();
+        this.cargar();
       },
       error: (err) => {
-        this.borrando.set(null);
+        this.aplicandoLote.set(false);
         this.error.set(AvisoComponent.mensajeDe(err));
+        this.limpiarSeleccion();
+        this.cargar();
       },
     });
   }

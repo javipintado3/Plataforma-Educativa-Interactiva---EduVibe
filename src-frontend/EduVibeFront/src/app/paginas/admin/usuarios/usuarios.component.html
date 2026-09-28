@@ -23,8 +23,8 @@
     </div>
   </div>
 
-  <!-- Filtros -->
-  <form class="filtros mb-2" [formGroup]="filtros" (ngSubmit)="cargar()">
+  <!-- Filtros: se sustituyen por la barra de lote en cuanto hay selección -->
+  <form class="filtros mb-2" [formGroup]="filtros" (ngSubmit)="cargar()" *ngIf="!seleccionados().size">
     <input class="entrada" formControlName="q" placeholder="Buscar por nombre o email">
 
     <select class="selector" formControlName="role" (change)="cargar()">
@@ -48,7 +48,7 @@
 
   <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
 
-  <!-- Barra de acciones en lote: solo aparece con selección, como en un DataGrid -->
+  <!-- Barra de acciones en lote: sustituye a los filtros en cuanto hay selección -->
   <div class="tarjeta tarjeta-cuerpo fila-entre envolver mb-2 barra-lote" *ngIf="seleccionados().size">
     <p class="fuerte mb-0">{{ seleccionados().size }} seleccionado(s)</p>
     <div class="fila espaciado-sm">

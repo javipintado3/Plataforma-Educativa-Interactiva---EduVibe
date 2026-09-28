@@ -27,11 +27,23 @@
     <ng-container *ngIf="auth.esAdmin(); else vistaTarjetas">
       <ng-container *ngIf="clases().length; else sinClases">
 
-        <div class="fila espaciado-sm mb-2">
+        <!-- Búsqueda: se sustituye por la barra de lote en cuanto hay selección -->
+        <div class="fila espaciado-sm mb-2" *ngIf="!seleccionados().size">
           <input class="entrada" style="max-width:320px" [value]="busqueda()"
                  (input)="busqueda.set($any($event.target).value)"
                  placeholder="Buscar por nombre o asignatura">
           <app-limpiar-filtros (limpiar)="busqueda.set('')"></app-limpiar-filtros>
+        </div>
+
+        <div class="tarjeta tarjeta-cuerpo fila-entre envolver mb-2 barra-lote" *ngIf="seleccionados().size">
+          <p class="fuerte mb-0">{{ seleccionados().size }} seleccionada(s)</p>
+          <div class="fila espaciado-sm">
+            <button type="button" class="boton boton-peligro boton-pequeno"
+                    [disabled]="aplicandoLote()" (click)="eliminarSeleccionadas()">
+              {{ aplicandoLote() ? 'Borrando…' : 'Eliminar' }}
+            </button>
+            <button type="button" class="boton boton-fantasma boton-pequeno" (click)="limpiarSeleccion()">Cancelar</button>
+          </div>
         </div>
 
         <div class="tarjeta" *ngIf="clasesFiltradas().length; else sinResultados">
@@ -39,16 +51,23 @@
             <table class="tabla">
               <thead>
                 <tr>
+                  <th style="width:1px">
+                    <input type="checkbox" [checked]="todosSeleccionados"
+                           (change)="alternarTodos($any($event.target).checked)">
+                  </th>
                   <th>Clase</th>
                   <th>Profesorado</th>
                   <th>Alumnado</th>
                   <th>Próxima entrega</th>
-                  <th style="text-align:right">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let clase of clasesFiltradas()"
                     class="fila-clase" [routerLink]="['/clases', clase.id]">
+                  <td (click)="$event.stopPropagation()">
+                    <input type="checkbox" [checked]="estaSeleccionado(clase.id)"
+                           (change)="alternarSeleccion(clase, $any($event.target).checked)">
+                  </td>
                   <td>
                     <div class="fila espaciado-sm">
                       <span class="pastilla-color" [style.background]="clase.color || 'var(--verde-600)'"></span>
@@ -62,15 +81,6 @@
                   <td class="pequeno">{{ clase.alumnado }}</td>
                   <td class="pequeno apagado">
                     {{ clase.proximaEntrega ? (clase.proximaEntrega | plazo) : 'Sin tareas pendientes' }}
-                  </td>
-                  <td>
-                    <div class="acciones">
-                      <button type="button" class="boton boton-peligro boton-pequeno"
-                              [disabled]="borrando() === clase.id"
-                              (click)="eliminar(clase, $event)">
-                        {{ borrando() === clase.id ? 'Borrando…' : 'Borrar' }}
-                      </button>
-                    </div>
                   </td>
                 </tr>
               </tbody>
