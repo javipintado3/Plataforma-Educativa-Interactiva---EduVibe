@@ -16,6 +16,16 @@
        falta, para que el texto no aparezca con la tipografía de reserva -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Aplica el tema antes de que Angular arranque: sin esto, una recarga en
+       modo oscuro se ve un instante en claro y luego cambia de golpe. -->
+  <script>
+    (function () {
+      var guardado = localStorage.getItem('eduvibe-tema');
+      var oscuro = guardado ? guardado === 'oscuro' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-tema', oscuro ? 'oscuro' : 'claro');
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

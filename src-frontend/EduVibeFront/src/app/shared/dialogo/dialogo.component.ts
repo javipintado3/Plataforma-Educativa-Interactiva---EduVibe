@@ -49,7 +49,7 @@ import { NgIf } from '@angular/common';
     }
 
     .dialogo {
-      background: #fff;
+      background: var(--blanco);
       border-radius: var(--radio-lg);
       box-shadow: var(--sombra-lg);
       width: 100%;

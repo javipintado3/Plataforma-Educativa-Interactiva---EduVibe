@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+
+import { TemaService } from './core/services/tema.service';
 
 /**
  * Raíz de la aplicación.
@@ -14,4 +16,10 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   template: '<router-outlet></router-outlet>',
 })
-export class AppComponent {}
+export class AppComponent {
+
+  // Se inyecta aquí, aunque nadie lea `tema`, para que el servicio (y su
+  // efecto que aplica data-tema) se instancie al arrancar la app entera,
+  // no solo cuando algún componente concreto lo pida.
+  private readonly tema = inject(TemaService);
+}

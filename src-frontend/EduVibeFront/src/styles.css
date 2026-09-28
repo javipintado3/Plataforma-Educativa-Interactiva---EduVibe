@@ -32,10 +32,13 @@
   /* Estados */
   --rojo:      #dc2626;
   --rojo-50:   #fef2f2;
+  --rojo-texto: #991b1b;
   --ambar:     #d97706;
   --ambar-50:  #fffbeb;
+  --ambar-texto: #92400e;
   --azul:      #2563eb;
   --azul-50:   #eff6ff;
+  --azul-texto: #1e40af;
 
   /* Elevación */
   --sombra-sm: 0 1px 2px rgba(15, 23, 42, .06);
@@ -47,6 +50,45 @@
   --radio:    12px;
   --radio-lg: 16px;
   --radio-xl: 20px;
+
+  /* Brillo del esqueleto de carga, aparte de --borde-sutil porque en oscuro
+     necesita ser más claro que el fondo, no más oscuro */
+  --esqueleto-brillo: #e9eef5;
+}
+
+/* ===========================================================================
+   Modo oscuro — mismo sistema, con los neutros y los tonos de marca
+   redefinidos para mantener el contraste. El acento verde y los colores de
+   asignatura (PALETA_CLASE) no cambian: son identidad, no legibilidad.
+   =========================================================================== */
+:root[data-tema="oscuro"] {
+  /* Verde de marca, aclarado para que siga leyéndose sobre fondo oscuro */
+  --verde-50:  rgba(16, 185, 129, .14);
+  --verde-100: rgba(16, 185, 129, .22);
+  --verde-200: rgba(16, 185, 129, .35);
+  --verde-600: #10b981;
+  --verde-700: #34d399;
+  --verde-800: #6ee7b7;
+
+  /* Neutros: misma escala slate, invertida */
+  --tinta:      #f1f5f9;
+  --tinta-70:   #cbd5e1;
+  --gris:       #94a3b8;
+  --gris-claro: #64748b;
+  --borde:      #334155;
+  --borde-sutil:#1e293b;
+  --fondo:      #020617;
+  --blanco:     #0f172a;
+
+  /* Estados: fondos translúcidos en vez de pasteles, textos aclarados */
+  --rojo-50:   rgba(220, 38, 38, .16);
+  --rojo-texto: #fca5a5;
+  --ambar-50:  rgba(217, 119, 6, .18);
+  --ambar-texto: #fcd34d;
+  --azul-50:   rgba(37, 99, 235, .18);
+  --azul-texto: #93c5fd;
+
+  --esqueleto-brillo: #334155;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -225,10 +267,10 @@ a:hover { text-decoration: underline; }
   border: 1px solid;
 }
 
-.aviso-error { background: var(--rojo-50); border-color: #fecaca; color: #991b1b; }
+.aviso-error { background: var(--rojo-50); border-color: #fecaca; color: var(--rojo-texto); }
 .aviso-exito { background: var(--verde-50); border-color: var(--verde-200); color: var(--verde-800); }
-.aviso-info  { background: var(--azul-50); border-color: #bfdbfe; color: #1e40af; }
-.aviso-atencion { background: var(--ambar-50); border-color: #fde68a; color: #92400e; }
+.aviso-info  { background: var(--azul-50); border-color: #bfdbfe; color: var(--azul-texto); }
+.aviso-atencion { background: var(--ambar-50); border-color: #fde68a; color: var(--ambar-texto); }
 
 /* ------------------------------------------------------------------ etiquetas */
 
@@ -246,9 +288,9 @@ a:hover { text-decoration: underline; }
 
 .pastilla-verde   { background: var(--verde-50);  color: var(--verde-700); }
 .pastilla-gris    { background: var(--borde-sutil); color: var(--gris); }
-.pastilla-ambar   { background: var(--ambar-50); color: #92400e; }
-.pastilla-roja    { background: var(--rojo-50);  color: #991b1b; }
-.pastilla-azul    { background: var(--azul-50);  color: #1e40af; }
+.pastilla-ambar   { background: var(--ambar-50); color: var(--ambar-texto); }
+.pastilla-roja    { background: var(--rojo-50);  color: var(--rojo-texto); }
+.pastilla-azul    { background: var(--azul-50);  color: var(--azul-texto); }
 
 /* --------------------------------------------------------------------- tablas */
 
@@ -273,7 +315,7 @@ a:hover { text-decoration: underline; }
 }
 
 .tabla tbody tr:last-child td { border-bottom: none; }
-.tabla tbody tr:hover { background: #fcfdfe; }
+.tabla tbody tr:hover { background: var(--borde-sutil); }
 
 .tabla-envoltorio { overflow-x: auto; }
 
@@ -357,7 +399,7 @@ a:hover { text-decoration: underline; }
 @keyframes girar { to { transform: rotate(360deg); } }
 
 .esqueleto {
-  background: linear-gradient(90deg, var(--borde-sutil) 25%, #e9eef5 37%, var(--borde-sutil) 63%);
+  background: linear-gradient(90deg, var(--borde-sutil) 25%, var(--esqueleto-brillo) 37%, var(--borde-sutil) 63%);
   background-size: 400% 100%;
   animation: brillo 1.3s ease infinite;
   border-radius: var(--radio-sm);

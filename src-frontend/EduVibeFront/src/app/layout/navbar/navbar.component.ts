@@ -3,6 +3,7 @@ import { NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { TemaService } from '../../core/services/tema.service';
 import { LogoComponent } from '../../shared/logo/logo.component';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
@@ -24,6 +25,7 @@ import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-e
 export class NavbarComponent {
 
   readonly auth = inject(AuthService);
+  readonly tema = inject(TemaService);
 
   readonly menuAbierto = signal(false);
   readonly navegacionAbierta = signal(false);
