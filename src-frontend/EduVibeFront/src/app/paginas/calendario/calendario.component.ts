@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CalendarioService } from '../../core/services/calendario.service';
@@ -48,7 +50,7 @@ interface Celda {
   selector: 'app-calendario',
   standalone: true,
   imports: [
-    NgIf, NgFor, ReactiveFormsModule,
+    NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent,
   ],
   templateUrl: './calendario.component.html',
@@ -73,7 +75,10 @@ export class CalendarioComponent implements OnInit {
   readonly entradas = signal<EntradaAgenda[]>([]);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
-  readonly borrando = signal<string | null>(null);
+
+  // --- selección en lote, para borrar varios eventos de golpe ---
+  readonly seleccionados = signal<Set<string>>(new Set());
+  readonly aplicandoLote = signal(false);
 
   /** Siempre hay un día elegido: así el panel de detalle y el alta tienen dónde apoyarse. */
   readonly diaSeleccionado = signal(this.claveDe(new Date()));
@@ -150,11 +155,13 @@ export class CalendarioComponent implements OnInit {
   hoy(): void {
     this.mesActual.set(this.inicioDeMes(new Date()));
     this.diaSeleccionado.set(this.claveDe(new Date()));
+    this.limpiarSeleccion();
     this.cargar();
   }
 
   seleccionar(celda: Celda): void {
     this.diaSeleccionado.set(celda.clave);
+    this.limpiarSeleccion();
   }
 
   /** Solo se puede borrar un evento a mano de una clase que se gestiona; las entregas no son eventos reales. */
@@ -170,6 +177,19 @@ export class CalendarioComponent implements OnInit {
 
   colorDe(entrada: EntradaAgenda): string {
     return entrada.classColor ?? COLOR_SIN_CLASE;
+  }
+
+  /**
+   * A dónde lleva pinchar en la entrada: la tarea si es una fecha de
+   * entrega, la clase si es un evento de una clase concreta. Los eventos de
+   * todo el centro (sin classId) no tienen a dónde ir, así que no son
+   * clicables.
+   */
+  destinoDe(entrada: EntradaAgenda): unknown[] | null {
+    if (entrada.origen === 'assignment') {
+      return ['/tareas', entrada.referencia];
+    }
+    return entrada.classId ? ['/clases', entrada.classId] : null;
   }
 
   abrirDialogo(): void {
@@ -221,25 +241,56 @@ export class CalendarioComponent implements OnInit {
     });
   }
 
-  async borrar(entrada: EntradaAgenda): Promise<void> {
-    const confirmado = await this.confirmacion.preguntar(`¿Borrar "${entrada.title}" de la agenda?`, {
-      titulo: 'Borrar evento', textoConfirmar: 'Borrar',
+  // --- selección en lote ---
+
+  estaSeleccionado(referencia: string): boolean {
+    return this.seleccionados().has(referencia);
+  }
+
+  alternarSeleccion(entrada: EntradaAgenda, marcado: boolean): void {
+    this.seleccionados.update(actuales => {
+      const nuevo = new Set(actuales);
+      marcado ? nuevo.add(entrada.referencia) : nuevo.delete(entrada.referencia);
+      return nuevo;
     });
+  }
+
+  limpiarSeleccion(): void {
+    this.seleccionados.set(new Set());
+  }
+
+  /**
+   * Borra los eventos seleccionados de golpe. Las entregas nunca están
+   * seleccionables (no son eventos reales, ver puedeBorrar), así que el
+   * lote siempre son eventos de agenda de verdad.
+   */
+  async eliminarSeleccionadas(): Promise<void> {
+    const ids = Array.from(this.seleccionados());
+    if (!ids.length || this.aplicandoLote()) {
+      return;
+    }
+
+    const confirmado = await this.confirmacion.preguntar(
+      `¿Borrar ${ids.length} evento(s) de la agenda?`,
+      { titulo: 'Borrar eventos', textoConfirmar: 'Borrar' });
     if (!confirmado) {
       return;
     }
 
-    this.borrando.set(entrada.referencia);
+    this.aplicandoLote.set(true);
     this.error.set(null);
 
-    this.calendarioService.eliminar(entrada.referencia).subscribe({
+    forkJoin(ids.map(id => this.calendarioService.eliminar(id))).subscribe({
       next: () => {
-        this.borrando.set(null);
-        this.entradas.update(lista => lista.filter(e => e.referencia !== entrada.referencia));
+        this.aplicandoLote.set(false);
+        this.entradas.update(lista => lista.filter(e => !ids.includes(e.referencia)));
+        this.limpiarSeleccion();
       },
       error: (err) => {
-        this.borrando.set(null);
+        this.aplicandoLote.set(false);
         this.error.set(AvisoComponent.mensajeDe(err));
+        this.limpiarSeleccion();
+        this.cargar();
       },
     });
   }
@@ -264,6 +315,7 @@ export class CalendarioComponent implements OnInit {
     const nuevoMes = new Date(mes.getFullYear(), mes.getMonth() + delta, 1);
     this.mesActual.set(nuevoMes);
     this.diaSeleccionado.set(this.claveDe(nuevoMes));
+    this.limpiarSeleccion();
     this.cargar();
   }
 

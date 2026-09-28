@@ -56,7 +56,8 @@
 
     <!-- Detalle del día elegido -->
     <div class="tarjeta">
-      <div class="fila-entre panel-dia">
+      <!-- Cabecera del día: se sustituye por la barra de lote en cuanto hay selección -->
+      <div class="fila-entre panel-dia" *ngIf="!seleccionados().size">
         <h3 class="mb-0">{{ tituloDia() }}</h3>
 
         <button type="button" class="boton boton-primario boton-pequeno" *ngIf="puedeCrear()" (click)="abrirDialogo()">
@@ -66,10 +67,28 @@
         </button>
       </div>
 
+      <div class="fila-entre envolver panel-dia barra-lote" *ngIf="seleccionados().size">
+        <p class="fuerte mb-0">{{ seleccionados().size }} seleccionado(s)</p>
+        <div class="fila espaciado-sm">
+          <button type="button" class="boton boton-peligro boton-pequeno"
+                  [disabled]="aplicandoLote()" (click)="eliminarSeleccionadas()">
+            {{ aplicandoLote() ? 'Borrando…' : 'Eliminar' }}
+          </button>
+          <button type="button" class="boton boton-fantasma boton-pequeno" (click)="limpiarSeleccion()">Cancelar</button>
+        </div>
+      </div>
+
       <app-estado-vacio *ngIf="!entradasDelDia().length"
         titulo="Nada este día" descripcion="Ni eventos ni fechas de entrega."></app-estado-vacio>
 
-      <article class="entrada-agenda" *ngFor="let entrada of entradasDelDia()">
+      <article class="entrada-agenda" *ngFor="let entrada of entradasDelDia()"
+               [class.clicable]="destinoDe(entrada)" [routerLink]="destinoDe(entrada)">
+        <span class="casilla-entrada" *ngIf="puedeBorrar(entrada)" (click)="$event.stopPropagation()">
+          <input type="checkbox" [checked]="estaSeleccionado(entrada.referencia)"
+                 (change)="alternarSeleccion(entrada, $any($event.target).checked)">
+        </span>
+        <span class="casilla-entrada" *ngIf="!puedeBorrar(entrada)"></span>
+
         <span class="franja-color" [style.background]="colorDe(entrada)"></span>
 
         <span class="hora-entrada">{{ horaDe(entrada.fecha) }}</span>
@@ -83,14 +102,6 @@
             </span>
           </span>
         </span>
-
-        <button type="button" class="boton boton-fantasma boton-pequeno" *ngIf="puedeBorrar(entrada)"
-                [disabled]="borrando() === entrada.referencia" (click)="borrar(entrada)" aria-label="Borrar evento">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>
-          </svg>
-        </button>
       </article>
     </div>
   </ng-container>

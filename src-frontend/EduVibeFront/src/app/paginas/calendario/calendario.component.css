@@ -110,6 +110,15 @@
 
 .panel-dia { padding: 18px 18px 12px; }
 
+.barra-lote { padding-bottom: 18px; }
+
+.casilla-entrada {
+  display: flex;
+  align-items: center;
+  width: 18px;
+  flex-shrink: 0;
+}
+
 .entrada-agenda {
   display: flex;
   align-items: center;
@@ -117,6 +126,9 @@
   padding: 13px 18px;
   border-top: 1px solid var(--borde-sutil);
 }
+
+.entrada-agenda.clicable { cursor: pointer; }
+.entrada-agenda.clicable:hover { background: var(--borde-sutil); }
 
 .franja-color {
   width: 4px;
