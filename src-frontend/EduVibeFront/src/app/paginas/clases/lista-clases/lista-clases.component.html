@@ -32,7 +32,7 @@
           <input class="entrada" style="max-width:320px" [value]="busqueda()"
                  (input)="busqueda.set($any($event.target).value)"
                  placeholder="Buscar por nombre o asignatura">
-          <app-limpiar-filtros (limpiar)="busqueda.set('')"></app-limpiar-filtros>
+          <app-limpiar-filtros *ngIf="busqueda()" (limpiar)="busqueda.set('')"></app-limpiar-filtros>
         </div>
 
         <div class="tarjeta tarjeta-cuerpo fila-entre envolver mb-2 barra-lote" *ngIf="seleccionados().size">

@@ -238,6 +238,12 @@ export class UsuariosComponent implements OnInit {
     status: [''],
   });
 
+  /** El botón de limpiar solo tiene sentido si hay algo que limpiar. */
+  get hayFiltrosActivos(): boolean {
+    const { q, role, status } = this.filtros.value;
+    return !!(q || role || status);
+  }
+
   // --- alta ---
   readonly dialogoAbierto = signal(false);
   readonly creando = signal(false);

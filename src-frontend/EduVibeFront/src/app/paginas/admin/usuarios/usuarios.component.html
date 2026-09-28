@@ -43,7 +43,7 @@
     </select>
 
     <button type="submit" class="boton boton-contorno">Buscar</button>
-    <app-limpiar-filtros (limpiar)="limpiarFiltros()"></app-limpiar-filtros>
+    <app-limpiar-filtros *ngIf="hayFiltrosActivos" (limpiar)="limpiarFiltros()"></app-limpiar-filtros>
   </form>
 
   <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
