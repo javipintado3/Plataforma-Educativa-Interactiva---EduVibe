@@ -20,6 +20,21 @@ public record PageResponse<T>(
         int totalPaginas,
         boolean ultima) {
 
+    /**
+     * Cuando el contenido ya está construido a parte (porque montarlo necesita
+     * consultas para toda la página a la vez, no una por elemento) y solo falta
+     * envolverlo con los datos de paginación.
+     */
+    public static <T> PageResponse<T> de(Page<?> page, List<T> contenido) {
+        return new PageResponse<>(
+                contenido,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast());
+    }
+
     public static <E, T> PageResponse<T> de(Page<E> page, Function<E, T> mapeador) {
         return new PageResponse<>(
                 page.getContent().stream().map(mapeador).toList(),

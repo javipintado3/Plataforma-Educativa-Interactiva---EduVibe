@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -44,6 +42,8 @@ import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /**
  * Entregas del alumnado y su corrección.
@@ -169,21 +169,15 @@ public class SubmissionService {
     /**
      * La cola de corrección del profesorado, cruzando todas sus clases.
      *
-     * En una tarea grupal cada miembro tiene su propia fila de entrega, pero
-     * calificar una califica a todo el subgrupo, así que se lista una sola por
-     * subgrupo: enseñar tantas filas como miembros haría parecer que hay más
-     * trabajo del real.
+     * Ya viene sin duplicados de tareas grupales: de eso se ocupa la consulta.
      */
     @Transactional(readOnly = true)
-    public List<EntregaPorCorregirResponse> porCorregir() {
+    public PageResponse<EntregaPorCorregirResponse> porCorregir(Pageable pageable) {
         AuthenticatedUser usuario = authService.identidadActual();
-        Set<String> subgruposYaListados = new HashSet<>();
 
-        return submissionRepository.findPorCorregirDeProfesor(usuario.id()).stream()
-                .filter(entrega -> entrega.getClassGroup() == null
-                        || subgruposYaListados.add(entrega.getAssignment().getId() + ":" + entrega.getClassGroup().getId()))
-                .map(EntregaPorCorregirResponse::de)
-                .toList();
+        return PageResponse.de(
+                submissionRepository.findPorCorregirDeProfesor(usuario.id(), Paginacion.sinOrden(pageable)),
+                EntregaPorCorregirResponse::de);
     }
 
     /**

@@ -15,6 +15,8 @@ import com.eduvibe.dto.notification.NotificationResponse;
 import com.eduvibe.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /** Notificaciones de quien está autenticado. Nadie ve ni gestiona las de otra persona. */
 @RestController
@@ -25,8 +27,8 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationResponse>> misNotificaciones() {
-        return ResponseEntity.ok(notificationService.misNotificaciones());
+    public ResponseEntity<PageResponse<NotificationResponse>> misNotificaciones(Pageable pageable) {
+        return ResponseEntity.ok(notificationService.misNotificaciones(pageable));
     }
 
     @GetMapping("/unread-count")

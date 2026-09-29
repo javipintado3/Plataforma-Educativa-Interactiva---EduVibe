@@ -22,6 +22,8 @@ import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /**
  * Muro de avisos de una clase.
@@ -42,14 +44,14 @@ public class AnnouncementService {
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
-    public List<AnnouncementResponse> listar(UUID classId) {
+    public PageResponse<AnnouncementResponse> listar(UUID classId, Pageable pageable) {
         acceso.exigirVisible(classId);
         boolean puedoBorrar = acceso.puedeCalificarEn(classId);
 
-        return announcementRepository.findBySchoolClassIdOrderByPinnedDescCreatedAtDesc(classId)
-                .stream()
-                .map(aviso -> AnnouncementResponse.de(aviso, puedoBorrar))
-                .toList();
+        return PageResponse.de(
+                announcementRepository.findBySchoolClassIdOrderByPinnedDescCreatedAtDesc(
+                        classId, Paginacion.sinOrden(pageable)),
+                aviso -> AnnouncementResponse.de(aviso, puedoBorrar));
     }
 
     @Transactional

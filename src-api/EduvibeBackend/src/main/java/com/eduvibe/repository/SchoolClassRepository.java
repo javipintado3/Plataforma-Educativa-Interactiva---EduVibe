@@ -9,22 +9,41 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eduvibe.model.SchoolClass;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SchoolClassRepository extends JpaRepository<SchoolClass, UUID> {
 
-    /** Todas las clases del centro: es la vista de un administrador. */
-    List<SchoolClass> findByOrganizationIdOrderByNameAscSubjectAsc(UUID organizationId);
+    /**
+     * Todas las clases del centro, paginadas y con búsqueda por nombre o materia:
+     * es la vista de un administrador. {@code patron} llega ya como LIKE en minúsculas.
+     */
+    @Query("""
+            SELECT c FROM SchoolClass c
+            WHERE c.organization.id = :organizationId
+              AND (lower(c.name) LIKE :patron OR lower(coalesce(c.subject, '')) LIKE :patron)
+            ORDER BY c.name ASC, c.subject ASC
+            """)
+    Page<SchoolClass> buscarDeCentro(@Param("organizationId") UUID organizationId,
+                                     @Param("patron") String patron, Pageable pageable);
 
     /** Para el resumen de perfil de administración. */
     long countByOrganizationId(UUID organizationId);
 
-    /** Las clases en las que participa una persona, sea profesor o alumno. */
-    @Query("""
+    /** Las clases en las que participa una persona, sea profesor o alumno, paginadas y con búsqueda. */
+    @Query(value = """
             SELECT e.schoolClass FROM Enrollment e
             WHERE e.user.id = :userId
+              AND (lower(e.schoolClass.name) LIKE :patron OR lower(coalesce(e.schoolClass.subject, '')) LIKE :patron)
             ORDER BY e.schoolClass.name ASC, e.schoolClass.subject ASC
+            """,
+           countQuery = """
+            SELECT COUNT(e) FROM Enrollment e
+            WHERE e.user.id = :userId
+              AND (lower(e.schoolClass.name) LIKE :patron OR lower(coalesce(e.schoolClass.subject, '')) LIKE :patron)
             """)
-    List<SchoolClass> findDeUsuario(@Param("userId") UUID userId);
+    Page<SchoolClass> buscarDeUsuario(@Param("userId") UUID userId,
+                                      @Param("patron") String patron, Pageable pageable);
 
     /**
      * Próxima fecha de entrega de cada clase, para la línea de estado de las

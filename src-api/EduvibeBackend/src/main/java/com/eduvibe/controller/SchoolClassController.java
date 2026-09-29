@@ -52,6 +52,9 @@ import com.eduvibe.service.SubmissionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Clases y todo lo que cuelga de una: personas, temas, tareas y calificaciones.
@@ -81,8 +84,9 @@ public class SchoolClassController {
 
     /** Panel principal: las clases de quien consulta. */
     @GetMapping
-    public ResponseEntity<List<ClassResponse>> misClases() {
-        return ResponseEntity.ok(schoolClassService.misClases());
+    public ResponseEntity<PageResponse<ClassResponse>> misClases(
+            @RequestParam(required = false, name = "q") String busqueda, Pageable pageable) {
+        return ResponseEntity.ok(schoolClassService.misClases(busqueda, pageable));
     }
 
     @PostMapping
@@ -176,8 +180,8 @@ public class SchoolClassController {
 
     /** Muro de la clase: fijados primero, luego lo más reciente. */
     @GetMapping("/{classId}/announcements")
-    public ResponseEntity<List<AnnouncementResponse>> avisos(@PathVariable UUID classId) {
-        return ResponseEntity.ok(announcementService.listar(classId));
+    public ResponseEntity<PageResponse<AnnouncementResponse>> avisos(@PathVariable UUID classId, Pageable pageable) {
+        return ResponseEntity.ok(announcementService.listar(classId, pageable));
     }
 
     @PostMapping("/{classId}/announcements")

@@ -1,6 +1,5 @@
 package com.eduvibe.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,8 @@ import com.eduvibe.service.SubmissionService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /**
  * Corrección de entregas.
@@ -32,8 +33,8 @@ public class SubmissionController {
 
     /** Entregas sin corregir de todas las clases del profesorado, para su acceso directo "Calificar". */
     @GetMapping("/pending-review")
-    public ResponseEntity<List<EntregaPorCorregirResponse>> porCorregir() {
-        return ResponseEntity.ok(submissionService.porCorregir());
+    public ResponseEntity<PageResponse<EntregaPorCorregirResponse>> porCorregir(Pageable pageable) {
+        return ResponseEntity.ok(submissionService.porCorregir(pageable));
     }
 
     /**

@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eduvibe.model.Submission;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
 
@@ -50,31 +52,37 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
      */
     List<Submission> findByAssignmentIdAndClassGroupIdAndIdNot(UUID assignmentId, UUID classGroupId, UUID exceptId);
 
-    /** Para el resumen de perfil del profesorado: cuánto trabajo tiene por corregir. */
-    @Query("""
-            SELECT COUNT(s) FROM Submission s
-            WHERE s.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
-              AND s.assignment.schoolClass.id IN (
-                  SELECT e.schoolClass.id FROM Enrollment e
-                  WHERE e.user.id = :teacherId
-                    AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
-            """)
-    long countPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
-
     /**
      * Las entregas enviadas y sin corregir de todas las clases que imparte el
      * profesor, las más antiguas primero: es la cola de trabajo que tiene que
      * vaciar, y lo que lleva más tiempo esperando va delante.
+     *
+     * En una tarea grupal cada miembro tiene su propia fila, pero calificar una
+     * califica a todo el subgrupo, así que solo se cuenta una por subgrupo (la de
+     * menor id). Se resuelve en la propia consulta y no después en memoria para
+     * que la paginación y el total salgan bien: quitar filas de una página ya
+     * cortada dejaría páginas cortas y un total que no cuadra.
      */
-    @EntityGraph(attributePaths = { "student", "assignment", "assignment.schoolClass", "classGroup" })
-    @Query("""
-            SELECT s FROM Submission s
-            WHERE s.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
+    String POR_CORREGIR = """
+            s.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
               AND s.assignment.schoolClass.id IN (
                   SELECT e.schoolClass.id FROM Enrollment e
                   WHERE e.user.id = :teacherId
                     AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
-            ORDER BY s.submittedAt ASC
-            """)
-    List<Submission> findPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
+              AND (s.classGroup IS NULL OR NOT EXISTS (
+                  SELECT 1 FROM Submission otra
+                  WHERE otra.assignment = s.assignment
+                    AND otra.classGroup = s.classGroup
+                    AND otra.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
+                    AND otra.id < s.id))
+            """;
+
+    @EntityGraph(attributePaths = { "student", "assignment", "assignment.schoolClass", "classGroup" })
+    @Query(value = "SELECT s FROM Submission s WHERE " + POR_CORREGIR + " ORDER BY s.submittedAt ASC, s.id ASC",
+           countQuery = "SELECT COUNT(s) FROM Submission s WHERE " + POR_CORREGIR)
+    Page<Submission> findPorCorregirDeProfesor(@Param("teacherId") UUID teacherId, Pageable pageable);
+
+    /** Para el resumen de perfil del profesorado: cuánto trabajo tiene por corregir (mismo criterio que la cola). */
+    @Query("SELECT COUNT(s) FROM Submission s WHERE " + POR_CORREGIR)
+    long countPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
 }

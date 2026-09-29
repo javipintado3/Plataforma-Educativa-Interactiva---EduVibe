@@ -15,6 +15,8 @@ import com.eduvibe.model.User;
 import com.eduvibe.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /**
  * Notificaciones dirigidas a quien está autenticado.
@@ -55,13 +57,12 @@ public class NotificationService {
     }
 
     @Transactional(readOnly = true)
-    public List<NotificationResponse> misNotificaciones() {
+    public PageResponse<NotificationResponse> misNotificaciones(Pageable pageable) {
         UUID userId = authService.identidadActual().id();
 
-        return notificationRepository.findTop30ByUserIdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(NotificationResponse::de)
-                .toList();
+        return PageResponse.de(
+                notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, Paginacion.sinOrden(pageable)),
+                NotificationResponse::de);
     }
 
     @Transactional(readOnly = true)

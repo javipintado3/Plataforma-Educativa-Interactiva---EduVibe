@@ -36,6 +36,9 @@ import com.eduvibe.repository.UserRepository;
 import com.eduvibe.security.AuthenticatedUser;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.eduvibe.dto.common.PageResponse;
 
 /**
  * Clases, matriculaciones y temas.
@@ -80,15 +83,18 @@ public class SchoolClassService {
      * Con veinte clases, la diferencia es entre tres consultas y cuarenta y una.
      */
     @Transactional(readOnly = true)
-    public List<ClassResponse> misClases() {
+    public PageResponse<ClassResponse> misClases(String busqueda, Pageable pageable) {
         AuthenticatedUser usuario = authService.identidadActual();
+        String patron = Paginacion.patronDeBusqueda(busqueda);
+        Pageable pagina = Paginacion.sinOrden(pageable);
 
-        List<SchoolClass> clases = usuario.esAdmin()
-                ? schoolClassRepository.findByOrganizationIdOrderByNameAscSubjectAsc(usuario.organizationId())
-                : schoolClassRepository.findDeUsuario(usuario.id());
+        Page<SchoolClass> resultado = usuario.esAdmin()
+                ? schoolClassRepository.buscarDeCentro(usuario.organizationId(), patron, pagina)
+                : schoolClassRepository.buscarDeUsuario(usuario.id(), patron, pagina);
+        List<SchoolClass> clases = resultado.getContent();
 
         if (clases.isEmpty()) {
-            return List.of();
+            return PageResponse.de(resultado, List.<ClassResponse>of());
         }
 
         List<UUID> ids = clases.stream().map(SchoolClass::getId).toList();
@@ -122,14 +128,14 @@ public class SchoolClassService {
 
         String rolSiNoEstaMatriculado = usuario.esAdmin() ? ROL_ADMINISTRACION : null;
 
-        return clases.stream()
+        return PageResponse.de(resultado, clases.stream()
                 .map(clase -> ClassResponse.de(
                         clase,
                         miRolPorClase.getOrDefault(clase.getId(), rolSiNoEstaMatriculado),
                         proximas.get(clase.getId()),
                         profesoradoPorClase.getOrDefault(clase.getId(), List.of()),
                         alumnadoPorClase.getOrDefault(clase.getId(), 0)))
-                .toList();
+                .toList());
     }
 
     /**

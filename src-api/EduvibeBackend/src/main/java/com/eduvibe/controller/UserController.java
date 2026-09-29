@@ -61,7 +61,7 @@ public class UserController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false, name = "q") String busqueda,
             @RequestParam(required = false) UUID excludeClassId,
-            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
 
         return ResponseEntity.ok(userService.listar(role, status, busqueda, excludeClassId, pageable));
     }

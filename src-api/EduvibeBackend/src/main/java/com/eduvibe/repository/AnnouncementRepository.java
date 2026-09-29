@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.eduvibe.model.Announcement;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AnnouncementRepository extends JpaRepository<Announcement, UUID> {
 
@@ -16,5 +18,5 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, UUID
      * muestra su nombre.
      */
     @EntityGraph(attributePaths = "author")
-    List<Announcement> findBySchoolClassIdOrderByPinnedDescCreatedAtDesc(UUID classId);
+    Page<Announcement> findBySchoolClassIdOrderByPinnedDescCreatedAtDesc(UUID classId, Pageable pageable);
 }
