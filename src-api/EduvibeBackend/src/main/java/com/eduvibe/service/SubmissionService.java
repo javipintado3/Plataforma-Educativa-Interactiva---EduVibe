@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import com.eduvibe.dto.rubric.RubricScoreInput;
 import com.eduvibe.dto.rubric.RubricScoreResponse;
 import com.eduvibe.dto.submission.GradeRequest;
 import com.eduvibe.dto.submission.GradeResponse;
+import com.eduvibe.dto.submission.EntregaPorCorregirResponse;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.dto.submission.SubmitRequest;
 import com.eduvibe.dto.submission.TeacherNoteRequest;
@@ -161,6 +164,26 @@ public class SubmissionService {
 
         List<Submission> entregas = submissionRepository.findByAssignmentIdOrderByStudentNameAsc(assignmentId);
         return conSusNotas(entregas);
+    }
+
+    /**
+     * La cola de corrección del profesorado, cruzando todas sus clases.
+     *
+     * En una tarea grupal cada miembro tiene su propia fila de entrega, pero
+     * calificar una califica a todo el subgrupo, así que se lista una sola por
+     * subgrupo: enseñar tantas filas como miembros haría parecer que hay más
+     * trabajo del real.
+     */
+    @Transactional(readOnly = true)
+    public List<EntregaPorCorregirResponse> porCorregir() {
+        AuthenticatedUser usuario = authService.identidadActual();
+        Set<String> subgruposYaListados = new HashSet<>();
+
+        return submissionRepository.findPorCorregirDeProfesor(usuario.id()).stream()
+                .filter(entrega -> entrega.getClassGroup() == null
+                        || subgruposYaListados.add(entrega.getAssignment().getId() + ":" + entrega.getClassGroup().getId()))
+                .map(EntregaPorCorregirResponse::de)
+                .toList();
     }
 
     /**

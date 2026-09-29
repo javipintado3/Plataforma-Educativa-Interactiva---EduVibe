@@ -60,4 +60,21 @@ public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
                     AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
             """)
     long countPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
+
+    /**
+     * Las entregas enviadas y sin corregir de todas las clases que imparte el
+     * profesor, las más antiguas primero: es la cola de trabajo que tiene que
+     * vaciar, y lo que lleva más tiempo esperando va delante.
+     */
+    @EntityGraph(attributePaths = { "student", "assignment", "assignment.schoolClass", "classGroup" })
+    @Query("""
+            SELECT s FROM Submission s
+            WHERE s.status = com.eduvibe.model.enums.SubmissionStatus.SUBMITTED
+              AND s.assignment.schoolClass.id IN (
+                  SELECT e.schoolClass.id FROM Enrollment e
+                  WHERE e.user.id = :teacherId
+                    AND e.roleInClass = com.eduvibe.model.enums.EnrollmentRole.TEACHER)
+            ORDER BY s.submittedAt ASC
+            """)
+    List<Submission> findPorCorregirDeProfesor(@Param("teacherId") UUID teacherId);
 }

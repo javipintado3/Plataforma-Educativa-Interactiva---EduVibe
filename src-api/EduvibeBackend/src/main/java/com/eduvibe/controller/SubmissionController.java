@@ -1,14 +1,17 @@
 package com.eduvibe.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.eduvibe.dto.submission.EntregaPorCorregirResponse;
 import com.eduvibe.dto.submission.GradeRequest;
 import com.eduvibe.dto.submission.SubmissionResponse;
 import com.eduvibe.dto.submission.TeacherNoteRequest;
@@ -26,6 +29,12 @@ import lombok.RequiredArgsConstructor;
 public class SubmissionController {
 
     private final SubmissionService submissionService;
+
+    /** Entregas sin corregir de todas las clases del profesorado, para su acceso directo "Calificar". */
+    @GetMapping("/pending-review")
+    public ResponseEntity<List<EntregaPorCorregirResponse>> porCorregir() {
+        return ResponseEntity.ok(submissionService.porCorregir());
+    }
 
     /**
      * Pone o corrige la nota. Es PUT porque una entrega tiene una sola
