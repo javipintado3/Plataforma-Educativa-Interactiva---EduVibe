@@ -13,7 +13,9 @@ import { AvisoComponent } from '../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../shared/estado-vacio/estado-vacio.component';
+import { PaginadorComponent } from '../../shared/paginador/paginador.component';
 import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
+import { paginacionLocal } from '../../core/utils/paginacion';
 
 const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
@@ -25,8 +27,14 @@ const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 /** Color neutro para un evento de todo el centro, que no tiene classColor. */
 const COLOR_SIN_CLASE = '#64748b';
 
-/** Máximo de entradas que se listan dentro de una celda antes de resumir en "+N". */
-const MAX_POR_CELDA = 3;
+/**
+ * Máximo de entradas que se listan dentro de una celda antes de resumir en "+N".
+ *
+ * Son dos porque la celda tiene una altura fija (ver el CSS): con más, o el
+ * contenido se sale, o la fila se alarga y la rejilla queda desigual. El día
+ * completo, con todo lo que tiene, se ve al pincharlo, en el panel de debajo.
+ */
+const MAX_POR_CELDA = 2;
 
 interface Celda {
   fecha: Date;
@@ -51,7 +59,7 @@ interface Celda {
   standalone: true,
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
-    CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent,
+    CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent, PaginadorComponent,
   ],
   templateUrl: './calendario.component.html',
   styleUrl: './calendario.component.css',
@@ -89,6 +97,9 @@ export class CalendarioComponent implements OnInit {
     const clave = this.diaSeleccionado();
     return this.entradas().filter(e => this.claveDe(new Date(e.fecha)) === clave);
   });
+
+  /** Diez entradas por página en el panel del día, para que un día cargado no alargue la pantalla. */
+  readonly paginacionDia = paginacionLocal(() => this.entradasDelDia());
 
   readonly tituloDia = computed(() => {
     const [anio, mes, dia] = this.diaSeleccionado().split('-').map(Number);
@@ -155,12 +166,14 @@ export class CalendarioComponent implements OnInit {
   hoy(): void {
     this.mesActual.set(this.inicioDeMes(new Date()));
     this.diaSeleccionado.set(this.claveDe(new Date()));
+    this.paginacionDia.reiniciar();
     this.limpiarSeleccion();
     this.cargar();
   }
 
   seleccionar(celda: Celda): void {
     this.diaSeleccionado.set(celda.clave);
+    this.paginacionDia.reiniciar();
     this.limpiarSeleccion();
   }
 
@@ -315,6 +328,7 @@ export class CalendarioComponent implements OnInit {
     const nuevoMes = new Date(mes.getFullYear(), mes.getMonth() + delta, 1);
     this.mesActual.set(nuevoMes);
     this.diaSeleccionado.set(this.claveDe(nuevoMes));
+    this.paginacionDia.reiniciar();
     this.limpiarSeleccion();
     this.cargar();
   }

@@ -1,8 +1,13 @@
 /* ---------------------------------------------------------------- rejilla */
 
+/*
+ * minmax(0, 1fr) y no 1fr a secas: con 1fr una columna no baja del ancho de su
+ * contenido, así que un título largo la ensanchaba y la página acababa con scroll
+ * horizontal y columnas de anchos distintos.
+ */
 .rejilla-cabecera {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 6px;
   text-align: center;
@@ -15,7 +20,7 @@
 
 .rejilla-mes {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -24,7 +29,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  min-height: 92px;
+  /* Altura fija: todas las filas miden lo mismo pase lo que pase dentro de la celda */
+  height: 104px;
+  min-width: 0;
+  overflow: hidden;
   padding: 6px 6px 8px;
   background: var(--blanco);
   border: 1px solid var(--borde-sutil);
@@ -64,12 +72,14 @@
   flex-direction: column;
   gap: 3px;
   width: 100%;
+  min-width: 0;
 }
 
 .punto-entrada {
   display: flex;
   align-items: center;
   gap: 5px;
+  min-width: 0;
   padding: 2px 6px;
   border-radius: 999px;
   overflow: hidden;
@@ -86,6 +96,7 @@
 }
 
 .punto-texto {
+  min-width: 0;
   font-size: .72rem;
   color: #fff;
   overflow: hidden;
@@ -100,7 +111,7 @@
 }
 
 @media (max-width: 700px) {
-  .celda { min-height: 64px; }
+  .celda { height: 64px; }
   .punto-texto { display: none; }
   .punto-entrada { width: 6px; height: 6px; padding: 0; }
   .punto-entrada::before { margin: 0 auto; }
@@ -149,7 +160,10 @@
   display: block;
   font-weight: 550;
   font-size: .93rem;
+  overflow-wrap: anywhere;
 }
+
+.pie-dia { display: block; padding: 0 18px 14px; }
 
 .meta {
   display: flex;

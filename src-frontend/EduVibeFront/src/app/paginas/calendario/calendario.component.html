@@ -81,7 +81,7 @@
       <app-estado-vacio *ngIf="!entradasDelDia().length"
         titulo="Nada este día" descripcion="Ni eventos ni fechas de entrega."></app-estado-vacio>
 
-      <article class="entrada-agenda" *ngFor="let entrada of entradasDelDia()"
+      <article class="entrada-agenda" *ngFor="let entrada of paginacionDia.visibles()"
                [class.clicable]="destinoDe(entrada)" [routerLink]="destinoDe(entrada)">
         <span class="casilla-entrada" *ngIf="puedeBorrar(entrada)" (click)="$event.stopPropagation()">
           <input type="checkbox" [checked]="estaSeleccionado(entrada.referencia)"
@@ -103,6 +103,10 @@
           </span>
         </span>
       </article>
+
+      <app-paginador class="pie-dia" [pagina]="paginacionDia.pagina()" [totalPaginas]="paginacionDia.totalPaginas()"
+        [totalElementos]="paginacionDia.total()" etiqueta="entrada(s)"
+        (cambio)="paginacionDia.irA($event)"></app-paginador>
     </div>
   </ng-container>
 </div>
