@@ -159,9 +159,10 @@ ON CONFLICT (assignment_id, student_id) DO NOTHING;
 -- Calificaciones de las entregas marcadas como corregidas. La nota se deriva
 -- del identificador para que sea variada pero estable entre ejecuciones.
 -- ---------------------------------------------------------------------------
-INSERT INTO grades (submission_id, score, feedback, graded_by)
+INSERT INTO grades (submission_id, score, raw_score, feedback, graded_by)
 SELECT sub.id,
        55 + (abs(hashtext(sub.id::text)) % 46),      -- entre 55 y 100
+       55 + (abs(hashtext(sub.id::text)) % 46),      -- raw_score: sin penalización coincide con la nota
        CASE (abs(hashtext(sub.id::text)) % 3)
          WHEN 0 THEN 'Buen trabajo. Cuida la presentación.'
          WHEN 1 THEN 'Correcto, aunque falta justificar algún paso.'
