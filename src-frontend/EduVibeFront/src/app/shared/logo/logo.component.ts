@@ -4,12 +4,9 @@ import { NgIf } from '@angular/common';
 /**
  * Logotipo de Eduvibe.
  *
- * El anterior era un clipart de libros apilados junto a una tipografía serif
- * que no tenía relación con él. Este parte de la misma idea —la pila de
- * libros— pero reducida a tres barras redondeadas de anchura decreciente, que
- * se leen a la vez como libros apilados y como las barras de un ecualizador:
- * el "vibe" del nombre. El punto suelto remata la barra corta y evita que la
- * composición quede demasiado rígida.
+ * Un birrete de graduación muy simplificado sobre un cuadrado verde con
+ * degradado. La borla amarilla es el único toque de color extra y aporta la
+ * energía del "vibe" del nombre.
  *
  * Al ser SVG se ve nítido a cualquier tamaño, cambia de color por CSS y pesa
  * unos cientos de bytes en lugar de los kilobytes de un PNG.
@@ -30,12 +27,13 @@ import { NgIf } from '@angular/common';
 
         <rect width="40" height="40" rx="11" [attr.fill]="'url(#' + idDegradado + ')'" />
 
-        <!-- Pila de tres "libros" de anchura decreciente -->
-        <rect x="9" y="24.5" width="22" height="5.2" rx="2.6" fill="#fff" opacity=".95" />
-        <rect x="9" y="17.4" width="16" height="5.2" rx="2.6" fill="#fff" opacity=".78" />
-        <rect x="9" y="10.3" width="10" height="5.2" rx="2.6" fill="#fff" opacity=".6" />
-
-        <circle cx="23.4" cy="12.9" r="2.6" fill="#fff" opacity=".95" />
+        <!-- Birrete de graduación (dibujado sobre una cuadrícula de 64, escalado a 40) -->
+        <g transform="scale(.625)">
+          <path d="M32 14 L57 26 L32 38 L7 26 Z" fill="#fff" stroke="#fff" stroke-width="3" stroke-linejoin="round" />
+          <path d="M18 34 V42 Q32 50 46 42 V34 L32 41 Z" fill="#fff" opacity=".85" />
+          <path d="M55 27 V42" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" />
+          <circle cx="55" cy="46" r="4" [attr.fill]="mono ? '#fff' : '#fbbf24'" />
+        </g>
       </svg>
 
       <span class="logo-texto" *ngIf="showWordmark">
