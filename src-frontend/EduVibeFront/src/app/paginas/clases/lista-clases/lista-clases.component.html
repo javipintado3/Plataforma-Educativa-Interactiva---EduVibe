@@ -19,20 +19,22 @@
 
   <app-aviso class="mb-2" tipo="error" [mensaje]="error()"></app-aviso>
 
-  <app-cargando *ngIf="cargando()"></app-cargando>
+  <!-- El spinner solo la primera vez: en las cargas siguientes (buscar, cambiar de página) se sigue viendo lo anterior,
+       para no destruir el campo de búsqueda y perder el foco a mitad de escribir -->
+  <app-cargando *ngIf="cargando() && !pagina()"></app-cargando>
 
-  <ng-container *ngIf="!cargando()">
+  <ng-container *ngIf="!cargando() || pagina()">
 
     <!-- Administración: tabla de gestión -->
     <ng-container *ngIf="auth.esAdmin(); else vistaTarjetas">
-      <ng-container *ngIf="clases().length; else sinClases">
+      <ng-container *ngIf="clases().length || busqueda().trim(); else sinClases">
 
         <!-- Búsqueda: se sustituye por la barra de lote en cuanto hay selección -->
         <div class="fila espaciado-sm mb-2" *ngIf="!seleccionados().size">
           <input class="entrada" style="max-width:320px" [value]="busqueda()"
-                 (input)="busqueda.set($any($event.target).value)"
+                 (input)="buscar($any($event.target).value)"
                  placeholder="Buscar por nombre o asignatura">
-          <app-limpiar-filtros *ngIf="busqueda()" (limpiar)="busqueda.set('')"></app-limpiar-filtros>
+          <app-limpiar-filtros *ngIf="busqueda()" (limpiar)="limpiarBusqueda()"></app-limpiar-filtros>
         </div>
 
         <div class="tarjeta tarjeta-cuerpo fila-entre envolver mb-2 barra-lote" *ngIf="seleccionados().size">
@@ -46,7 +48,7 @@
           </div>
         </div>
 
-        <div class="tarjeta" *ngIf="clasesFiltradas().length; else sinResultados">
+        <div class="tarjeta" *ngIf="clases().length; else sinResultados">
           <div class="tabla-envoltorio">
             <table class="tabla">
               <thead>
@@ -62,7 +64,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let clase of clasesFiltradas()"
+                <tr *ngFor="let clase of clases()"
                     class="fila-clase" [routerLink]="['/clases', clase.id]">
                   <td (click)="$event.stopPropagation()">
                     <input type="checkbox" [checked]="estaSeleccionado(clase.id)"
@@ -99,19 +101,15 @@
     <!-- Profesorado y alumnado: sus tarjetas -->
     <ng-template #vistaTarjetas>
       <ng-container *ngIf="clases().length; else sinClases">
-        <div class="rejilla" #rejilla>
-          <app-tarjeta-clase *ngFor="let clase of clasesPagina()" [clase]="clase"></app-tarjeta-clase>
-        </div>
-
-        <div class="paginacion" *ngIf="totalPaginas() > 1">
-          <button type="button" class="boton boton-contorno boton-pequeno"
-                  [disabled]="paginaEfectiva() === 0" (click)="paginaAnterior()">Anterior</button>
-          <span class="pequeno apagado">Página {{ paginaEfectiva() + 1 }} de {{ totalPaginas() }}</span>
-          <button type="button" class="boton boton-contorno boton-pequeno"
-                  [disabled]="paginaEfectiva() >= totalPaginas() - 1" (click)="paginaSiguiente()">Siguiente</button>
+        <div class="rejilla">
+          <app-tarjeta-clase *ngFor="let clase of clases()" [clase]="clase"></app-tarjeta-clase>
         </div>
       </ng-container>
     </ng-template>
+
+    <app-paginador *ngIf="pagina() as p"
+      [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+      etiqueta="clase(s)" (cambio)="cargar($event)"></app-paginador>
 
     <ng-template #sinClases>
       <div class="tarjeta">

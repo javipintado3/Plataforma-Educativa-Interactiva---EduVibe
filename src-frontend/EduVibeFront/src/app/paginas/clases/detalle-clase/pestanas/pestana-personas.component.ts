@@ -9,11 +9,13 @@ import { SubgruposService } from '../../../../core/services/subgrupos.service';
 import { UsuariosService } from '../../../../core/services/usuarios.service';
 import { Miembro, Pagina, RolEnClase, Subgrupo, Usuario } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
+import { paginacionLocal, TAMANO_PAGINA } from '../../../../core/utils/paginacion';
 import { AvatarComponent } from '../../../../shared/avatar/avatar.component';
 import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
 
 /**
@@ -32,6 +34,7 @@ import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/past
   imports: [
     NgIf, NgFor, ReactiveFormsModule,
     AvatarComponent, CargandoComponent, EstadoVacioComponent, AvisoComponent, DialogoComponent, PastillaEstadoComponent,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-personas.component.html',
   styleUrl: './pestana-personas.component.css',
@@ -59,9 +62,13 @@ export class PestanaPersonasComponent implements OnInit {
   readonly profesorado = computed(() => this.miembros().filter(m => m.roleInClass === 'teacher'));
   readonly alumnado = computed(() => this.miembros().filter(m => m.roleInClass === 'student'));
 
-  // --- matriculación ---
+  // Diez por página en cada lista, en el cliente: la clase entera se carga de una vez porque
+  // los contadores de la cabecera y la matriculación necesitan verla completa.
+  readonly paginacionProfesorado = paginacionLocal(() => this.profesorado());
+  readonly paginacionAlumnado = paginacionLocal(() => this.alumnado());
+  readonly paginacionSubgrupos = paginacionLocal(() => this.subgrupos());
 
-  private static readonly TAMANO_PAGINA_ANADIR = 8;
+  // --- matriculación ---
 
   readonly dialogoAnadirAbierto = signal(false);
   readonly rolAAnadir = signal<RolEnClase>('student');
@@ -132,7 +139,7 @@ export class PestanaPersonasComponent implements OnInit {
 
     this.usuariosService.listar({
       role: this.rolAAnadir(), q: this.formBusqueda.getRawValue().q, excludeClassId: this.claseId,
-      page: pagina, size: PestanaPersonasComponent.TAMANO_PAGINA_ANADIR,
+      page: pagina, size: TAMANO_PAGINA,
     }).subscribe({
       next: (resultado) => {
         this.buscando.set(false);

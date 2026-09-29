@@ -1,14 +1,14 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin, map, switchMap } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { ClasesService } from '../../core/services/clases.service';
 import { NotificacionesService } from '../../core/services/notificaciones.service';
 import { PerfilService } from '../../core/services/perfil.service';
 import { SubidasService } from '../../core/services/subidas.service';
-import { Clase, Notificacion, ResumenPerfil } from '../../core/models';
+import { Clase, Notificacion, Pagina, ResumenPerfil } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { AvisoComponent } from '../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../shared/cargando/cargando.component';
@@ -17,6 +17,7 @@ import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-e
 import { TarjetaClaseComponent } from '../../shared/tarjeta-clase/tarjeta-clase.component';
 import { rutaDeNotificacion } from '../../shared/notificaciones/ruta-notificacion';
 import { FechaPipe } from '../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../shared/paginador/paginador.component';
 
 /** Cómo se lee cada rol en el desglose de administración. */
 const ETIQUETAS_ROL: Record<string, string> = {
@@ -37,7 +38,7 @@ const ETIQUETAS_ROL: Record<string, string> = {
   imports: [
     NgIf, NgFor, RouterLink, DecimalPipe,
     AvatarComponent, AvisoComponent, CargandoComponent, EstadoVacioComponent,
-    PastillaEstadoComponent, TarjetaClaseComponent, FechaPipe,
+    PastillaEstadoComponent, TarjetaClaseComponent, FechaPipe, PaginadorComponent,
   ],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css',
@@ -54,6 +55,7 @@ export class PerfilComponent implements OnInit {
   readonly resumen = signal<ResumenPerfil | null>(null);
   readonly clases = signal<Clase[]>([]);
   readonly notificaciones = signal<Notificacion[]>([]);
+  readonly paginaNotificaciones = signal<Pagina<Notificacion> | null>(null);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly marcandoTodas = signal(false);
@@ -76,19 +78,29 @@ export class PerfilComponent implements OnInit {
 
     forkJoin({
       resumen: this.perfilService.resumen(),
-      clases: this.clasesService.misClases(),
+      // Solo se enseñan las primeras clases como acceso rápido: basta la primera página
+      clases: this.clasesService.misClases().pipe(map(pagina => pagina.contenido)),
       notificaciones: this.notificacionesService.misNotificaciones(),
     }).subscribe({
       next: ({ resumen, clases, notificaciones }) => {
         this.resumen.set(resumen);
         this.clases.set(clases);
-        this.notificaciones.set(notificaciones);
+        this.notificaciones.set(notificaciones.contenido);
+        this.paginaNotificaciones.set(notificaciones);
         this.cargando.set(false);
       },
       error: (err) => {
         this.error.set(AvisoComponent.mensajeDe(err, 'No se ha podido cargar el perfil'));
         this.cargando.set(false);
       },
+    });
+  }
+
+  /** Cambia de página de notificaciones; las pagina el servidor, de diez en diez. */
+  cargarNotificaciones(pagina: number): void {
+    this.notificacionesService.misNotificaciones(pagina).subscribe(resultado => {
+      this.notificaciones.set(resultado.contenido);
+      this.paginaNotificaciones.set(resultado);
     });
   }
 

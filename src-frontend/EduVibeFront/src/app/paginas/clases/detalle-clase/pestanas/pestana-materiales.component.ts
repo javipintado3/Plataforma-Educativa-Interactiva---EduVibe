@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -14,6 +14,8 @@ import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/past
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
 import { RutaArchivoPipe } from '../../../../shared/pipes/ruta-archivo.pipe';
 import { SubidaArchivoComponent } from '../../../../shared/subida-archivo/subida-archivo.component';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { totalDePaginas, trozo } from '../../../../core/utils/paginacion';
 
 /**
  * Pestaña "Materiales": apuntes, enlaces y vídeos de la clase.
@@ -29,11 +31,35 @@ import { SubidaArchivoComponent } from '../../../../shared/subida-archivo/subida
     NgIf, NgFor, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, PastillaEstadoComponent,
     SubidaArchivoComponent, RutaArchivoPipe, FechaPipe,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-materiales.component.html',
   styleUrl: './pestana-materiales.component.css',
 })
-export class PestanaMaterialesComponent implements OnInit {
+export class PestanaMaterialesComponent implements OnInit, OnChanges {
+
+  /**
+   * Diez por página, en el cliente: la lista se carga entera porque cada unidad la
+   * filtra a su gusto ({@link temaFiltro}), así que el servidor no puede saber qué
+   * es "la página 2". Al cambiar de unidad se vuelve a la primera.
+   */
+  readonly paginaActual = signal(0);
+
+  get totalPaginas(): number {
+    return totalDePaginas(this.materialesVisibles.length);
+  }
+
+  get paginaVisible(): number {
+    return Math.min(this.paginaActual(), this.totalPaginas - 1);
+  }
+
+  get materialesPagina() {
+    return trozo(this.materialesVisibles, this.paginaVisible);
+  }
+
+  ngOnChanges(): void {
+    this.paginaActual.set(0);
+  }
 
   private readonly clasesService = inject(ClasesService);
   private readonly materialesService = inject(MaterialesService);

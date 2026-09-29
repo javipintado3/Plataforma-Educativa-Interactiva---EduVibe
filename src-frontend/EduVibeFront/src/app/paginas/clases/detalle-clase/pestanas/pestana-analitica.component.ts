@@ -7,6 +7,8 @@ import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { paginacionLocal } from '../../../../core/utils/paginacion';
 
 /** Un punto ya convertido a coordenadas SVG, para pintar la gráfica de evolución. */
 interface PuntoGrafica extends PuntoNota {
@@ -32,11 +34,15 @@ const MARGEN = 20;
   imports: [
     NgIf, NgFor, NgClass,
     CargandoComponent, EstadoVacioComponent, AvisoComponent, FechaPipe,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-analitica.component.html',
   styleUrl: './pestana-analitica.component.css',
 })
 export class PestanaAnaliticaComponent implements OnInit {
+
+  /** Diez alumnos por página; los totales de arriba (media, en riesgo) siguen contando a toda la clase. */
+  readonly paginacionAlumnos = paginacionLocal(() => this.analitica()?.students ?? []);
 
   private readonly clasesService = inject(ClasesService);
 

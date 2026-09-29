@@ -24,7 +24,7 @@
   </div>
 
   <div class="tarjeta" *ngIf="hilosVisibles.length">
-    <a class="tarea" *ngFor="let hilo of hilosVisibles" [routerLink]="['/foro', hilo.id]">
+    <a class="tarea" *ngFor="let hilo of hilosPagina" [routerLink]="['/foro', hilo.id]">
       <span class="crecer" style="min-width:0">
         <span class="titulo">{{ hilo.title }}</span>
         <span class="meta">
@@ -36,6 +36,10 @@
       <span class="pastilla pastilla-gris">{{ hilo.postCount }} mensaje(s)</span>
     </a>
   </div>
+
+  <app-paginador [pagina]="paginaVisible" [totalPaginas]="totalPaginas"
+    [totalElementos]="hilosVisibles.length" etiqueta="hilo(s)"
+    (cambio)="paginaActual.set($event)"></app-paginador>
 </ng-container>
 
 <!-- Alta de hilo -->

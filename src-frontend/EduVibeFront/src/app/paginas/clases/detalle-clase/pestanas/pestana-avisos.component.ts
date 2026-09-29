@@ -1,15 +1,16 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ClasesService } from '../../../../core/services/clases.service';
 import { ConfirmacionService } from '../../../../core/services/confirmacion.service';
-import { Anuncio } from '../../../../core/models';
+import { Anuncio, Pagina } from '../../../../core/models';
 import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
 
 /**
  * Pestaña "Avisos": el muro de la clase.
@@ -21,7 +22,8 @@ import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
 @Component({
   selector: 'app-pestana-avisos',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, FechaPipe],
+  imports: [NgIf, NgFor, ReactiveFormsModule, CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, FechaPipe,
+    PaginadorComponent],
   templateUrl: './pestana-avisos.component.html',
   styleUrl: './pestana-avisos.component.css',
 })
@@ -34,7 +36,9 @@ export class PestanaAvisosComponent implements OnInit {
   @Input({ required: true }) claseId!: string;
   @Input() puedoEditar = false;
 
-  readonly avisos = signal<Anuncio[]>([]);
+  /** La página de avisos que se está viendo: la pagina el servidor, de diez en diez. */
+  readonly pagina = signal<Pagina<Anuncio> | null>(null);
+  readonly avisos = computed(() => this.pagina()?.contenido ?? []);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
   readonly borrando = signal<string | null>(null);
@@ -52,13 +56,18 @@ export class PestanaAvisosComponent implements OnInit {
     this.cargar();
   }
 
-  cargar(): void {
+  cargar(pagina = 0): void {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.clasesService.avisos(this.claseId).subscribe({
-      next: (avisos) => {
-        this.avisos.set(avisos);
+    this.clasesService.avisos(this.claseId, pagina).subscribe({
+      next: (resultado) => {
+        // Si al retirar un aviso la página en la que estábamos se queda sin nada, se retrocede a la última
+        if (!resultado.contenido.length && resultado.pagina > 0) {
+          this.cargar(resultado.totalPaginas - 1);
+          return;
+        }
+        this.pagina.set(resultado);
         this.cargando.set(false);
       },
       error: (err) => {
@@ -90,7 +99,8 @@ export class PestanaAvisosComponent implements OnInit {
       next: () => {
         this.publicando.set(false);
         this.dialogoAbierto.set(false);
-        this.cargar();
+        // El aviso nuevo va arriba del muro, así que se vuelve a la primera página
+        this.cargar(0);
       },
       error: (err) => {
         this.publicando.set(false);
@@ -113,7 +123,8 @@ export class PestanaAvisosComponent implements OnInit {
     this.clasesService.borrarAviso(aviso.id).subscribe({
       next: () => {
         this.borrando.set(null);
-        this.avisos.update(lista => lista.filter(a => a.id !== aviso.id));
+        // Se vuelve a pedir la página: el servidor sube el aviso que estaba en la siguiente
+        this.cargar(this.pagina()?.pagina ?? 0);
       },
       error: (err) => {
         this.borrando.set(null);

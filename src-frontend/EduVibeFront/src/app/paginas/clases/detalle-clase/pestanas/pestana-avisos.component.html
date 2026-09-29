@@ -46,6 +46,10 @@
       </button>
     </article>
   </div>
+
+  <app-paginador *ngIf="pagina() as p"
+    [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+    etiqueta="aviso(s)" (cambio)="cargar($event)"></app-paginador>
 </ng-container>
 
 <!-- Alta de aviso -->

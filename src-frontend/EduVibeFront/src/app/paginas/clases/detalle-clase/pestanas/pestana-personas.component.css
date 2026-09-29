@@ -25,29 +25,6 @@
   white-space: nowrap;
 }
 
-.paginacion {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px 4px 2px;
-}
-
-.boton-pagina {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radio-sm);
-  background: none;
-  border: 1px solid var(--borde);
-  color: var(--tinta-70);
-  cursor: pointer;
-}
-
-.boton-pagina:hover:not(:disabled) { background: var(--fondo); border-color: var(--gris-claro); }
-.boton-pagina:disabled { opacity: .35; cursor: default; }
 
 /* Checkbox más grande y con el verde de la app, en vez del nativo diminuto. */
 .casilla {

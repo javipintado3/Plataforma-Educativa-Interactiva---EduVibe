@@ -50,3 +50,8 @@
 .materia-vacia {
   padding: 16px 18px;
 }
+
+.pie-tabla {
+  display: block;
+  padding: 0 18px 14px;
+}

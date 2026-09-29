@@ -15,6 +15,8 @@ import { PastillaEstadoComponent } from '../../../shared/pastilla-estado/pastill
 import { FechaPipe, PlazoPipe } from '../../../shared/pipes/fecha.pipe';
 import { RutaArchivoPipe } from '../../../shared/pipes/ruta-archivo.pipe';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
+import { PaginadorComponent } from '../../../shared/paginador/paginador.component';
+import { paginacionLocal } from '../../../core/utils/paginacion';
 
 /**
  * Pantalla de una tarea. Es dos pantallas en una, según quién la abra:
@@ -33,11 +35,15 @@ import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-ar
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, AvatarComponent,
     DialogoComponent, AvisoComponent, SubidaArchivoComponent, FechaPipe, PlazoPipe, RutaArchivoPipe,
+    PaginadorComponent,
   ],
   templateUrl: './detalle-tarea.component.html',
   styleUrl: './detalle-tarea.component.css',
 })
 export class DetalleTareaComponent implements OnInit {
+
+  /** Diez entregas por página en la lista de corrección; el contador de pendientes cuenta todas. */
+  readonly paginacionEntregas = paginacionLocal(() => this.entregas());
 
   private readonly tareasService = inject(TareasService);
   private readonly fb = inject(FormBuilder);

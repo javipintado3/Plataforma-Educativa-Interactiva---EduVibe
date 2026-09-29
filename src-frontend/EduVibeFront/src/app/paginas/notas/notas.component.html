@@ -12,7 +12,7 @@
   <ng-container *ngIf="!cargando()">
     <div class="pila" *ngIf="materias().length; else sinClases">
 
-      <section class="tarjeta materia" *ngFor="let materia of materias()">
+      <section class="tarjeta materia" *ngFor="let materia of paginacionMaterias.visibles()">
         <header class="materia-cabecera">
           <span class="materia-color" [style.background]="materia.clase.color || 'var(--verde-600)'"></span>
           <div class="materia-titulo">
@@ -41,7 +41,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let entrega of materia.entregas">
+              <tr *ngFor="let entrega of entregasVisibles(materia)">
                 <td>
                   <a [routerLink]="['/tareas', entrega.assignmentId]" class="fuerte">{{ entrega.assignmentTitle }}</a>
                   <span class="pastilla pastilla-roja separado" *ngIf="entrega.entregadaTarde">Tarde</span>
@@ -62,12 +62,21 @@
           </table>
         </div>
 
+        <app-paginador class="pie-tabla" [pagina]="paginaDeEntregas(materia)"
+          [totalPaginas]="totalPaginasDeEntregas(materia)" [totalElementos]="materia.entregas.length"
+          etiqueta="tarea(s)" (cambio)="irAPaginaDeEntregas(materia, $event)"></app-paginador>
+
         <p class="pequeno apagado materia-vacia mb-0" *ngIf="!materia.entregas.length">
           Todavía no has entregado nada en esta clase.
         </p>
       </section>
 
     </div>
+
+    <app-paginador *ngIf="materias().length"
+      [pagina]="paginacionMaterias.pagina()" [totalPaginas]="paginacionMaterias.totalPaginas()"
+      [totalElementos]="paginacionMaterias.total()" etiqueta="materia(s)"
+      (cambio)="paginacionMaterias.irA($event)"></app-paginador>
 
     <ng-template #sinClases>
       <div class="tarjeta">

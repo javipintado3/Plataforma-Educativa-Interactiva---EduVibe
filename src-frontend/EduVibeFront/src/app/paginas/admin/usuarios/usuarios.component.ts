@@ -15,6 +15,7 @@ import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.
 import { LimpiarFiltrosComponent } from '../../../shared/limpiar-filtros/limpiar-filtros.component';
 import { PastillaEstadoComponent } from '../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe } from '../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../shared/paginador/paginador.component';
 
 /**
  * Panel de usuarios.
@@ -34,7 +35,7 @@ import { FechaPipe } from '../../../shared/pipes/fecha.pipe';
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     AvatarComponent, CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, LimpiarFiltrosComponent,
-    DialogoComponent, AvisoComponent, FechaPipe,
+    DialogoComponent, AvisoComponent, FechaPipe, PaginadorComponent,
   ],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.css',

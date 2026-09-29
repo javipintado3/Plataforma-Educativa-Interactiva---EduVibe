@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let entrega of entregas()">
+          <tr *ngFor="let entrega of paginacion.visibles()">
             <td>
               <a [routerLink]="['/tareas', entrega.assignmentId]" class="fuerte">{{ entrega.assignmentTitle }}</a>
               <span class="pastilla pastilla-roja separado" *ngIf="entrega.entregadaTarde">Tarde</span>
@@ -45,6 +45,10 @@
       </table>
     </div>
   </div>
+
+  <app-paginador [pagina]="paginacion.pagina()" [totalPaginas]="paginacion.totalPaginas()"
+    [totalElementos]="paginacion.total()" etiqueta="entrega(s)"
+    (cambio)="paginacion.irA($event)"></app-paginador>
 
   <ng-template #sinEntregas>
     <div class="tarjeta">

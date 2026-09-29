@@ -91,7 +91,7 @@
         <app-estado-vacio *ngIf="!cargandoClases() && !clases().length"
           titulo="No participa en ninguna clase" descripcion="Se le puede matricular desde la propia clase."></app-estado-vacio>
 
-        <a *ngFor="let clase of clases()" class="fila-clase" [routerLink]="['/clases', clase.classId]">
+        <a *ngFor="let clase of paginacionClases.visibles()" class="fila-clase" [routerLink]="['/clases', clase.classId]">
           <span class="pastilla-color" [style.background]="clase.color || 'var(--verde-600)'"></span>
           <div style="min-width:0;flex:1">
             <p class="fuerte mb-0">{{ clase.name }}</p>
@@ -102,6 +102,10 @@
             {{ clase.roleInClass === 'teacher' ? 'Profesorado' : 'Alumnado' }}
           </span>
         </a>
+
+        <app-paginador [pagina]="paginacionClases.pagina()" [totalPaginas]="paginacionClases.totalPaginas()"
+          [totalElementos]="paginacionClases.total()" etiqueta="clase(s)"
+          (cambio)="paginacionClases.irA($event)"></app-paginador>
       </div>
     </div>
   </ng-container>

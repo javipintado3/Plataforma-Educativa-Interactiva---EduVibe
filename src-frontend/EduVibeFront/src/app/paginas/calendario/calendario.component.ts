@@ -120,7 +120,7 @@ export class CalendarioComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.puedeCrear()) {
-      this.clasesService.misClases().subscribe(clases => this.misClases.set(clases));
+      this.clasesService.todasMisClases().subscribe(clases => this.misClases.set(clases));
     }
     this.cargar();
   }

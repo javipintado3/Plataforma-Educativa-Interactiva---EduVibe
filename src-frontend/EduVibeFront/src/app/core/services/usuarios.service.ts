@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { ClaseDeUsuario, EstadoCuenta, Invitacion, Pagina, ResultadoImportacion, Rol, Usuario, UsuarioCreado } from '../models';
+import { TAMANO_PAGINA } from '../utils/paginacion';
 
 /** Panel de administración de usuarios. */
 @Injectable({ providedIn: 'root' })
@@ -28,7 +29,7 @@ export class UsuariosService {
     if (filtros.status) params = params.set('status', filtros.status);
     if (filtros.q?.trim()) params = params.set('q', filtros.q.trim());
     if (filtros.excludeClassId) params = params.set('excludeClassId', filtros.excludeClassId);
-    params = params.set('page', filtros.page ?? 0).set('size', filtros.size ?? 20);
+    params = params.set('page', filtros.page ?? 0).set('size', filtros.size ?? TAMANO_PAGINA);
 
     return this.http.get<Pagina<Usuario>>(this.api, { params });
   }

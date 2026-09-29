@@ -105,3 +105,5 @@
 }
 
 .texto-notificacion { display: block; font-size: .87rem; }
+
+.pie-desplegable { display: block; padding: 0 12px 12px; }

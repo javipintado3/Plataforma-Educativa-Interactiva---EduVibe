@@ -28,7 +28,7 @@
     </div>
 
     <div class="tarjeta">
-      <ng-container *ngFor="let alumno of a.students">
+      <ng-container *ngFor="let alumno of paginacionAlumnos.visibles()">
 
         <button type="button" class="fila-alumno" (click)="alternar(alumno.userId)">
           <span class="crecer" style="min-width:0">
@@ -78,5 +78,9 @@
         </div>
       </ng-container>
     </div>
+
+    <app-paginador [pagina]="paginacionAlumnos.pagina()" [totalPaginas]="paginacionAlumnos.totalPaginas()"
+      [totalElementos]="paginacionAlumnos.total()" etiqueta="alumno(s)"
+      (cambio)="paginacionAlumnos.irA($event)"></app-paginador>
   </ng-container>
 </ng-container>

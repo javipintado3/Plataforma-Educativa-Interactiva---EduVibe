@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Notificacion } from '../models';
+import { Notificacion, Pagina } from '../models';
+import { TAMANO_PAGINA } from '../utils/paginacion';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
@@ -11,8 +12,10 @@ export class NotificacionesService {
   private readonly http = inject(HttpClient);
   private readonly api = `${environment.apiUrl}/notifications`;
 
-  misNotificaciones(): Observable<Notificacion[]> {
-    return this.http.get<Notificacion[]>(this.api);
+  /** Una página de las notificaciones de quien consulta, las más recientes primero. */
+  misNotificaciones(pagina = 0): Observable<Pagina<Notificacion>> {
+    const params = new HttpParams().set('page', pagina).set('size', TAMANO_PAGINA);
+    return this.http.get<Pagina<Notificacion>>(this.api, { params });
   }
 
   noLeidas(): Observable<number> {

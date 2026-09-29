@@ -125,15 +125,8 @@
       </table>
     </div>
 
-    <div class="paginacion" *ngIf="p.totalPaginas > 1">
-      <button type="button" class="boton boton-contorno boton-pequeno"
-              [disabled]="p.pagina === 0" (click)="cargar(p.pagina - 1)">Anterior</button>
-      <span class="pequeno apagado">
-        Página {{ p.pagina + 1 }} de {{ p.totalPaginas }} · {{ p.totalElementos }} usuario(s)
-      </span>
-      <button type="button" class="boton boton-contorno boton-pequeno"
-              [disabled]="p.ultima" (click)="cargar(p.pagina + 1)">Siguiente</button>
-    </div>
+    <app-paginador [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+      etiqueta="usuario(s)" (cambio)="cargar($event)"></app-paginador>
   </div>
 </div>
 

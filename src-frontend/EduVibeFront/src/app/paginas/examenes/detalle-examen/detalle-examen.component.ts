@@ -11,6 +11,8 @@ import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe, PlazoPipe } from '../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../shared/paginador/paginador.component';
+import { paginacionLocal } from '../../../core/utils/paginacion';
 
 /**
  * Pantalla de aterrizaje de un examen. Es dos pantallas en una, según quién la abra:
@@ -28,11 +30,15 @@ import { FechaPipe, PlazoPipe } from '../../../shared/pipes/fecha.pipe';
     NgIf, NgFor, RouterLink,
     CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, AvatarComponent,
     AvisoComponent, FechaPipe, PlazoPipe,
+    PaginadorComponent,
   ],
   templateUrl: './detalle-examen.component.html',
   styleUrl: './detalle-examen.component.css',
 })
 export class DetalleExamenComponent implements OnInit {
+
+  /** Diez intentos por página en la lista de resultados. */
+  readonly paginacionIntentos = paginacionLocal(() => this.intentos());
 
   private readonly examenesService = inject(ExamenesService);
   private readonly confirmacion = inject(ConfirmacionService);

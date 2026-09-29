@@ -68,15 +68,6 @@
 
 .icono-documento-csv { color: var(--verde-700); flex-shrink: 0; }
 
-.paginacion {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 13px 18px;
-  border-top: 1px solid var(--borde-sutil);
-}
-
 .enlace {
   display: flex;
   align-items: center;

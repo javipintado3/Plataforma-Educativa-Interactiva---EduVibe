@@ -10,6 +10,8 @@ import { CargandoComponent } from '../../../../shared/cargando/cargando.componen
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { paginacionLocal } from '../../../../core/utils/paginacion';
 
 /**
  * Pestaña "Calificaciones" del alumnado: sus entregas en esta clase, con la
@@ -29,11 +31,15 @@ import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
   imports: [
     NgIf, NgFor, RouterLink,
     CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, AvisoComponent, FechaPipe,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-calificaciones.component.html',
   styleUrl: './pestana-calificaciones.component.css',
 })
 export class PestanaCalificacionesComponent implements OnInit {
+
+  /** Diez por página; la media se calcula con todas las entregas, no solo con las de la página. */
+  readonly paginacion = paginacionLocal(() => this.entregas());
 
   private readonly clasesService = inject(ClasesService);
 

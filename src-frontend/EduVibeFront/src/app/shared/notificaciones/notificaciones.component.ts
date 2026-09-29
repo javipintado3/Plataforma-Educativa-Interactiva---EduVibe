@@ -3,10 +3,11 @@ import { NgFor, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { NotificacionesService } from '../../core/services/notificaciones.service';
-import { Notificacion } from '../../core/models';
+import { Notificacion, Pagina } from '../../core/models';
 import { CargandoComponent } from '../cargando/cargando.component';
 import { EstadoVacioComponent } from '../estado-vacio/estado-vacio.component';
 import { FechaPipe } from '../pipes/fecha.pipe';
+import { PaginadorComponent } from '../paginador/paginador.component';
 import { rutaDeNotificacion } from './ruta-notificacion';
 
 /**
@@ -20,7 +21,7 @@ import { rutaDeNotificacion } from './ruta-notificacion';
 @Component({
   selector: 'app-notificaciones',
   standalone: true,
-  imports: [NgIf, NgFor, CargandoComponent, EstadoVacioComponent, FechaPipe],
+  imports: [NgIf, NgFor, CargandoComponent, EstadoVacioComponent, FechaPipe, PaginadorComponent],
   templateUrl: './notificaciones.component.html',
   styleUrl: './notificaciones.component.css',
 })
@@ -31,6 +32,8 @@ export class NotificacionesComponent implements OnInit {
 
   readonly abierto = signal(false);
   readonly notificaciones = signal<Notificacion[]>([]);
+  /** Datos de paginación de lo que se está viendo; la lista la pagina el servidor. */
+  readonly pagina = signal<Pagina<Notificacion> | null>(null);
   readonly cargando = signal(false);
   readonly cargadas = signal(false);
   readonly noLeidas = signal(0);
@@ -47,10 +50,11 @@ export class NotificacionesComponent implements OnInit {
     }
   }
 
-  private cargar(): void {
+  cargar(pagina = 0): void {
     this.cargando.set(true);
-    this.notificacionesService.misNotificaciones().subscribe(lista => {
-      this.notificaciones.set(lista);
+    this.notificacionesService.misNotificaciones(pagina).subscribe(resultado => {
+      this.notificaciones.set(resultado.contenido);
+      this.pagina.set(resultado);
       this.cargando.set(false);
       this.cargadas.set(true);
     });
@@ -99,6 +103,10 @@ export class NotificacionesComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   alPulsarFuera(evento: MouseEvent): void {
     const objetivo = evento.target as HTMLElement;
+    // Un elemento que ya se ha quitado del DOM (p. ej. al cambiar de página) no dice nada sobre dónde se pulsó
+    if (!objetivo.isConnected) {
+      return;
+    }
     if (!objetivo.closest('[data-menu-notificaciones]')) {
       this.abierto.set(false);
     }

@@ -169,6 +169,10 @@
             </span>
           </button>
         </div>
+
+        <app-paginador *ngIf="paginaNotificaciones() as p"
+          [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+          etiqueta="notificación(es)" (cambio)="cargarNotificaciones($event)"></app-paginador>
       </section>
     </div>
   </ng-container>

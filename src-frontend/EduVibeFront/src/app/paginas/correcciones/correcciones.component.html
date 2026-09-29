@@ -46,6 +46,10 @@
       </div>
     </div>
 
+    <app-paginador *ngIf="pagina() as p"
+      [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+      etiqueta="entrega(s) pendiente(s)" (cambio)="cargar($event)"></app-paginador>
+
     <ng-template #todoAlDia>
       <div class="tarjeta">
         <app-estado-vacio

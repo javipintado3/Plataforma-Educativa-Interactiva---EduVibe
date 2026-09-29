@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -10,6 +10,8 @@ import { CargandoComponent } from '../../../../shared/cargando/cargando.componen
 import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { totalDePaginas, trozo } from '../../../../core/utils/paginacion';
 
 /**
  * Pestaña "Foro": los hilos de debate de la clase, con más actividad
@@ -26,11 +28,35 @@ import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, DialogoComponent, AvisoComponent, FechaPipe,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-foro.component.html',
   styleUrl: './pestana-foro.component.css',
 })
-export class PestanaForoComponent implements OnInit {
+export class PestanaForoComponent implements OnInit, OnChanges {
+
+  /**
+   * Diez por página, en el cliente: la lista se carga entera porque cada unidad la
+   * filtra a su gusto ({@link temaFiltro}), así que el servidor no puede saber qué
+   * es "la página 2". Al cambiar de unidad se vuelve a la primera.
+   */
+  readonly paginaActual = signal(0);
+
+  get totalPaginas(): number {
+    return totalDePaginas(this.hilosVisibles.length);
+  }
+
+  get paginaVisible(): number {
+    return Math.min(this.paginaActual(), this.totalPaginas - 1);
+  }
+
+  get hilosPagina() {
+    return trozo(this.hilosVisibles, this.paginaVisible);
+  }
+
+  ngOnChanges(): void {
+    this.paginaActual.set(0);
+  }
 
   private readonly clasesService = inject(ClasesService);
   private readonly router = inject(Router);

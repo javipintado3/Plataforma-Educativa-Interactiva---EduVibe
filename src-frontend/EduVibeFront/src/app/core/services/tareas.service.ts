@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { DetalleTarea, Entrega, EntregaPorCorregir, Rubrica } from '../models';
+import { DetalleTarea, Entrega, EntregaPorCorregir, Pagina, Rubrica } from '../models';
+import { TAMANO_PAGINA } from '../utils/paginacion';
 
 /** Tareas, entregas y corrección. */
 @Injectable({ providedIn: 'root' })
@@ -43,9 +44,10 @@ export class TareasService {
     return this.http.get<Entrega[]>(`${this.api}/assignments/${tareaId}/submissions`);
   }
 
-  /** Entregas sin corregir de todas las clases del profesorado, las más antiguas primero. */
-  porCorregir(): Observable<EntregaPorCorregir[]> {
-    return this.http.get<EntregaPorCorregir[]>(`${this.api}/submissions/pending-review`);
+  /** Una página de las entregas sin corregir de todas las clases del profesorado, las más antiguas primero. */
+  porCorregir(pagina = 0): Observable<Pagina<EntregaPorCorregir>> {
+    const params = new HttpParams().set('page', pagina).set('size', TAMANO_PAGINA);
+    return this.http.get<Pagina<EntregaPorCorregir>>(`${this.api}/submissions/pending-review`, { params });
   }
 
   /**

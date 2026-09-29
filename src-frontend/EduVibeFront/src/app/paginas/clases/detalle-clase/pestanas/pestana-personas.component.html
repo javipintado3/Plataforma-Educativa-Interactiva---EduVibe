@@ -16,7 +16,7 @@
     </div>
 
     <div class="tarjeta">
-      <div class="persona" *ngFor="let miembro of profesorado()">
+      <div class="persona" *ngFor="let miembro of paginacionProfesorado.visibles()">
         <app-avatar [nombre]="miembro.name"></app-avatar>
         <div class="crecer" style="min-width:0">
           <p class="nombre mb-0">{{ miembro.name }}</p>
@@ -32,6 +32,10 @@
         titulo="Sin profesorado asignado"
         [descripcion]="auth.esAdmin() ? 'Añade un profesor con el botón de arriba.' : 'Todavía no hay profesorado en esta clase.'"></app-estado-vacio>
     </div>
+
+    <app-paginador [pagina]="paginacionProfesorado.pagina()" [totalPaginas]="paginacionProfesorado.totalPaginas()"
+      [totalElementos]="paginacionProfesorado.total()" etiqueta="profesor(es)"
+      (cambio)="paginacionProfesorado.irA($event)"></app-paginador>
   </section>
 
   <section>
@@ -46,7 +50,7 @@
     </div>
 
     <div class="tarjeta">
-      <div class="persona" *ngFor="let miembro of alumnado()">
+      <div class="persona" *ngFor="let miembro of paginacionAlumnado.visibles()">
         <app-avatar [nombre]="miembro.name"></app-avatar>
         <div class="crecer" style="min-width:0">
           <p class="nombre mb-0">{{ miembro.name }}</p>
@@ -62,6 +66,10 @@
         titulo="Todavía no hay alumnado"
         [descripcion]="auth.esAdmin() ? 'Añade alumnado con el botón de arriba para que puedan ver las tareas.' : 'Todavía no hay alumnado en esta clase.'"></app-estado-vacio>
     </div>
+
+    <app-paginador [pagina]="paginacionAlumnado.pagina()" [totalPaginas]="paginacionAlumnado.totalPaginas()"
+      [totalElementos]="paginacionAlumnado.total()" etiqueta="alumno(s)"
+      (cambio)="paginacionAlumnado.irA($event)"></app-paginador>
   </section>
 
   <section class="mt-3">
@@ -79,7 +87,7 @@
     <app-cargando *ngIf="cargandoSubgrupos()"></app-cargando>
 
     <div class="tarjeta" *ngIf="!cargandoSubgrupos() && subgrupos().length">
-      <div class="persona" *ngFor="let grupo of subgrupos()">
+      <div class="persona" *ngFor="let grupo of paginacionSubgrupos.visibles()">
         <div class="crecer" style="min-width:0">
           <p class="nombre mb-0">{{ grupo.name }}</p>
           <p class="pequeno apagado mb-0">{{ nombresDe(grupo.members) }}</p>
@@ -91,6 +99,10 @@
         </span>
       </div>
     </div>
+
+    <app-paginador [pagina]="paginacionSubgrupos.pagina()" [totalPaginas]="paginacionSubgrupos.totalPaginas()"
+      [totalElementos]="paginacionSubgrupos.total()" etiqueta="subgrupo(s)"
+      (cambio)="paginacionSubgrupos.irA($event)"></app-paginador>
 
     <div class="tarjeta" *ngIf="!cargandoSubgrupos() && !subgrupos().length">
       <app-estado-vacio
@@ -166,22 +178,8 @@
       </table>
     </div>
 
-    <div class="paginacion" *ngIf="p.contenido.length">
-      <span class="pequeno apagado">{{ p.totalElementos }} persona(s)</span>
-      <div class="fila espaciado-sm">
-        <span class="pequeno apagado">Página {{ p.pagina + 1 }} de {{ p.totalPaginas }}</span>
-        <button type="button" class="boton-pagina" [disabled]="p.pagina === 0"
-                (click)="buscar(p.pagina - 1)" aria-label="Página anterior">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <button type="button" class="boton-pagina" [disabled]="p.ultima"
-                (click)="buscar(p.pagina + 1)" aria-label="Página siguiente">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-        </button>
-      </div>
-    </div>
+    <app-paginador [pagina]="p.pagina" [totalPaginas]="p.totalPaginas" [totalElementos]="p.totalElementos"
+      etiqueta="persona(s)" (cambio)="buscar($event)"></app-paginador>
   </ng-container>
 
   <ng-container acciones>

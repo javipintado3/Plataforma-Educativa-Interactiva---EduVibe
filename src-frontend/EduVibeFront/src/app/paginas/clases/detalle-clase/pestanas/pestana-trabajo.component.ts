@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, inject, signal } from '@angular/core';
 import { NgClass, NgFor, NgIf } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -11,6 +11,8 @@ import { DialogoComponent } from '../../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe, PlazoPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { paginarBloques, totalDePaginas } from '../../../../core/utils/paginacion';
 
 /** Una tarea ya emparejada con el tema al que pertenece. */
 interface Bloque {
@@ -32,11 +34,40 @@ interface Bloque {
     NgIf, NgFor, NgClass, RouterLink, ReactiveFormsModule,
     CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent,
     DialogoComponent, AvisoComponent, FechaPipe, PlazoPipe,
+    PaginadorComponent,
   ],
   templateUrl: './pestana-trabajo.component.html',
   styleUrl: './pestana-trabajo.component.css',
 })
-export class PestanaTrabajoComponent implements OnInit {
+export class PestanaTrabajoComponent implements OnInit, OnChanges {
+
+  /**
+   * Diez por página, en el cliente, contando tareas y no unidades (ver {@link paginarBloques}).
+   * Se carga todo de una vez porque cada unidad lo filtra a su gusto ({@link temaFiltro}).
+   * Al cambiar de unidad se vuelve a la primera página.
+   */
+  readonly paginaActual = signal(0);
+
+  get totalElementos(): number {
+    return this.bloquesVisibles.reduce((total, bloque) => total + bloque.tareas.length, 0);
+  }
+
+  get totalPaginas(): number {
+    return totalDePaginas(this.totalElementos);
+  }
+
+  get paginaVisible(): number {
+    return Math.min(this.paginaActual(), this.totalPaginas - 1);
+  }
+
+  get bloquesPagina(): Bloque[] {
+    return paginarBloques(this.bloquesVisibles, bloque => bloque.tareas,
+      (bloque, tareas) => ({ ...bloque, tareas }), this.paginaVisible);
+  }
+
+  ngOnChanges(): void {
+    this.paginaActual.set(0);
+  }
 
   private readonly clasesService = inject(ClasesService);
   private readonly fb = inject(FormBuilder);

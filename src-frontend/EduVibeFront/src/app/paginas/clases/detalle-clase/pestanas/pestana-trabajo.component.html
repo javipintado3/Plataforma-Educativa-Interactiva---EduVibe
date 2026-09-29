@@ -25,7 +25,7 @@
     </app-estado-vacio>
   </div>
 
-  <section class="bloque" *ngFor="let bloque of bloquesVisibles">
+  <section class="bloque" *ngFor="let bloque of bloquesPagina">
     <h3 class="titulo-bloque" *ngIf="temaFiltro === undefined">{{ bloque.tema?.title || etiquetaSinUnidad }}</h3>
 
     <div class="tarjeta">
@@ -60,6 +60,10 @@
       </a>
     </div>
   </section>
+
+  <app-paginador [pagina]="paginaVisible" [totalPaginas]="totalPaginas"
+    [totalElementos]="totalElementos" etiqueta="tarea(s)"
+    (cambio)="paginaActual.set($event)"></app-paginador>
 </ng-container>
 
 <!-- Alta de tarea -->

@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,23 +7,17 @@ import { forkJoin } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { ClasesService } from '../../../core/services/clases.service';
 import { ConfirmacionService } from '../../../core/services/confirmacion.service';
-import { Clase, ModoVistaClase } from '../../../core/models';
+import { Clase, ModoVistaClase, Pagina } from '../../../core/models';
 import { AvisoComponent } from '../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../shared/cargando/cargando.component';
 import { DialogoComponent } from '../../../shared/dialogo/dialogo.component';
 import { EstadoVacioComponent } from '../../../shared/estado-vacio/estado-vacio.component';
 import { LimpiarFiltrosComponent } from '../../../shared/limpiar-filtros/limpiar-filtros.component';
+import { PaginadorComponent } from '../../../shared/paginador/paginador.component';
 import { PALETA_CLASE } from '../../../shared/paleta-clase';
 import { PlazoPipe } from '../../../shared/pipes/fecha.pipe';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-clase.component';
-
-/** Debe coincidir con minmax(268px, 1fr) y gap de .rejilla en el CSS: es la misma cuenta que hace el grid. */
-const ANCHO_MIN_TARJETA = 268;
-const GAP_REJILLA = 18;
-
-/** Filas por página en la vista de tarjetas: la página ocupa una pantalla sin scroll, sea cual sea su ancho. */
-const FILAS_POR_PAGINA = 2;
 
 /**
  * Panel principal: las clases de quien entra.
@@ -31,6 +25,10 @@ const FILAS_POR_PAGINA = 2;
  * Cada rol ve lo suyo sin que esta pantalla filtre nada: el backend ya
  * devuelve las clases que corresponden. Duplicar aquí esa decisión sería
  * mantener la misma regla en dos sitios.
+ *
+ * Las clases llegan paginadas del servidor, de diez en diez, y la búsqueda por
+ * nombre o asignatura también la hace él: filtrar solo lo que hay en la página
+ * actual dejaría fuera lo que está en las demás.
  */
 @Component({
   selector: 'app-lista-clases',
@@ -38,7 +36,7 @@ const FILAS_POR_PAGINA = 2;
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     TarjetaClaseComponent, EstadoVacioComponent, CargandoComponent, LimpiarFiltrosComponent,
-    DialogoComponent, AvisoComponent, SubidaArchivoComponent, PlazoPipe,
+    DialogoComponent, AvisoComponent, SubidaArchivoComponent, PlazoPipe, PaginadorComponent,
   ],
   templateUrl: './lista-clases.component.html',
   styleUrl: './lista-clases.component.css',
@@ -48,12 +46,12 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
   private readonly clasesService = inject(ClasesService);
   private readonly confirmacion = inject(ConfirmacionService);
   private readonly fb = inject(FormBuilder);
-  private readonly zone = inject(NgZone);
   readonly auth = inject(AuthService);
 
   readonly paleta = PALETA_CLASE;
 
-  readonly clases = signal<Clase[]>([]);
+  readonly pagina = signal<Pagina<Clase> | null>(null);
+  readonly clases = computed(() => this.pagina()?.contenido ?? []);
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
 
@@ -61,73 +59,26 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
   readonly creando = signal(false);
   readonly errorFormulario = signal<string | null>(null);
 
-  // --- tarjetas (profesorado y alumnado): paginación según lo que quepa en pantalla ---
-  private readonly rejillaEl = viewChild<ElementRef<HTMLDivElement>>('rejilla');
-  private observador?: ResizeObserver;
-
-  readonly anchoRejilla = signal(0);
-  readonly paginaActual = signal(0);
-
-  /** Las mismas columnas que calcula el grid con auto-fill: no se duplica el número a mano en ningún sitio. */
-  readonly columnas = computed(() =>
-    Math.max(1, Math.floor((this.anchoRejilla() + GAP_REJILLA) / (ANCHO_MIN_TARJETA + GAP_REJILLA))));
-
-  readonly tamPagina = computed(() => this.columnas() * FILAS_POR_PAGINA);
-
-  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.clases().length / this.tamPagina())));
-
-  /** Si la ventana crece y sobran páginas, la actual se recorta sin tocar la señal: no hace falta escribirla desde un effect. */
-  readonly paginaEfectiva = computed(() => Math.min(this.paginaActual(), this.totalPaginas() - 1));
-
-  readonly clasesPagina = computed(() => {
-    const tam = this.tamPagina();
-    const inicio = this.paginaEfectiva() * tam;
-    return this.clases().slice(inicio, inicio + tam);
-  });
-
-  constructor() {
-    // El contenedor de la rejilla aparece y desaparece (solo existe para
-    // profesorado/alumnado, y solo con clases cargadas), así que el
-    // ResizeObserver se conecta y desconecta cada vez que cambia, en vez de
-    // engancharse una sola vez en ngAfterViewInit.
-    effect(() => {
-      const elemento = this.rejillaEl()?.nativeElement;
-      this.observador?.disconnect();
-
-      if (!elemento) {
-        return;
-      }
-      this.observador = new ResizeObserver(entradas => {
-        const ancho = entradas[0].contentRect.width;
-        this.zone.run(() => this.anchoRejilla.set(ancho));
-      });
-      this.observador.observe(elemento);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.observador?.disconnect();
-  }
-
-  paginaAnterior(): void {
-    this.paginaActual.set(Math.max(0, this.paginaEfectiva() - 1));
-  }
-
-  paginaSiguiente(): void {
-    this.paginaActual.set(Math.min(this.totalPaginas() - 1, this.paginaEfectiva() + 1));
-  }
-
   // --- gestión (vista de administración) ---
   readonly busqueda = signal('');
+  private temporizadorBusqueda?: ReturnType<typeof setTimeout>;
 
-  readonly clasesFiltradas = computed(() => {
-    const texto = this.busqueda().trim().toLowerCase();
-    if (!texto) {
-      return this.clases();
-    }
-    return this.clases().filter(c =>
-      c.name.toLowerCase().includes(texto) || (c.subject ?? '').toLowerCase().includes(texto));
-  });
+  /**
+   * Busca en el servidor, esperando un momento a que se deje de teclear para no
+   * lanzar una petición por cada letra. Al cambiar la búsqueda se vuelve a la
+   * primera página: la que estábamos viendo podría no existir con menos resultados.
+   */
+  buscar(texto: string): void {
+    this.busqueda.set(texto);
+    clearTimeout(this.temporizadorBusqueda);
+    this.temporizadorBusqueda = setTimeout(() => this.cargar(0), 300);
+  }
+
+  limpiarBusqueda(): void {
+    clearTimeout(this.temporizadorBusqueda);
+    this.busqueda.set('');
+    this.cargar(0);
+  }
 
   // --- selección en lote ---
   readonly seleccionados = signal<Set<string>>(new Set());
@@ -146,12 +97,12 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
   }
 
   get todosSeleccionados(): boolean {
-    const visibles = this.clasesFiltradas();
+    const visibles = this.clases();
     return visibles.length > 0 && visibles.every(c => this.estaSeleccionado(c.id));
   }
 
   alternarTodos(marcado: boolean): void {
-    const visibles = this.clasesFiltradas();
+    const visibles = this.clases();
     this.seleccionados.update(actuales => {
       const nuevo = new Set(actuales);
       for (const clase of visibles) {
@@ -174,17 +125,25 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.cargar();
+    this.cargar(0);
   }
 
-  cargar(): void {
+  ngOnDestroy(): void {
+    clearTimeout(this.temporizadorBusqueda);
+  }
+
+  cargar(pagina = 0): void {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.clasesService.misClases().subscribe({
-      next: (clases) => {
-        this.clases.set(clases);
-        this.paginaActual.set(0);
+    this.clasesService.misClases(pagina, this.busqueda()).subscribe({
+      next: (resultado) => {
+        // Si al borrar la página en la que estábamos se queda vacía, se retrocede a la última que exista
+        if (!resultado.contenido.length && resultado.pagina > 0) {
+          this.cargar(resultado.totalPaginas - 1);
+          return;
+        }
+        this.pagina.set(resultado);
         this.cargando.set(false);
       },
       error: (err) => {
@@ -222,7 +181,7 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
       next: () => {
         this.creando.set(false);
         this.dialogoAbierto.set(false);
-        this.cargar();
+        this.cargar(0);
       },
       error: (err) => {
         this.creando.set(false);
@@ -258,13 +217,13 @@ export class ListaClasesComponent implements OnInit, OnDestroy {
       next: () => {
         this.aplicandoLote.set(false);
         this.limpiarSeleccion();
-        this.cargar();
+        this.cargar(this.pagina()?.pagina ?? 0);
       },
       error: (err) => {
         this.aplicandoLote.set(false);
         this.error.set(AvisoComponent.mensajeDe(err));
         this.limpiarSeleccion();
-        this.cargar();
+        this.cargar(this.pagina()?.pagina ?? 0);
       },
     });
   }

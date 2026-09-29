@@ -11,6 +11,8 @@ import { CargandoComponent } from '../../../../shared/cargando/cargando.componen
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../../../shared/pastilla-estado/pastilla-estado.component';
 import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
+import { PaginadorComponent } from '../../../../shared/paginador/paginador.component';
+import { paginacionLocal } from '../../../../core/utils/paginacion';
 
 /**
  * Ficha de una persona: se llega aquí pinchando su fila en el listado, igual
@@ -23,11 +25,15 @@ import { FechaPipe } from '../../../../shared/pipes/fecha.pipe';
   imports: [
     NgIf, NgFor, RouterLink, ReactiveFormsModule,
     AvatarComponent, CargandoComponent, EstadoVacioComponent, PastillaEstadoComponent, AvisoComponent, FechaPipe,
+    PaginadorComponent,
   ],
   templateUrl: './detalle-usuario.component.html',
   styleUrl: './detalle-usuario.component.css',
 })
 export class DetalleUsuarioComponent implements OnInit {
+
+  /** Diez clases por página en la ficha de la persona. */
+  readonly paginacionClases = paginacionLocal(() => this.clases());
 
   private readonly usuariosService = inject(UsuariosService);
   private readonly fb = inject(FormBuilder);

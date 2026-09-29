@@ -33,5 +33,10 @@
         </span>
       </button>
     </div>
+
+    <!-- Fuera del bloque de carga: si se destruyera al pedir otra página, el clic ya no vería su desplegable -->
+    <app-paginador class="pie-desplegable" *ngIf="pagina() as p"
+      [pagina]="p.pagina" [totalPaginas]="p.totalPaginas"
+      (cambio)="cargar($event)"></app-paginador>
   </div>
 </div>

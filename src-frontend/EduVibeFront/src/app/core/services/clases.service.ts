@@ -1,12 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
   AnaliticaClase, Anuncio, Clase, DetalleClase, DetalleExamen, DetalleHiloForo, DetalleTarea, Entrega, Examen,
-  HiloForo, Material, Miembro, ModoVistaClase, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
+  HiloForo, Material, Miembro, ModoVistaClase, Pagina, PreguntaBanco, Subgrupo, Tarea, Tema, TipoMaterial,
 } from '../models';
+import { TAMANO_MAXIMO_PAGINA, TAMANO_PAGINA, todasLasPaginas } from '../utils/paginacion';
 
 /**
  * Clases y todo lo que cuelga de una.
@@ -21,9 +22,26 @@ export class ClasesService {
   private readonly http = inject(HttpClient);
   private readonly api = `${environment.apiUrl}/classes`;
 
-  /** Las clases de quien consulta; para la administración, todas las del centro. */
-  misClases(): Observable<Clase[]> {
-    return this.http.get<Clase[]>(this.api);
+  /**
+   * Una página de las clases de quien consulta; para la administración, de todas
+   * las del centro. La búsqueda por nombre o materia la hace el servidor: filtrar
+   * solo lo que hay en la página actual dejaría fuera lo que está en las demás.
+   */
+  misClases(pagina = 0, busqueda = '', tamano = TAMANO_PAGINA): Observable<Pagina<Clase>> {
+    let params = new HttpParams().set('page', pagina).set('size', tamano);
+    if (busqueda.trim()) {
+      params = params.set('q', busqueda.trim());
+    }
+    return this.http.get<Pagina<Clase>>(this.api, { params });
+  }
+
+  /**
+   * Todas las clases de quien consulta, recorriendo las páginas. Para las
+   * pantallas que necesitan el conjunto entero (calendario, notas), no una lista
+   * que se pinta de diez en diez.
+   */
+  todasMisClases(): Observable<Clase[]> {
+    return todasLasPaginas(pagina => this.misClases(pagina, '', TAMANO_MAXIMO_PAGINA));
   }
 
   detalle(claseId: string): Observable<DetalleClase> {
@@ -84,8 +102,9 @@ export class ClasesService {
   }
 
   /** Muro de la clase: fijados primero, luego lo más reciente. */
-  avisos(claseId: string): Observable<Anuncio[]> {
-    return this.http.get<Anuncio[]>(`${this.api}/${claseId}/announcements`);
+  avisos(claseId: string, pagina = 0): Observable<Pagina<Anuncio>> {
+    const params = new HttpParams().set('page', pagina).set('size', TAMANO_PAGINA);
+    return this.http.get<Pagina<Anuncio>>(`${this.api}/${claseId}/announcements`, { params });
   }
 
   crearAviso(claseId: string, datos: { content: string; pinned?: boolean }): Observable<Anuncio> {

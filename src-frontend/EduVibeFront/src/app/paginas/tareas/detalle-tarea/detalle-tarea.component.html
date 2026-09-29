@@ -165,7 +165,7 @@
           titulo="Todavía no hay entregas"
           descripcion="Aquí aparecerá el trabajo del alumnado según lo vaya enviando."></app-estado-vacio>
 
-        <button type="button" class="entrega" *ngFor="let entrega of entregas()"
+        <button type="button" class="entrega" *ngFor="let entrega of paginacionEntregas.visibles()"
                 (click)="abrirCorreccion(entrega)">
           <app-avatar [nombre]="entrega.studentName" [pequeno]="true"></app-avatar>
 
@@ -183,6 +183,10 @@
             <app-pastilla-estado *ngIf="!entrega.grade" [valor]="entrega.status"></app-pastilla-estado>
           </span>
         </button>
+
+        <app-paginador class="pie-lista" [pagina]="paginacionEntregas.pagina()"
+          [totalPaginas]="paginacionEntregas.totalPaginas()" [totalElementos]="paginacionEntregas.total()"
+          etiqueta="entrega(s)" (cambio)="paginacionEntregas.irA($event)"></app-paginador>
       </div>
     </aside>
   </div>

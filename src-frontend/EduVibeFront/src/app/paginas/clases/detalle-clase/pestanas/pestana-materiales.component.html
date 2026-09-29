@@ -26,7 +26,7 @@
   </div>
 
   <div class="tarjeta" *ngIf="materialesVisibles.length">
-    <article class="material" *ngFor="let material of materialesVisibles">
+    <article class="material" *ngFor="let material of materialesPagina">
 
       <span class="crecer" style="min-width:0">
         <a class="titulo" *ngIf="material.fileUrl" [href]="material.fileUrl | rutaArchivo" target="_blank" rel="noopener">
@@ -65,6 +65,10 @@
       </span>
     </article>
   </div>
+
+  <app-paginador [pagina]="paginaVisible" [totalPaginas]="totalPaginas"
+    [totalElementos]="materialesVisibles.length" etiqueta="material(es)"
+    (cambio)="paginaActual.set($event)"></app-paginador>
 </ng-container>
 
 <!-- Alta / edición de material -->
