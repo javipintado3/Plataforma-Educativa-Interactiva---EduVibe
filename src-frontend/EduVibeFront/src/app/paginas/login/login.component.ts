@@ -49,8 +49,8 @@ export class LoginComponent {
 
   readonly cuentasDemo: CuentaDemo[] = [
     { rol: 'Administración', email: 'admin@eduvibe.demo', descripcion: 'Gestiona usuarios y clases' },
-    { rol: 'Profesorado', email: 'carmen.ortega@eduvibe.demo', descripcion: 'Pone tareas y corrige' },
-    { rol: 'Alumnado', email: 'marina.vazquez@eduvibe.demo', descripcion: 'Entrega y consulta notas' },
+    { rol: 'Profesorado', email: 'ivan.cordero@eduvibe.demo', descripcion: 'Pone tareas y corrige' },
+    { rol: 'Alumnado', email: 'abril.medina@eduvibe.demo', descripcion: 'Entrega y consulta notas' },
   ];
 
   readonly contrasenaDemo = 'demo1234';
