@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, NgZone, OnDestroy, OnInit, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { NgFor, NgIf } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,6 +18,13 @@ import { PlazoPipe } from '../../../shared/pipes/fecha.pipe';
 import { SubidaArchivoComponent } from '../../../shared/subida-archivo/subida-archivo.component';
 import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-clase.component';
 
+/** Debe coincidir con minmax(268px, 1fr) y gap de .rejilla en el CSS: es la misma cuenta que hace el grid. */
+const ANCHO_MIN_TARJETA = 268;
+const GAP_REJILLA = 18;
+
+/** Filas por página en la vista de tarjetas: la página ocupa una pantalla sin scroll, sea cual sea su ancho. */
+const FILAS_POR_PAGINA = 2;
+
 /**
  * Panel principal: las clases de quien entra.
  *
@@ -36,11 +43,12 @@ import { TarjetaClaseComponent } from '../../../shared/tarjeta-clase/tarjeta-cla
   templateUrl: './lista-clases.component.html',
   styleUrl: './lista-clases.component.css',
 })
-export class ListaClasesComponent implements OnInit {
+export class ListaClasesComponent implements OnInit, OnDestroy {
 
   private readonly clasesService = inject(ClasesService);
   private readonly confirmacion = inject(ConfirmacionService);
   private readonly fb = inject(FormBuilder);
+  private readonly zone = inject(NgZone);
   readonly auth = inject(AuthService);
 
   readonly paleta = PALETA_CLASE;
@@ -52,6 +60,62 @@ export class ListaClasesComponent implements OnInit {
   readonly dialogoAbierto = signal(false);
   readonly creando = signal(false);
   readonly errorFormulario = signal<string | null>(null);
+
+  // --- tarjetas (profesorado y alumnado): paginación según lo que quepa en pantalla ---
+  private readonly rejillaEl = viewChild<ElementRef<HTMLDivElement>>('rejilla');
+  private observador?: ResizeObserver;
+
+  readonly anchoRejilla = signal(0);
+  readonly paginaActual = signal(0);
+
+  /** Las mismas columnas que calcula el grid con auto-fill: no se duplica el número a mano en ningún sitio. */
+  readonly columnas = computed(() =>
+    Math.max(1, Math.floor((this.anchoRejilla() + GAP_REJILLA) / (ANCHO_MIN_TARJETA + GAP_REJILLA))));
+
+  readonly tamPagina = computed(() => this.columnas() * FILAS_POR_PAGINA);
+
+  readonly totalPaginas = computed(() => Math.max(1, Math.ceil(this.clases().length / this.tamPagina())));
+
+  /** Si la ventana crece y sobran páginas, la actual se recorta sin tocar la señal: no hace falta escribirla desde un effect. */
+  readonly paginaEfectiva = computed(() => Math.min(this.paginaActual(), this.totalPaginas() - 1));
+
+  readonly clasesPagina = computed(() => {
+    const tam = this.tamPagina();
+    const inicio = this.paginaEfectiva() * tam;
+    return this.clases().slice(inicio, inicio + tam);
+  });
+
+  constructor() {
+    // El contenedor de la rejilla aparece y desaparece (solo existe para
+    // profesorado/alumnado, y solo con clases cargadas), así que el
+    // ResizeObserver se conecta y desconecta cada vez que cambia, en vez de
+    // engancharse una sola vez en ngAfterViewInit.
+    effect(() => {
+      const elemento = this.rejillaEl()?.nativeElement;
+      this.observador?.disconnect();
+
+      if (!elemento) {
+        return;
+      }
+      this.observador = new ResizeObserver(entradas => {
+        const ancho = entradas[0].contentRect.width;
+        this.zone.run(() => this.anchoRejilla.set(ancho));
+      });
+      this.observador.observe(elemento);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.observador?.disconnect();
+  }
+
+  paginaAnterior(): void {
+    this.paginaActual.set(Math.max(0, this.paginaEfectiva() - 1));
+  }
+
+  paginaSiguiente(): void {
+    this.paginaActual.set(Math.min(this.totalPaginas() - 1, this.paginaEfectiva() + 1));
+  }
 
   // --- gestión (vista de administración) ---
   readonly busqueda = signal('');
@@ -120,6 +184,7 @@ export class ListaClasesComponent implements OnInit {
     this.clasesService.misClases().subscribe({
       next: (clases) => {
         this.clases.set(clases);
+        this.paginaActual.set(0);
         this.cargando.set(false);
       },
       error: (err) => {

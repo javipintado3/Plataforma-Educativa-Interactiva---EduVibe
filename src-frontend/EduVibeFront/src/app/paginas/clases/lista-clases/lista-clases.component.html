@@ -98,9 +98,19 @@
 
     <!-- Profesorado y alumnado: sus tarjetas -->
     <ng-template #vistaTarjetas>
-      <div class="rejilla" *ngIf="clases().length; else sinClases">
-        <app-tarjeta-clase *ngFor="let clase of clases()" [clase]="clase"></app-tarjeta-clase>
-      </div>
+      <ng-container *ngIf="clases().length; else sinClases">
+        <div class="rejilla" #rejilla>
+          <app-tarjeta-clase *ngFor="let clase of clasesPagina()" [clase]="clase"></app-tarjeta-clase>
+        </div>
+
+        <div class="paginacion" *ngIf="totalPaginas() > 1">
+          <button type="button" class="boton boton-contorno boton-pequeno"
+                  [disabled]="paginaEfectiva() === 0" (click)="paginaAnterior()">Anterior</button>
+          <span class="pequeno apagado">Página {{ paginaEfectiva() + 1 }} de {{ totalPaginas() }}</span>
+          <button type="button" class="boton boton-contorno boton-pequeno"
+                  [disabled]="paginaEfectiva() >= totalPaginas() - 1" (click)="paginaSiguiente()">Siguiente</button>
+        </div>
+      </ng-container>
     </ng-template>
 
     <ng-template #sinClases>

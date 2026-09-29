@@ -4,6 +4,14 @@
   gap: 18px;
 }
 
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
 .colores { display: flex; gap: 9px; flex-wrap: wrap; }
 
 .color {
