@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { DetalleTarea, Entrega, Rubrica } from '../models';
+import { DetalleTarea, Entrega, EntregaPorCorregir, Rubrica } from '../models';
 
 /** Tareas, entregas y corrección. */
 @Injectable({ providedIn: 'root' })
@@ -41,6 +41,11 @@ export class TareasService {
   /** Todas las entregas de la tarea. Solo para el profesorado de la clase. */
   entregas(tareaId: string): Observable<Entrega[]> {
     return this.http.get<Entrega[]>(`${this.api}/assignments/${tareaId}/submissions`);
+  }
+
+  /** Entregas sin corregir de todas las clases del profesorado, las más antiguas primero. */
+  porCorregir(): Observable<EntregaPorCorregir[]> {
+    return this.http.get<EntregaPorCorregir[]>(`${this.api}/submissions/pending-review`);
   }
 
   /**

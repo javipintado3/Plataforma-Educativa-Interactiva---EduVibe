@@ -7,15 +7,9 @@
 
     <!-- Navegación principal -->
     <nav class="nav" [class.desplegada]="navegacionAbierta()">
-      <a routerLink="/clases" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
-        {{ auth.esAdmin() ? 'Clases' : 'Mis clases' }}
-      </a>
-      <a routerLink="/calendario" routerLinkActive="activo" class="enlace" (click)="cerrarTodo()">
-        Calendario
-      </a>
-      <a routerLink="/admin/usuarios" routerLinkActive="activo" class="enlace"
-         *ngIf="auth.esAdmin()" (click)="cerrarTodo()">
-        Usuarios
+      <a *ngFor="let enlace of enlaces()" [routerLink]="enlace.ruta" routerLinkActive="activo"
+         class="enlace" (click)="cerrarTodo()">
+        {{ enlace.texto }}
       </a>
     </nav>
 

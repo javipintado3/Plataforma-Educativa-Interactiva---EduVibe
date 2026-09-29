@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { ClasesService } from '../../../../core/services/clases.service';
 import { Entrega } from '../../../../core/models';
+import { mediaPonderada } from '../../../../core/utils/media-ponderada';
 import { AvisoComponent } from '../../../../shared/aviso/aviso.component';
 import { CargandoComponent } from '../../../../shared/cargando/cargando.component';
 import { EstadoVacioComponent } from '../../../../shared/estado-vacio/estado-vacio.component';
@@ -44,21 +45,7 @@ export class PestanaCalificacionesComponent implements OnInit {
 
   readonly calificadas = computed(() => this.entregas().filter(e => e.grade !== null));
 
-  /** Media ponderada, en porcentaje: normaliza cada nota a su propia escala antes de pesarla. */
-  readonly media = computed(() => {
-    const notas = this.calificadas();
-    if (!notas.length) {
-      return null;
-    }
-    let sumaPonderada = 0;
-    let sumaPesos = 0;
-    for (const entrega of notas) {
-      const porcentaje = (Number(entrega.grade!.score) / entrega.points) * 100;
-      sumaPonderada += porcentaje * entrega.weight;
-      sumaPesos += entrega.weight;
-    }
-    return Math.round((sumaPonderada / sumaPesos) * 10) / 10;
-  });
+  readonly media = computed(() => mediaPonderada(this.entregas()));
 
   ngOnInit(): void {
     this.cargando.set(true);

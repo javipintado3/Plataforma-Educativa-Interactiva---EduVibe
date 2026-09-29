@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { LayoutPrincipalComponent } from './layout/layout-principal/layout-principal.component';
-import { adminGuard, invitadoGuard, sesionGuard } from './core/guards/sesion.guard';
+import { adminGuard, alumnoGuard, invitadoGuard, profesorGuard, sesionGuard } from './core/guards/sesion.guard';
 
 /**
  * Rutas de la aplicación.
@@ -84,6 +84,20 @@ export const routes: Routes = [
         title: 'Calendario · Eduvibe',
         loadComponent: () => import('./paginas/calendario/calendario.component')
           .then(m => m.CalendarioComponent),
+      },
+      {
+        path: 'notas',
+        canActivate: [alumnoGuard],
+        title: 'Notas · Eduvibe',
+        loadComponent: () => import('./paginas/notas/notas.component')
+          .then(m => m.NotasComponent),
+      },
+      {
+        path: 'correcciones',
+        canActivate: [profesorGuard],
+        title: 'Calificar · Eduvibe',
+        loadComponent: () => import('./paginas/correcciones/correcciones.component')
+          .then(m => m.CorreccionesComponent),
       },
       {
         path: 'perfil',

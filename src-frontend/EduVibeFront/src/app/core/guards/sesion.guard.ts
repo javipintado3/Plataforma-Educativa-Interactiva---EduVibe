@@ -22,8 +22,14 @@ export const sesionGuard: CanActivateFn = (_ruta, estado) => {
   return router.createUrlTree(['/login'], { queryParams: { volverA: estado.url } });
 };
 
-/** Exige además rol de administración. */
-export const adminGuard: CanActivateFn = (ruta, estado) => {
+/**
+ * Fabrica un guard que exige sesión y, además, que la persona cumpla el rol.
+ *
+ * Los tres guards por rol eran el mismo código con una pregunta distinta, así
+ * que se comparte el cuerpo y cada uno solo dice cuál es su pregunta. Quien no
+ * cumple vuelve a /clases, que existe para todos los roles.
+ */
+const exigirRol = (cumple: (auth: AuthService) => boolean): CanActivateFn => (_ruta, estado) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -31,8 +37,17 @@ export const adminGuard: CanActivateFn = (ruta, estado) => {
     return router.createUrlTree(['/login'], { queryParams: { volverA: estado.url } });
   }
 
-  return auth.esAdmin() ? true : router.createUrlTree(['/clases']);
+  return cumple(auth) ? true : router.createUrlTree(['/clases']);
 };
+
+/** Exige además rol de administración. */
+export const adminGuard = exigirRol(auth => auth.esAdmin());
+
+/** Exige además rol de profesorado. */
+export const profesorGuard = exigirRol(auth => auth.esProfesor());
+
+/** Exige además rol de alumnado. */
+export const alumnoGuard = exigirRol(auth => auth.esAlumno());
 
 /** Impide volver al login teniendo ya la sesión abierta. */
 export const invitadoGuard: CanActivateFn = () => {

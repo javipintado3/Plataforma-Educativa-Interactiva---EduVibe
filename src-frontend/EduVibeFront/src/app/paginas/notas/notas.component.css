@@ -1,0 +1,52 @@
+.pila {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.materia {
+  padding: 0;
+  overflow: hidden;
+}
+
+.materia-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.materia-color {
+  width: 6px;
+  align-self: stretch;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.materia-titulo {
+  flex: 1;
+  min-width: 0;
+}
+
+.materia-media {
+  text-align: right;
+}
+
+.media {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--verde-700);
+  letter-spacing: -.03em;
+  line-height: 1.1;
+}
+
+.nota {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--verde-700);
+}
+
+.materia-vacia {
+  padding: 16px 18px;
+}

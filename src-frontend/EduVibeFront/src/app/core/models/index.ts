@@ -210,6 +210,20 @@ export interface Entrega {
   groupName: string | null;
 }
 
+/** Una entrega a la espera de corrección, en la cola del profesorado (sin el contenido entregado). */
+export interface EntregaPorCorregir {
+  submissionId: string;
+  assignmentId: string;
+  assignmentTitle: string;
+  classId: string;
+  className: string;
+  studentName: string;
+  /** El subgrupo que la entregó, en una tarea grupal; entonces `studentName` es solo uno de sus miembros. */
+  groupName: string | null;
+  submittedAt: string | null;
+  entregadaTarde: boolean;
+}
+
 export interface Anuncio {
   id: string;
   content: string;
