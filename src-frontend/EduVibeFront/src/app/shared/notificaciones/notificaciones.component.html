@@ -1,0 +1,37 @@
+<div class="menu-notificaciones" data-menu-notificaciones>
+  <button type="button" class="disparador" (click)="alternar()"
+          [attr.aria-expanded]="abierto()" aria-haspopup="true" aria-label="Notificaciones">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="contador" *ngIf="noLeidas() > 0">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+  </button>
+
+  <div class="desplegable" *ngIf="abierto()">
+    <div class="cabecera-desplegable">
+      <p class="fuerte mb-0">Notificaciones</p>
+      <button type="button" class="boton-marcar" *ngIf="noLeidas() > 0"
+              [disabled]="marcandoTodas()" (click)="marcarTodasLeidas($event)">
+        {{ marcandoTodas() ? 'Marcando…' : 'Marcar todo leído' }}
+      </button>
+    </div>
+
+    <app-cargando *ngIf="cargando()"></app-cargando>
+
+    <div class="lista-notificaciones" *ngIf="!cargando()">
+      <app-estado-vacio *ngIf="!notificaciones().length"
+        titulo="Sin notificaciones" descripcion="Aquí aparecerán las novedades de tus clases."></app-estado-vacio>
+
+      <button type="button" class="notificacion" *ngFor="let n of notificaciones()"
+              [class.no-leida]="!n.leida" (click)="irA(n)">
+        <span class="punto" *ngIf="!n.leida" aria-hidden="true"></span>
+        <span class="crecer" style="min-width:0">
+          <span class="texto-notificacion">{{ n.texto }}</span>
+          <span class="pequeno apagado bloque">{{ n.createdAt | fecha }}</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

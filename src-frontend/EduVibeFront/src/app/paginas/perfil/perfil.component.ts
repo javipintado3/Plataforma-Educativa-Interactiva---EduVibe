@@ -15,20 +15,8 @@ import { CargandoComponent } from '../../shared/cargando/cargando.component';
 import { EstadoVacioComponent } from '../../shared/estado-vacio/estado-vacio.component';
 import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
 import { TarjetaClaseComponent } from '../../shared/tarjeta-clase/tarjeta-clase.component';
+import { rutaDeNotificacion } from '../../shared/notificaciones/ruta-notificacion';
 import { FechaPipe } from '../../shared/pipes/fecha.pipe';
-
-/** A qué ruta lleva cada tipo de notificación, según lo que traiga en su payload. */
-function rutaDe(notificacion: Notificacion): string | null {
-  const payload = notificacion.payload ?? {};
-
-  if (notificacion.type === 'announcement_created' && payload['classId']) {
-    return `/clases/${payload['classId']}`;
-  }
-  if ((notificacion.type === 'assignment_created' || notificacion.type === 'grade_published') && payload['assignmentId']) {
-    return `/tareas/${payload['assignmentId']}`;
-  }
-  return null;
-}
 
 /** Cómo se lee cada rol en el desglose de administración. */
 const ETIQUETAS_ROL: Record<string, string> = {
@@ -152,7 +140,7 @@ export class PerfilComponent implements OnInit {
   /** Marca leída y, si la notificación trae dónde ir, navega. */
   irA(notificacion: Notificacion): void {
     this.marcarLeida(notificacion);
-    const ruta = rutaDe(notificacion);
+    const ruta = rutaDeNotificacion(notificacion);
     if (ruta) {
       this.router.navigateByUrl(ruta);
     }

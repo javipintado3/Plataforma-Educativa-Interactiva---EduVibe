@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { TemaService } from '../../core/services/tema.service';
 import { LogoComponent } from '../../shared/logo/logo.component';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { NotificacionesComponent } from '../../shared/notificaciones/notificaciones.component';
 import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-estado.component';
 
 /**
@@ -18,7 +19,10 @@ import { PastillaEstadoComponent } from '../../shared/pastilla-estado/pastilla-e
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [NgIf, RouterLink, RouterLinkActive, LogoComponent, AvatarComponent, PastillaEstadoComponent],
+  imports: [
+    NgIf, RouterLink, RouterLinkActive,
+    LogoComponent, AvatarComponent, NotificacionesComponent, PastillaEstadoComponent,
+  ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
